@@ -1,0 +1,29 @@
+set nocompatible
+set relativenumber
+set number
+set scrolloff=8
+set tabstop=4
+
+command! MakeTags !ctags -R .
+
+call plug#begin()
+
+" Git integration
+Plug 'tpope/vim-fugitive'
+
+" Align stuff
+Plug 'godlygeek/tabular'
+
+" Markdown syntax highlight
+Plug 'plasticboy/vim-markdown'
+
+let g:vim_markdown_folding_disabled = 1
+let g:mkdp_refresh_slow = 1
+let g:mkdp_browser = 'google-chrome-stable'
+
+
+" Markdown preview
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'  }
+
+
+call plug#end()

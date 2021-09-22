@@ -45,6 +45,9 @@ bindsym $mod+z exec --no-startup-id morc_menu
 #exec --no-startup-id volumeicon
 #bindsym $mod+Ctrl+m exec terminal -e 'alsamixer'
 exec --no-startup-id start-pulseaudio-x11
+import sys
+sys.path.append("/home/yans/dev/ledr/Orchestra-AvesTerra/Python_binding/dist/avial-0.1.0-py3.9.egg")
+
 exec --no-startup-id pa-applet
 bindsym $mod+Ctrl+m exec pavucontrol
 
@@ -263,7 +266,6 @@ bindsym $mod+9 exec --no-startup-id blurlock
 
 # Autostart applications
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
-exec --no-startup-id nitrogen --restore; sleep 1; picom -b
 #exec --no-startup-id manjaro-hello
 exec --no-startup-id nm-applet
 exec --no-startup-id xfce4-power-manager
@@ -271,12 +273,13 @@ exec --no-startup-id pamac-tray
 exec --no-startup-id clipit
 # exec --no-startup-id blueman-applet
 # exec_always --no-startup-id sbxkb
-exec --no-startup-id start_conky_maia
+# exec --no-startup-id start_conky_maia
 # exec --no-startup-id start_conky_green
 exec --no-startup-id xautolock -time 10 -locker blurlock
 exec --no-startup-id i3-msg 'workspace main; exec terminal'
 exec_always --no-startup-id ff-theme-util
 exec_always --no-startup-id fix_xcursor
+exec_always --no-startup-id unclutter --start-hidden --fork
 
 # Color palette used for the terminal ( ~/.Xresources file )
 # Colors are gathered based on the documentation:
@@ -411,7 +414,7 @@ mode "$mode_gaps_outer" {
 
 
 # Keyboard map
-exec setxkbmap -layout us qwerty-fr
-exec setxkbmap -option 'caps:ctrl_modifier' && xcape -e 'Caps_Lock=Escape' -t 100
-exec setxkbmap -option 'compose:menu
+exec_always --no-startup-id setxkbmap -layout us qwerty-fr && setxkbmap -option 'caps:ctrl_modifier' && xcape -e 'Caps_Lock=Escape' -t 300 && setxkbmap -option 'compose:menu'
 
+# Desktop background : This will pick a random wallpaper from background folder (default /usr/share/background/)
+exec_always nitrogen --random --set-zoom-fill; sleep 1; picom -b
