@@ -126,6 +126,7 @@ mkcdir ()
 alias gl="git log --oneline --graph --decorate --all"
 alias gocc="cd ~/dev/ledr/Orchestra-AvesTerra/C_client/"
 
+alias la="ls -A"
 
 
 

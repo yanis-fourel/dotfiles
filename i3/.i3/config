@@ -45,9 +45,6 @@ bindsym $mod+z exec --no-startup-id morc_menu
 #exec --no-startup-id volumeicon
 #bindsym $mod+Ctrl+m exec terminal -e 'alsamixer'
 exec --no-startup-id start-pulseaudio-x11
-import sys
-sys.path.append("/home/yans/dev/ledr/Orchestra-AvesTerra/Python_binding/dist/avial-0.1.0-py3.9.egg")
-
 exec --no-startup-id pa-applet
 bindsym $mod+Ctrl+m exec pavucontrol
 
@@ -275,7 +272,7 @@ exec --no-startup-id clipit
 # exec_always --no-startup-id sbxkb
 # exec --no-startup-id start_conky_maia
 # exec --no-startup-id start_conky_green
-exec --no-startup-id xautolock -time 10 -locker blurlock
+exec --no-startup-id xautolock -time 120 -locker blurlock
 exec --no-startup-id i3-msg 'workspace main; exec terminal'
 exec_always --no-startup-id ff-theme-util
 exec_always --no-startup-id fix_xcursor

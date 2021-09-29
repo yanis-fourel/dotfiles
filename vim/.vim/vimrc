@@ -1,12 +1,43 @@
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" SETTINGS                                                                    "
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set nocompatible
 set relativenumber
 set number
 set scrolloff=8
 set tabstop=4
+set hls
+set listchars=tab:\|\ 
+set list
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" REMAPS                                                                      "
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Don't jump to next match on * press
+nnoremap * *``
 
-command! MakeTags !ctags -R .
+" Quick vimrc edit
+nnoremap <leader>v :e $MYVIMRC<CR>
+nnoremap <leader>c :w<CR><C-^>:source $MYVIMRC<CR>
 
+" Go to tab by number
+noremap <leader>1 1gt
+noremap <leader>2 2gt
+noremap <leader>3 3gt
+noremap <leader>4 4gt
+noremap <leader>5 5gt
+noremap <leader>6 6gt
+noremap <leader>7 7gt
+noremap <leader>8 8gt
+noremap <leader>9 9gt
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" PLUGINS                                                                     "
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call plug#begin()
+
+" Theme
+Plug 'morhetz/gruvbox'
 
 " Git integration
 Plug 'tpope/vim-fugitive'
@@ -26,4 +57,21 @@ let g:mkdp_browser = 'google-chrome-stable'
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'  }
 
 
+Plug 'itchyny/lightline.vim'
+set laststatus=2
+set noshowmode " hides vim default '-- INSERT --'
+
+
+Plug 'vifm/vifm.vim'
+
+
+
 call plug#end()
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+
+command! MakeTags !ctags -R .
+
+" Theme
+autocmd vimenter * ++nested colorscheme gruvbox
