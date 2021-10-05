@@ -1,3 +1,5 @@
+let mapleader = " "
+
 
 " Don't jump to next match on * press
 nnoremap * *``

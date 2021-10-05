@@ -3,6 +3,7 @@ set nocompatible
 set relativenumber
 set number
 set scrolloff=8
+set shiftwidth=4
 set tabstop=4
 set hls
 set listchars=tab:\|\ 
@@ -11,7 +12,7 @@ set title
 set ignorecase
 set path+=**
 set wildignore+=*/node_modules/*
-
+set history=200
 
 command! MakeTags !ctags -R .
 
@@ -20,17 +21,17 @@ command! MakeTags !ctags -R .
 """ THEME (note: has to be before LSP initialisation for some reasons
 
 if exists("&termguicolors") && exists("&winblend")
-		syntax enable
-		set termguicolors
+	syntax enable
+	set termguicolors
 
-		let g:gruvbox_invert_selection='0'
-		let g:gruvbox_contrast_dark = 'hard'
+	let g:gruvbox_invert_selection='0'
+	let g:gruvbox_contrast_dark = 'hard'
 
 
-		colorscheme gruvbox
-		"autocmd vimenter * ++nested colorscheme gruvbox
+	colorscheme gruvbox
+	"autocmd vimenter * ++nested colorscheme gruvbox
 
-		set background=dark
+	set background=dark
 
 endif
 
