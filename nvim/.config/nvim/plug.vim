@@ -8,6 +8,12 @@ call plug#begin(stdpath('data') . '/plugged')
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
 
+Plug 'godlygeek/tabular'
+Plug 'romainl/vim-cool'
+
+
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'  }
+
 " Theme
 Plug 'morhetz/gruvbox'
 if has("nvim")

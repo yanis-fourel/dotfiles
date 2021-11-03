@@ -18,5 +18,5 @@ inoremap <silent> <C-h> <Cmd>Lspsaga signature_help<CR>
 nnoremap <silent> <C-h> <Cmd>Lspsaga signature_help<CR>
 nnoremap <silent> <C-k> <Cmd>Lspsaga hover_doc<CR>
 nnoremap <silent> gh <Cmd>Lspsaga lsp_finder<CR>
-
+nnoremap <silent> <leader>r <Cmd>Lspsaga rename<CR>
 

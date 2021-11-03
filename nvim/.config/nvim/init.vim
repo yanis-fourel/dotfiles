@@ -5,14 +5,16 @@ set number
 set scrolloff=8
 set shiftwidth=4
 set tabstop=4
-set hls
 set listchars=tab:\|\ 
 set list
 set title
 set ignorecase
+set smartcase
 set path+=**
 set wildignore+=*/node_modules/*
 set history=200
+" TODO: following does not seem to work
+set formatoptions-=o " don't insert current comment leader when pressing o / O in normal mode
 
 command! MakeTags !ctags -R .
 
