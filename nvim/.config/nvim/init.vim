@@ -45,4 +45,4 @@ runtime ./maps.vim
 
 
 
-
+set guifont=FiraCode:h16

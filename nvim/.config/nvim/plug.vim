@@ -11,6 +11,7 @@ Plug 'tpope/vim-rhubarb'
 Plug 'godlygeek/tabular'
 Plug 'romainl/vim-cool'
 
+Plug 'tree-sitter/tree-sitter', { 'do': 'TSUpdate' }
 
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'  }
 
