@@ -15,6 +15,10 @@ Plug 'tree-sitter/tree-sitter', { 'do': 'TSUpdate' }
 
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'  }
 
+Plug 'mhartington/formatter.nvim'
+
+Plug 'easymotion/vim-easymotion'
+
 " Theme
 Plug 'morhetz/gruvbox'
 if has("nvim")

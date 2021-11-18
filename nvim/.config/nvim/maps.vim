@@ -46,14 +46,6 @@ noremap <leader>7 7gt
 noremap <leader>8 8gt
 noremap <leader>9 9gt
 
-" Disables command line I always get stuck on
-nnoremap q: <Nop>
-
-
-nnoremap <M-H> 5j
-nnoremap <M-j> 5j
-nnoremap <M-k> 5k
-nnoremap <M-l> 5l
 
 
 " Git remaps
