@@ -123,11 +123,15 @@ mkcdir ()
 
 
 # alias
-alias gl="git log --oneline --graph --decorate --all"
+alias gl="git log --oneline --graph --decorate"
+alias gla="git log --oneline --graph --decorate --all"
 alias gocc="cd ~/dev/ledr/Orchestra-AvesTerra/C_client/"
 
 alias la="ls -A"
 alias vi="nvim"
+
+alias python="python3.10"
+alias python3="python3.10"
 
 
 ###############################################################################
@@ -165,3 +169,5 @@ zle -N _zlf_handler
 ###############################################################################
 
 export AESTERRA_LIBS=/home/yanis/dev/ledr/Orchestra-AvesTerra/Python_binding/avial/libs
+export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib
+
