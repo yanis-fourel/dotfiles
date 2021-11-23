@@ -29,10 +29,7 @@ if exists("&termguicolors") && exists("&winblend")
 	let g:gruvbox_invert_selection='0'
 	let g:gruvbox_contrast_dark = 'hard'
 
-
 	colorscheme gruvbox
-	"autocmd vimenter * ++nested colorscheme gruvbox
-
 	set background=dark
 
 endif
@@ -42,7 +39,7 @@ endif
 runtime ./plug.vim
 runtime ./maps.vim
 
-
+cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%'
 
 
 set guifont=FiraCode:h16

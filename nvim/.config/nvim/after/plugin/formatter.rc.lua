@@ -1,3 +1,5 @@
+if not vim.g.loaded_formatter then return end
+
 require('formatter').setup({
   filetype = {
     c = {

@@ -24,9 +24,12 @@ Plug 'morhetz/gruvbox'
 if has("nvim")
     " LSP + autocomplete
     Plug 'neovim/nvim-lspconfig'
-    Plug 'glepnir/lspsaga.nvim'
+"    Plug 'glepnir/lspsaga.nvim'
     Plug 'folke/lsp-colors.nvim'
     Plug 'hrsh7th/nvim-compe'
+	Plug 'ray-x/guihua.lua', {'do': 'cd lua/fzy && make' }
+	Plug 'ray-x/navigator.lua'
+	Plug 'ray-x/lsp_signature.nvim'
 
     " Telescope
     Plug 'nvim-lua/plenary.nvim'

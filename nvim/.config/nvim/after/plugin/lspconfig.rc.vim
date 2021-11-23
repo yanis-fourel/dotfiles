@@ -1,5 +1,8 @@
 if !exists('g:lspconfig') | finish | endif
 
+" The 'Navigator' plugin will configure everithing
+finish
+
 
 
 lua << EOF

@@ -1,3 +1,5 @@
+if not vim.g.loaded_compe then return end
+
 vim.o.completeopt = "menuone,noselect"
 
 require'compe'.setup {
