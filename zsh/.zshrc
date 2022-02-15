@@ -115,7 +115,7 @@ TERM=xterm-256color
 
 
 # functions
-mkcdir ()
+mkcd ()
 {
     mkdir -p -- "$1" &&
       cd -P -- "$1"
@@ -133,41 +133,21 @@ alias vi="nvim"
 alias python="python3.10"
 alias python3="python3.10"
 
+alias fuck="killall -9"
 
-###############################################################################
-# LF integration
-###############################################################################
-_zlf() {
-    emulate -L zsh
-    local d=$(mktemp -d) || return 1
-    {
-        mkfifo -m 600 $d/fifo || return 1
-        tmux split -bf zsh -c "exec {ZLE_FIFO}>$d/fifo; export ZLE_FIFO; exec lf" || return 1
-        local fd
-        exec {fd}<$d/fifo
-        zle -Fw $fd _zlf_handler
-    } always {
-        rm -rf $d
-    }
-}
-zle -N _zlf
-bindkey '\ek' _zlf
+alias wtyping="python /home/yanis/perso/WikipediaTypingPractice/wikityping.py --article"
 
-_zlf_handler() {
-    emulate -L zsh
-    local line
-    if ! read -r line <&$1; then
-        zle -F $1
-        exec {1}<&-
-        return 1
-    fi
-    eval $line
-    zle -R
-}
-zle -N _zlf_handler
+
+
+#bindings
+
+bindkey -s "^n" '. ranger ^M'
+
 
 ###############################################################################
 
 export AESTERRA_LIBS=/home/yanis/dev/ledr/Orchestra-AvesTerra/Python_binding/avial/libs
 export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib
+
+source "/home/yanis/tools/emsdk/emsdk_env.sh"
 
