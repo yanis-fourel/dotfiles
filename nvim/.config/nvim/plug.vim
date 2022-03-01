@@ -8,25 +8,29 @@ call plug#begin(stdpath('data') . '/plugged')
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
 
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-abolish'
+Plug 'tpope/vim-eunuch'
+
 Plug 'godlygeek/tabular'
-Plug 'romainl/vim-cool'
 
 Plug 'tree-sitter/tree-sitter', { 'do': 'TSUpdate' }
 
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'  }
 
-Plug 'mhartington/formatter.nvim'
+Plug 'vimwiki/vimwiki'
 
 Plug 'easymotion/vim-easymotion'
 
-Plug 'tpope/vim-surround'
+Plug 'unblevable/quick-scope'
 
-Plug 'tpope/vim-abolish'
+Plug 'romainl/vim-cool'
 
-Plug 'vimwiki/vimwiki'
+Plug 'rust-lang/rust.vim'
 
 " Theme
 Plug 'morhetz/gruvbox'
+
 
 if has("nvim")
     Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
@@ -48,12 +52,19 @@ if has("nvim")
     Plug 'nvim-lua/plenary.nvim'
     Plug 'nvim-telescope/telescope.nvim'
     Plug 'nvim-telescope/telescope-fzy-native.nvim'
+	Plug 'nvim-lua/popup.nvim'
 
 
 	Plug 'terrortylor/nvim-comment'
 	Plug 'lukas-reineke/indent-blankline.nvim'
 
 	Plug 'ThePrimeagen/harpoon'
+	Plug 'ThePrimeagen/git-worktree.nvim'
+	Plug 'ThePrimeagen/vim-be-good'
+
+	Plug 'hoob3rt/lualine.nvim'
+
+
 
 endif
 

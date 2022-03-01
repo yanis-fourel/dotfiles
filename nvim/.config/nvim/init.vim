@@ -20,11 +20,14 @@ set wildignore+=*/node_modules/*
 set history=200
 " TODO: following does not seem to work
 set formatoptions-=o " don't insert current comment leader when pressing o / O in normal mode
+set wrap
+set linebreak
+set undodir=~/.vimdid
+set undofile
 filetype plugin on
 " }}}
 
 command! MakeTags !ctags -R .
-
 
 
 " {{{ THEME (note: has to be before LSP initialisation for some reasons 
@@ -59,35 +62,21 @@ nmap <leader><leader>z i" {{{occo" }}}kkA
 
 cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%'
 
-" {{{ Map Colemak-dh movements keys
+tnoremap <Esc> <C-\><C-n>
 
-"noremap m h
-"noremap n j
-"noremap e k
-"noremap i l
-"
-"noremap h m
-"noremap j n
-"noremap k e
-"noremap l i
-"
-"noremap M H
-"noremap N J
-"noremap E K
-"noremap I L
-"
-"noremap H M
-"noremap J N
-"noremap K E
-"noremap L I
 
-" }}}
+" {{{ hjkl
+
+" Map j and k to gj/gk, but only when no count is given
+" However, for larger jumps like 6j add the current position to the jump list
+" so that you can use <c-o>/<c-i> to jump to the previous position
+nnoremap <expr> <Down> v:count ? (v:count > 5 ? "m'" . v:count : '') . 'j' : 'gj'
+nnoremap <expr> <Up>   v:count ? (v:count > 5 ? "m'" . v:count : '') . 'k' : 'gk'
 
 noremap <Left> h
-noremap <Up> k
-noremap <Down> j
 noremap <Right> l
 
+" }}}
 
 " Don't jump to next match on * press
 nnoremap * *``
@@ -196,7 +185,6 @@ EOF
 lua<<EOF
 require("harpoon").setup({})
 require("telescope").load_extension('harpoon')
-
 EOF
 
 nnoremap <leader>m :lua require("harpoon.mark").add_file()<CR>
@@ -204,6 +192,153 @@ nnoremap <leader>fm :Telescope harpoon marks<CR>
 
 " }}}
 
+" {{{ git-worktree
+
+lua<<EOF
+require("telescope").load_extension("git_worktree")
+EOF
+
+nnoremap <leader>gn :lua require("telescope").extensions.git_worktree.create_git_worktree()<CR>
+nnoremap <leader>gw :lua require("telescope").extensions.git_worktree.git_worktrees()<CR>
+
+" }}}
+
+" {{{ Easymotion
+
+" let g:EasyMotion_do_mapping = 0 " Disable default mappings
+let g:EasyMotion_smartcase = 1
+
+nmap s <Plug>(easymotion-overwin-line)
+
+let g:EasyMotion_keys = 'neiothluydpfwqcxzmgjbkvsra'
+
+" }}}
+
+" {{{ QuickScope
+
+let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
+
+highlight QuickScopePrimary guifg='#5fffff' gui=underline ctermfg=155 cterm=underline
+highlight QuickScopeSecondary guifg='#999999' gui=underline ctermfg=81 cterm=underline
+
+" }}}
+
+" {{{ Tabularize
+
+nnoremap <leader>=  <cmd>Tabularize /\\(+\\)\\?=/l1r1<CR>
+nnoremap <leader>/  <cmd>Tabularize /\\/\\/<CR>
+nnoremap <leader>\\ <cmd>Tabularize /\\\\$/l1l0<CR>
+nnoremap <leader>.  <cmd>Tabularize /\\W\\zs\\.\\w/l1l0<CR>
+nnoremap <leader>:  <cmd>Tabularize /\\:\\zs\\w*[^\\s]/<CR>
+nnoremap <leader>,  <cmd>Tabularize /\\
+nnoremap <leader>(  <cmd>Tabularize /(/l0l0<CR>
+
+" }}}
+
+" {{{ navigator
+
+lua<<EOF
+require'navigator'.setup({
+	lsp = {
+		format_on_save = false
+	},
+	default_mapping = false,
+	keymaps = {
+		{key = "gr", func = "require('navigator.reference').reference()"},
+		{key = "gd", func = "require('navigator.definition').definition()"},
+		{key = "<leader>ca", mode = "n", func = "require('navigator.codeAction').code_action()"},
+		{key = "<leader>ca", mode = "v", func = "range_code_action()"},
+		{key = "<Leader>re", func = "rename()"},
+		{key = "gL", func = "require('navigator.diagnostics').show_diagnostics()"},
+		{key = "g0", func = "require('navigator.symbols').document_symbols()"},
+		{key = "gW", func = "workspace_symbol()"},
+		{key = "gh", func = "vim.lsp.buf.hover()"},
+
+		{key = "}d", func = "diagnostic.goto_next({ border = 'rounded', max_width = 80})"},
+		{key = "{d", func = "diagnostic.goto_prev({ border = 'rounded', max_width = 80})"},
+		{key = "}r", func = "require('navigator.treesitter').goto_next_usage()"},
+		{key = "{r", func = "require('navigator.treesitter').goto_previous_usage()"},
+		{key = "<leader>l", func = "require('navigator.dochighlight').hi_symbol()"},
+	}
+})
+
+
+local function lspSymbol(name, icon)
+	vim.fn.sign_define(
+		"DiagnosticSign" .. name,
+		{ text = icon, numhl = "DiagnosticDefault" .. name }
+	)
+end
+
+lspSymbol("Error", "")
+lspSymbol("Information", "")
+lspSymbol("Hint", "")
+lspSymbol("Info", "")
+lspSymbol("Warning", "")
+EOF
+
+" }}}
+
+" {{{ lsp_signature
+
+lua require "lsp_signature".setup()
+
+" }}}
+
+" {{{ cmp
+set completeopt=menu,menuone,noselect 
+
+
+lua <<EOF
+local cmp = require'cmp'
+
+cmp.setup({
+	mapping = {
+		['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
+		['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
+		['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
+		['<C-y>'] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
+		['<C-e>'] = cmp.mapping({
+			i = cmp.mapping.abort(),
+			c = cmp.mapping.close(),
+		}),
+
+        ['<Down>'] = cmp.mapping(cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }), {'i', 'c'}),
+        ['<Up>']   = cmp.mapping(cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }), {'i', 'c'}),
+	},
+	sources = cmp.config.sources({
+		{ name = 'nvim_lsp' },
+	}, {
+		{ name = 'buffer' },
+	})
+})
+
+-- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline('/', {
+	sources = {
+		{ name = 'buffer' }
+	}
+})
+
+  -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline(':', {
+	sources = cmp.config.sources({
+		{ name = 'path' }
+	}, {
+		{ name = 'cmdline' }
+	})
+})
+
+-- Setup lspconfig.
+local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+
+local servers = { 'rust_analyzer', 'clangd', 'pyright' }
+for _, lsp in ipairs(servers) do
+	require('lspconfig')[lsp].setup {
+		capabilities = capabilities
+	}
+end
+EOF
 " }}}
 
 " vim: foldlevel=1 foldmethod=marker
