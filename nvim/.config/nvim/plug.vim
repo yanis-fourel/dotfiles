@@ -62,8 +62,15 @@ if has("nvim")
 	Plug 'ThePrimeagen/git-worktree.nvim'
 	Plug 'ThePrimeagen/vim-be-good'
 
-	Plug 'hoob3rt/lualine.nvim'
+	" Status line
+	Plug 'feline-nvim/feline.nvim'
+	Plug 'kyazdani42/nvim-web-devicons'
+	Plug 'lewis6991/gitsigns.nvim' " requires Plenary
 
+	" Plug 'hoob3rt/lualine.nvim'
+
+
+	Plug 'p00f/nvim-ts-rainbow'
 
 
 endif
