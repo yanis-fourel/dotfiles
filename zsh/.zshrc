@@ -126,6 +126,7 @@ mkcd ()
 alias gl="git log --oneline --graph --decorate"
 alias gla="git log --oneline --graph --decorate --all"
 alias gocc="cd ~/dev/ledr/Orchestra-AvesTerra/C_client/"
+alias gs="git status"
 
 alias la="ls -A"
 alias vi="nvim"
