@@ -2,7 +2,10 @@ if exists('g:vscode')
 	runtime ./vscode.vim
 	finish
 endif
+
 " {{{ set
+
+let mapleader = " "
 
 set nocompatible
 set relativenumber
@@ -24,6 +27,12 @@ set wrap
 set linebreak
 set undodir=~/.vimdid
 set undofile
+set guifont=FiraCode:h16
+set mouse=a
+
+" Compiling file: obj/encode/json/print.o -> src/encode/json/print.c:186:78: error: format sp
+set errorformat+=%.%#Compiling\ file%.%#\ ->\ %f:%l:%c%.%#
+
 filetype plugin on
 " }}}
 
@@ -49,14 +58,9 @@ runtime ./plug.vim
 
 
 
-set guifont=FiraCode:h16
-
-" Compiling file: obj/encode/json/print.o -> src/encode/json/print.c:186:78: error: format sp
-set errorformat+=%.%#Compiling\ file%.%#\ ->\ %f:%l:%c%.%#
 
 " {{{ MAPS 
 
-let mapleader = " "
 
 nmap <leader><leader>z i" {{{occo" }}}kkA 
 
@@ -81,9 +85,6 @@ noremap <Right> l
 " Don't jump to next match on * press
 nnoremap * *``
 
-" Quick vimrc edit
-nnoremap <leader>v :e $MYVIMRC<CR>
-nnoremap <leader>c :w<CR><C-^>:source $MYVIMRC<CR>
 
 " {{{ Go to tab by number 
 
@@ -103,22 +104,16 @@ noremap <leader>9 9gt
 " {{{ Git remaps 
 
 nnoremap <leader>gs :G<CR>
-nnoremap <leader>gg :diffger //3<CR>
-nnoremap <leader>gm :diffger //2<CR>
+nnoremap <leader>gg :diffget //2<CR>
+nnoremap <leader>gm :diffget //3<CR>
 
 " }}}
 
-" TODO: this prevents me from navigating with { and } motions...
-" {{{ My version of 'unimpaired' using {} instead of [] because it's easier for me 
-
-nnoremap {q :cprevious<CR>
-nnoremap }q :cnext<CR>
-
-" }}}
 
 " rename with substitute cmd
 map <leader><leader>re yiw:%s///g<c-F>hhhhpla
 
+nnoremap <leader><leader>x <cmd>source %<CR>
 " }}}
 
 " {{{ Plugins
@@ -235,6 +230,40 @@ nnoremap <leader>(  <cmd>Tabularize /(/l0l0<CR>
 
 " }}}
 
+" }}}
+
+
+" {{{ LSP stuffs
+
+lua<<EOF
+local lsp_installer = require("nvim-lsp-installer")
+
+lsp_installer.on_server_ready(function(server)
+	local opts = {}
+
+
+	if server == "denols" then
+		vim.g.markdown_fenced_languages = {
+			"ts=typescript"
+		}
+		opts.init_opt = {
+			enable = true,
+			lint = true,
+			codelens = {
+				references = true,
+				implementations = true
+			}
+		}
+	end
+
+	server:setup(opts)
+end)
+EOF
+
+nnoremap K <cmd>lua vim.lsp.buf.hover()<CR>
+
+" }}}
+
 " {{{ navigator
 
 lua<<EOF
@@ -252,13 +281,18 @@ require'navigator'.setup({
 		{key = "gL", func = "require('navigator.diagnostics').show_diagnostics()"},
 		{key = "g0", func = "require('navigator.symbols').document_symbols()"},
 		{key = "gW", func = "workspace_symbol()"},
-		{key = "gh", func = "vim.lsp.buf.hover()"},
+		{key = "K", func = "vim.lsp.buf.hover()"},
 
-		{key = "}d", func = "diagnostic.goto_next({ border = 'rounded', max_width = 80})"},
-		{key = "{d", func = "diagnostic.goto_prev({ border = 'rounded', max_width = 80})"},
-		{key = "}r", func = "require('navigator.treesitter').goto_next_usage()"},
-		{key = "{r", func = "require('navigator.treesitter').goto_previous_usage()"},
+		{key = "]d", func = "diagnostic.goto_next({ border = 'rounded', max_width = 80})"},
+		{key = "[d", func = "diagnostic.goto_prev({ border = 'rounded', max_width = 80})"},
+		{key = "]r", func = "require('navigator.treesitter').goto_next_usage()"},
+		{key = "[r", func = "require('navigator.treesitter').goto_previous_usage()"},
 		{key = "<leader>l", func = "require('navigator.dochighlight').hi_symbol()"},
+	},
+	lsp_signature_help = true,
+	lsp_installer = true,
+	icons = {
+		-- TODO
 	}
 })
 
@@ -279,25 +313,23 @@ EOF
 
 " }}}
 
-" {{{ lsp_signature
-
-lua require "lsp_signature".setup()
-
-" }}}
-
 " {{{ cmp
 set completeopt=menu,menuone,noselect 
 
 
 lua <<EOF
 local cmp = require'cmp'
+local lspkind = require('lspkind')
 
 cmp.setup({
 	mapping = {
 		['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
 		['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
 		['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
-		['<C-y>'] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
+		['<C-y>'] = cmp.mapping.confirm {
+			behavior = cmp.ConfirmBehavior.Insert,
+			select = true
+		},
 		['<C-e>'] = cmp.mapping({
 			i = cmp.mapping.abort(),
 			c = cmp.mapping.close(),
@@ -308,9 +340,15 @@ cmp.setup({
 	},
 	sources = cmp.config.sources({
 		{ name = 'nvim_lsp' },
-	}, {
-		{ name = 'buffer' },
-	})
+		{ name = 'path' },
+		{ name = 'buffer', keyword_length=5 },
+	}),
+	formatting = {
+		format = lspkind.cmp_format({
+			mode = 'symbol', -- show only symbol annotations
+			maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
+		})
+	},
 })
 
 -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
@@ -332,13 +370,13 @@ cmp.setup.cmdline(':', {
 -- Setup lspconfig.
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 
-local servers = { 'rust_analyzer', 'clangd', 'pyright' }
-for _, lsp in ipairs(servers) do
-	require('lspconfig')[lsp].setup {
-		capabilities = capabilities
-	}
-end
 EOF
+" }}}
+
+" {{{ lsp_extensions
+
+autocmd InsertLeave,BufEnter,BufWinEnter,TabEnter,BufWritePost *.rs :lua require'lsp_extensions'.inlay_hints{ prefix = ' » ', highlight = "NonText", enabled = {"ChainingHint"} }
+
 " }}}
 
 " {{{ ts-rainbow
@@ -372,7 +410,25 @@ EOF
 
 " }}}
 
+lua require('auto-session').setup()
 lua require('gitsigns').setup()
+
+
+"TODO:
+" TAB system: (replaces Harpoon)
+" 2 tab type: 1 *temporary tab*, N *permanent tabs*
+"
+" From a *permanent tab*:
+" When following a reference, or jumping anywhere, it opens the "temporary tab".
+"
+" I can make this tab "permanent" with a shortcut
+"
+" From a *temporary tab*:
+" When following a reference, or jumping anywhere, it replaces the current *temporary tab*
+" Jumping back to a *permanent tab* closes the *temporary tab*
+"
+"
+" Each *permanent tab* displays its buffer name, as well as a label (number, or a letter...) used to jump to the tab
 
 
 " vim: foldlevel=1 foldmethod=marker

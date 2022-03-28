@@ -11,6 +11,7 @@ Plug 'tpope/vim-rhubarb'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-eunuch'
+Plug 'tpope/vim-unimpaired'
 
 Plug 'godlygeek/tabular'
 
@@ -28,6 +29,8 @@ Plug 'romainl/vim-cool'
 
 Plug 'rust-lang/rust.vim'
 
+Plug 'preservim/nerdtree'
+
 " Theme
 Plug 'morhetz/gruvbox'
 
@@ -39,11 +42,13 @@ if has("nvim")
     Plug 'neovim/nvim-lspconfig'
 "    Plug 'glepnir/lspsaga.nvim'
 "    Plug 'folke/lsp-colors.nvim'
+	Plug 'hrsh7th/nvim-cmp'
 	Plug 'hrsh7th/cmp-nvim-lsp'
 	Plug 'hrsh7th/cmp-buffer'
 	Plug 'hrsh7th/cmp-path'
 	Plug 'hrsh7th/cmp-cmdline'
-	Plug 'hrsh7th/nvim-cmp'
+	Plug 'onsails/lspkind-nvim'
+	Plug 'nvim-lua/lsp_extensions.nvim'
 	Plug 'ray-x/guihua.lua', {'do': 'cd lua/fzy && make' }
 	Plug 'ray-x/navigator.lua'
 	Plug 'ray-x/lsp_signature.nvim'
@@ -72,7 +77,9 @@ if has("nvim")
 
 	Plug 'p00f/nvim-ts-rainbow'
 
+	Plug 'rmagatti/auto-session'
 
+	Plug 'williamboman/nvim-lsp-installer'
 endif
 
 call plug#end()
