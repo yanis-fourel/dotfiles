@@ -106,6 +106,7 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 
+NVIM_CONFIG_DIR="~/.dotfiles/nvim/.config/nvim/"
 
 bindkey "^ " autosuggest-accept
 bindkey "^[[A" history-beginning-search-backward
@@ -127,6 +128,7 @@ alias gl="git log --oneline --graph --decorate"
 alias gla="git log --oneline --graph --decorate --all"
 alias gocc="cd ~/dev/ledr/Orchestra-AvesTerra/C_client/"
 alias gs="git status"
+alias fastclone="git clone --depth=1 --recurse-submodules --shallow-submodules "
 
 alias la="ls -A"
 alias vi="nvim"
@@ -138,6 +140,10 @@ alias fuck="killall -9"
 
 alias wtyping="python /home/yanis/perso/WikipediaTypingPractice/wikityping.py --article"
 
+# Vim Config
+alias vc="vi $NVIM_CONFIG_DIR/init.* --cmd 'cd %:h'"
+
+alias webidl_binder="$EMSDK/upstream/emscripten/tools/webidl_binder"
 
 
 #bindings
