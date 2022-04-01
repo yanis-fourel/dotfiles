@@ -1,0 +1,18 @@
+PRE_COMMIT_STOP_TOKEN="DZ_COMMIT"
+PRE_COMMIT_STOP_TOKEN="${PRE_COMMIT_STOP_TOKEN}_STOP" # separating it so that it doesn't prevent itself from being commited in my dotfiles
+
+
+files_to_scan=$(git diff --cached --diff-filter=d --name-only)
+results=$(grep -Hn $PRE_COMMIT_STOP_TOKEN $files_to_scan | sed 's/^\([^:]\+\):\([^:]\+\):\(.*\)$/\1:\2 -> \3/')
+
+if [ -n "$results" ]
+then
+
+echo "Error: $PRE_COMMIT_STOP_TOKEN found:"
+echo "$results"
+echo "Aborting commit"
+exit 1
+
+fi
+
+
