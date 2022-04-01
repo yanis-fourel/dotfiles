@@ -74,7 +74,7 @@ plugins=(
 	git
 	zsh-autosuggestions
 #	web-search
-	dirhistory
+#	dirhistory
 )
 
 source $ZSH/oh-my-zsh.sh
