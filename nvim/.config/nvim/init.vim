@@ -63,6 +63,7 @@ runtime ./plug.vim
 
 
 nmap <leader><leader>z i" {{{occo" }}}kkA 
+nmap <leader><leader>dc iDZ_DONT_COMMIT<ESC>
 
 cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%'
 
@@ -149,13 +150,19 @@ local actions = require('telescope.actions')
 
 require('telescope').setup {
 	defaults = {
+		mappings = {
+			i = {
+				['<C-q>'] = actions.smart_add_to_qflist + actions.open_qflist,
+			},
+		},
+		
 		file_sorter = require('telescope.sorters').get_fzy_sorter,
 		prompt_prefix = ' >',
 
 		file_previewer   = require('telescope.previewers') .vim_buffer_cat.new,
 		grep_previewer   = require('telescope.previewers') .vim_buffer_vimgrep.new,
 		qflist_previewer = require('telescope.previewers') .vim_buffer_qflist.new,
-		},
+	},
 	extensions = {
 		fzy_native = { 
 			override_generic_sorter = false,
@@ -261,11 +268,17 @@ end)
 EOF
 
 nnoremap K <cmd>lua vim.lsp.buf.hover()<CR>
+nnoremap gd <cmd>lua vim.lsp.buf.definition()<CR>
+nnoremap gi <cmd>lua vim.lsp.buf.implementation()<CR>
+
+" overwritten 'go into insert mode at position one last left insert mode'
+nnoremap ggi gi
 
 " }}}
 
 " {{{ navigator
 
+" TODO: This does not seem to work anymore...
 lua<<EOF
 require'navigator'.setup({
 	lsp = {
@@ -274,14 +287,12 @@ require'navigator'.setup({
 	default_mapping = false,
 	keymaps = {
 		{key = "gr", func = "require('navigator.reference').reference()"},
-		{key = "gd", func = "require('navigator.definition').definition()"},
 		{key = "<leader>ca", mode = "n", func = "require('navigator.codeAction').code_action()"},
 		{key = "<leader>ca", mode = "v", func = "range_code_action()"},
 		{key = "<Leader>re", func = "rename()"},
 		{key = "gL", func = "require('navigator.diagnostics').show_diagnostics()"},
 		{key = "g0", func = "require('navigator.symbols').document_symbols()"},
 		{key = "gW", func = "workspace_symbol()"},
-		{key = "K", func = "vim.lsp.buf.hover()"},
 
 		{key = "]d", func = "diagnostic.goto_next({ border = 'rounded', max_width = 80})"},
 		{key = "[d", func = "diagnostic.goto_prev({ border = 'rounded', max_width = 80})"},
@@ -429,6 +440,7 @@ lua require('gitsigns').setup()
 "
 "
 " Each *permanent tab* displays its buffer name, as well as a label (number, or a letter...) used to jump to the tab
+" check https://github.com/noib3/nvim-cokeline   this may be a good 'framework' to make is happen
 
 
 " vim: foldlevel=1 foldmethod=marker

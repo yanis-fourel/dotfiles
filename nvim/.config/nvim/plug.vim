@@ -31,6 +31,8 @@ Plug 'rust-lang/rust.vim'
 
 Plug 'preservim/nerdtree'
 
+Plug 'alx741/vinfo'
+
 " Theme
 Plug 'morhetz/gruvbox'
 
