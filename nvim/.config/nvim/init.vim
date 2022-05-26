@@ -7,6 +7,7 @@ endif
 
 let mapleader = " "
 
+set encoding=utf-8
 set nocompatible
 set relativenumber
 set number
@@ -19,16 +20,15 @@ set title
 set ignorecase
 set smartcase
 set path+=**
-set wildignore+=*/node_modules/*
+set wildignore+=**/node_modules/*
 set history=200
-" TODO: following does not seem to work
-set formatoptions-=o " don't insert current comment leader when pressing o / O in normal mode
 set wrap
 set linebreak
 set undodir=~/.vimdid
 set undofile
 set guifont=FiraCode:h16
 set mouse=a
+set laststatus=3
 
 " Compiling file: obj/encode/json/print.o -> src/encode/json/print.c:186:78: error: format sp
 set errorformat+=%.%#Compiling\ file%.%#\ ->\ %f:%l:%c%.%#
@@ -63,7 +63,15 @@ runtime ./plug.vim
 
 
 nmap <leader><leader>z i" {{{occo" }}}kkA 
-nmap <leader><leader>dc iDZ_DONT_COMMIT<ESC>
+nmap <leader><leader>cs aDZ_COMMIT_STOP<ESC>
+imap <C-c><C-s> DZ_COMMIT_STOP
+
+nnoremap <leader>>> >i{
+nnoremap <leader><< <i{
+
+nnoremap <leader><leader>s <cmd>silent! source %<CR>
+
+nnoremap / /\v
 
 cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%'
 
@@ -75,11 +83,11 @@ tnoremap <Esc> <C-\><C-n>
 " Map j and k to gj/gk, but only when no count is given
 " However, for larger jumps like 6j add the current position to the jump list
 " so that you can use <c-o>/<c-i> to jump to the previous position
-nnoremap <expr> <Down> v:count ? (v:count > 5 ? "m'" . v:count : '') . 'j' : 'gj'
-nnoremap <expr> <Up>   v:count ? (v:count > 5 ? "m'" . v:count : '') . 'k' : 'gk'
+nmap <expr> <Down> v:count ? (v:count > 5 ? "m'" . v:count : '') . 'j' : 'gj'
+nmap <expr> <Up>   v:count ? (v:count > 5 ? "m'" . v:count : '') . 'k' : 'gk'
 
-noremap <Left> h
-noremap <Right> l
+nmap <Left> h
+nmap <Right> l
 
 " }}}
 
@@ -237,6 +245,29 @@ nnoremap <leader>(  <cmd>Tabularize /(/l0l0<CR>
 
 " }}}
 
+
+" {{{ Whitespace dispay
+
+" 
+
+let g:indent_blankline_show_first_indent_level = v:false
+let g:indent_blankline_char_list_blankline     = ['|', '┆', '¦', '']
+let g:indent_blankline_char_list               = ['|', '┆', '¦', '']
+
+lua<<EOF
+
+vim.opt.list = true
+vim.opt.listchars:append("eol:↴")
+vim.opt.listchars:append("space:⋅")
+                        
+require("indent_blankline").setup {
+
+}
+
+EOF
+
+" }}}
+
 " }}}
 
 
@@ -264,15 +295,24 @@ lsp_installer.on_server_ready(function(server)
 	end
 
 	server:setup(opts)
+
+	require "lsp_signature".on_attach({
+		floating_window = false,
+		hint_prefix = "",
+		hi_parameter = "LspSignatureActiveParameter",
+		toggle_key = "<M-x>"
+	})
 end)
 EOF
 
 nnoremap K <cmd>lua vim.lsp.buf.hover()<CR>
 nnoremap gd <cmd>lua vim.lsp.buf.definition()<CR>
 nnoremap gi <cmd>lua vim.lsp.buf.implementation()<CR>
+nnoremap ]d <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
+nnoremap [d <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
 
 " overwritten 'go into insert mode at position one last left insert mode'
-nnoremap ggi gi
+nnoremap <leader>gi gi
 
 " }}}
 
@@ -386,7 +426,8 @@ EOF
 
 " {{{ lsp_extensions
 
-autocmd InsertLeave,BufEnter,BufWinEnter,TabEnter,BufWritePost *.rs :lua require'lsp_extensions'.inlay_hints{ prefix = ' » ', highlight = "NonText", enabled = {"ChainingHint"} }
+" TODO: make that work for rust
+" autocmd InsertLeave,BufEnter,BufWinEnter,TabEnter,BufWritePost *.rs :lua require'lsp_extensions'.inlay_hints{ prefix = ' » ', highlight = "NonText", enabled = {"ChainingHint"} }
 
 " }}}
 
@@ -411,7 +452,7 @@ EOF
 
 " }}}
 
-" {{{ feline
+" {{{ status line
 
 lua<<EOF
 

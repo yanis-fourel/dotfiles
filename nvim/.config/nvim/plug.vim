@@ -33,6 +33,10 @@ Plug 'preservim/nerdtree'
 
 Plug 'alx741/vinfo'
 
+Plug 'KabbAmine/vCoolor.vim'
+
+Plug 'mg979/vim-visual-multi'
+
 " Theme
 Plug 'morhetz/gruvbox'
 
