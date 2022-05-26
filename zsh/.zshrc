@@ -140,6 +140,9 @@ alias fuck="killall -9"
 
 alias wtyping="python /home/yanis/perso/WikipediaTypingPractice/wikityping.py --article"
 
+# make with multiple jobs and (most of the time) proper output
+alias makej="make -j -Otarget --no-print-directory"
+
 # Vim Config
 alias vc="vi $NVIM_CONFIG_DIR/init.* --cmd 'cd %:h'"
 
@@ -156,5 +159,23 @@ bindkey -s "^n" '. ranger ^M'
 export AESTERRA_LIBS=/home/yanis/dev/ledr/Orchestra-AvesTerra/Python_binding/avial/libs
 export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib
 
-source "/home/yanis/tools/emsdk/emsdk_env.sh"
+source "/home/yanis/tools/emsdk/emsdk_env.sh" &> /dev/null
 
+
+
+# source: https://gist.github.com/knadh/123bca5cfdae8645db750bfb49cb44b0
+function preexec() {
+  timer=$(($(date +%s%0N)*0.000000001))
+}
+
+function precmd() {
+  if [ $timer ]; then
+    now=$(($(date +%s%0N)*0.000000001))
+    elapsed=$(echo $(($now-$timer)) | awk '{printf "%.3f", $1}')
+
+    export RPROMPT="%F{cyan}${elapsed}s %{$reset_color%}"
+    unset timer
+  else
+    export RPROMPT=""
+  fi
+}
