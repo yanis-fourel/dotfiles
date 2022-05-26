@@ -57,7 +57,7 @@ bindsym $mod+Ctrl+m exec pavucontrol
 
 # Start Applications
 bindsym $mod+Ctrl+b exec terminal -e 'bmenu'
-# bindsym $mod+F1 exec pcmanfm
+bindsym $mod+e exec pcmanfm
 # bindsym $mod+Shift+F1 exec pcmanfm_pkexec
 # bindsym $mod+F2 exec google-chrome-stable
 # bindsym $mod+F3 exec spotify
@@ -75,16 +75,16 @@ bindsym $mod+Ctrl+x --release exec --no-startup-id xkill
 # focus_follows_mouse no
 
 # change focus
-bindsym $mod+m focus left
-bindsym $mod+n focus down
-bindsym $mod+e focus up
-bindsym $mod+i focus right
+# bindsym $mod+m focus left
+# bindsym $mod+n focus down
+# bindsym $mod+e focus up
+# bindsym $mod+i focus right
 
 # move focused window
-bindsym $mod+Shift+m move left
-bindsym $mod+Shift+n move down
-bindsym $mod+Shift+e move up
-bindsym $mod+Shift+i move right
+# bindsym $mod+Shift+m move left
+# bindsym $mod+Shift+n move down
+# bindsym $mod+Shift+e move up
+# bindsym $mod+Shift+i move right
 
 # workspace back and forth (with/without active container)
 workspace_auto_back_and_forth no
