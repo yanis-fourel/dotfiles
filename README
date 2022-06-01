@@ -1,0 +1,4 @@
+use `stow` to install these.
+
+usage of stow:
+`stow nvim` will 'install' everything in the 'nvim' folder in '..', so if this repo was cloned in ~, `stow nvim` is enough to 'install' the nvim dotfiles
