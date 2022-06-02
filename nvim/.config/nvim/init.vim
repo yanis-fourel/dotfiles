@@ -39,18 +39,6 @@ filetype plugin on
 command! MakeTags !ctags -R .
 
 
-" {{{ THEME (note: has to be before LSP initialisation for some reasons 
-if exists("&termguicolors") && exists("&winblend")
-	syntax enable
-	set termguicolors
-
-	let g:gruvbox_invert_selection='0'
-	let g:gruvbox_contrast_dark = 'hard'
-
-	colorscheme gruvbox
-	set background=dark
-endif
-" }}}
 
 
 
@@ -275,12 +263,13 @@ EOF
 
 lua<<EOF
 local lsp_installer = require("nvim-lsp-installer")
+local lspconfig = require("lspconfig")
 
-lsp_installer.on_server_ready(function(server)
+local function on_attach(client)
 	local opts = {}
 
 
-	if server == "denols" then
+	if client == "denols" then
 		vim.g.markdown_fenced_languages = {
 			"ts=typescript"
 		}
@@ -294,7 +283,7 @@ lsp_installer.on_server_ready(function(server)
 		}
 	end
 
-	server:setup(opts)
+	client:setup(opts)
 
 	require "lsp_signature".on_attach({
 		floating_window = false,
@@ -302,7 +291,10 @@ lsp_installer.on_server_ready(function(server)
 		hi_parameter = "LspSignatureActiveParameter",
 		toggle_key = "<M-x>"
 	})
-end)
+end
+
+lspconfig.clangd.setup { on_attach = on_attach }
+
 EOF
 
 nnoremap K <cmd>lua vim.lsp.buf.hover()<CR>
@@ -465,6 +457,18 @@ EOF
 lua require('auto-session').setup()
 lua require('gitsigns').setup()
 
+" {{{ Theme
+if exists("&termguicolors") && exists("&winblend")
+	set background=dark
+	syntax enable
+	set termguicolors
+
+	let g:gruvbox_invert_selection='0'
+	let g:gruvbox_contrast_dark = 'hard'
+
+	colorscheme gruvbox
+endif
+" }}}
 
 "TODO:
 " TAB system: (replaces Harpoon)
