@@ -17,7 +17,7 @@ disabled = false
 symbol = ""
 
 [directory]
-format = "[$repo_root$path]($style)[$read_only]($read_only_style) "
+repo_root_style = "yellow dimmed"
 
 [cmd_duration]
 show_milliseconds = false
