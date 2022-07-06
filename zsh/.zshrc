@@ -164,18 +164,20 @@ source "/home/yanis/tools/emsdk/emsdk_env.sh" &> /dev/null
 
 
 # source: https://gist.github.com/knadh/123bca5cfdae8645db750bfb49cb44b0
-function preexec() {
-  timer=$(($(date +%s%0N)*0.000000001))
-}
+# function preexec() {
+#   timer=$(($(date +%s%0N)*0.000000001))
+# }
+#
+# function precmd() {
+#   if [ $timer ]; then
+#     now=$(($(date +%s%0N)*0.000000001))
+#     elapsed=$(echo $(($now-$timer)) | awk '{printf "%.3f", $1}')
+#
+#     export RPROMPT="%F{cyan}${elapsed}s %{$reset_color%}"
+#     unset timer
+#   else
+#     export RPROMPT=""
+#   fi
+# }
 
-function precmd() {
-  if [ $timer ]; then
-    now=$(($(date +%s%0N)*0.000000001))
-    elapsed=$(echo $(($now-$timer)) | awk '{printf "%.3f", $1}')
-
-    export RPROMPT="%F{cyan}${elapsed}s %{$reset_color%}"
-    unset timer
-  else
-    export RPROMPT=""
-  fi
-}
+eval "$(starship init zsh)"
