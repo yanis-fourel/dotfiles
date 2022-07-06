@@ -29,6 +29,7 @@ set undofile
 set guifont=FiraCode:h16
 set mouse=a
 set laststatus=3
+set termguicolors
 
 " Compiling file: obj/encode/json/print.o -> src/encode/json/print.c:186:78: error: format sp
 set errorformat+=%.%#Compiling\ file%.%#\ ->\ %f:%l:%c%.%#
@@ -233,7 +234,6 @@ nnoremap <leader>(  <cmd>Tabularize /(/l0l0<CR>
 
 " }}}
 
-
 " {{{ Whitespace dispay
 
 " 
@@ -256,6 +256,15 @@ EOF
 
 " }}}
 
+" {{{ Hierarchy viewer (litee)
+
+lua << EOF
+require('litee.lib').setup({})
+require('litee.calltree').setup({})
+EOF
+
+" }}}
+
 " }}}
 
 
@@ -268,32 +277,22 @@ local lspconfig = require("lspconfig")
 local function on_attach(client)
 	local opts = {}
 
-
-	if client == "denols" then
-		vim.g.markdown_fenced_languages = {
-			"ts=typescript"
-		}
-		opts.init_opt = {
-			enable = true,
-			lint = true,
-			codelens = {
-				references = true,
-				implementations = true
-			}
-		}
-	end
+	print("Attaching " + client + " lsp")
 
 	client:setup(opts)
 
-	require "lsp_signature".on_attach({
-		floating_window = false,
-		hint_prefix = "",
-		hi_parameter = "LspSignatureActiveParameter",
-		toggle_key = "<M-x>"
-	})
 end
 
+require "lsp_signature".on_attach({
+	floating_window = false,
+	hint_prefix = "",
+	hi_parameter = "LspSignatureActiveParameter",
+	toggle_key = "<M-x>"
+})
+
 lspconfig.clangd.setup { on_attach = on_attach }
+lspconfig.rust_analyzer.setup { on_attach = on_attach }
+lspconfig.tsserver.setup { on_attach = on_attach }
 
 EOF
 
@@ -461,7 +460,6 @@ lua require('gitsigns').setup()
 if exists("&termguicolors") && exists("&winblend")
 	set background=dark
 	syntax enable
-	set termguicolors
 
 	let g:gruvbox_invert_selection='0'
 	let g:gruvbox_contrast_dark = 'hard'

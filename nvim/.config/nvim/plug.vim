@@ -86,6 +86,9 @@ if has("nvim")
 	Plug 'rmagatti/auto-session'
 
 	Plug 'williamboman/nvim-lsp-installer'
+
+	Plug 'ldelossa/litee.nvim'
+	Plug 'ldelossa/litee-calltree.nvim'
 endif
 
 call plug#end()
