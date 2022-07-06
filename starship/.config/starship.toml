@@ -12,9 +12,16 @@ success_symbol = "[➜](bold green)" # The "success_symbol" segment is being set
 [battery]
 disabled = true
 
+[status]
+disabled = false
+symbol = ""
+
+[directory]
+format = "[$repo_root$path]($style)[$read_only]($read_only_style) "
+
 [cmd_duration]
 show_milliseconds = false
-show_notification = true
+show_notifications = true
 
 [git_metrics]
 disabled = true
