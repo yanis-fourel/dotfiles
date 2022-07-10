@@ -2,14 +2,28 @@ local cmp = require('cmp')
 
 vim.o.completeopt = "menu,menuone,preview,noinsert,longest"
 
+
 cmp.setup({
 	config = {
 		disable = true, -- disables default config
 	},
-	-- snippet support was disabled in lsp capabilities
+	snippet = {
+		expand = function(args)
+			require("luasnip").lsp_expand(args.body)
+		end,
+	},
 	formatting = {
 		format = require('lspkind').cmp_format({
-			mode = 'symbol', -- show only symbol annotations
+			menu = {
+				buffer = "[buf]",
+				nvim_lsp = "[LSP]",
+				nvim_lua = "[api]",
+				path = "[path]",
+				luasnip = "[snip]",
+				ghissues = "[issues]",
+				tn = "[TabNine]",
+			},
+			mode = 'symbol_text', -- show only symbol annotations
 			maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
 		})
 	},
@@ -26,10 +40,10 @@ cmp.setup({
 		{ name = 'nvim_lsp' },
 		{ name = 'nvim_lua' },
 		{ name = 'path' },
-	}, {
-		{ name = 'buffer' },
+		{ name = 'buffer', keyword_length = 5 },
 	}),
 	experimental = {
+		native_menu = false,
 		ghost_text = true
 	},
 	matching = {
@@ -65,6 +79,7 @@ cmp.setup.cmdline(':', {
 })
 
 
+-- ray-x's lsp_signature
 require('lsp_signature').setup({
   debug = false, -- set to true to enable debug logging
   log_path = vim.fn.stdpath("cache") .. "/lsp_signature.log", -- log dir when debug is on

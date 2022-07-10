@@ -1,4 +1,4 @@
-require('packer').startup(function()
+require('packer').startup(function(use)
 
 	-- Core
 	use  'wbthomason/packer.nvim'
@@ -11,7 +11,7 @@ require('packer').startup(function()
 	use  'BurntSushi/ripgrep'
 	use {'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
 	-- check out https://github.com/nvim-telescope/telescope.nvim/wiki/Extensions lol
-	
+
 	-- LSP + autocomplete
 	use  'neovim/nvim-lspconfig'
 	use  'williamboman/nvim-lsp-installer'
@@ -24,6 +24,9 @@ require('packer').startup(function()
 	use  'hrsh7th/cmp-cmdline'
 	use  'onsails/lspkind.nvim' -- icons in the completion list
 	use  'ray-x/lsp_signature.nvim'
+	use  'L3MON4D3/LuaSnip'
+
+	use {'simrat39/rust-tools.nvim', config = function() require('rust-tools').setup({}) end }
 
 	-- LUA
 	use 'euclidianAce/BetterLua.vim'

@@ -5,10 +5,12 @@ require('maps')
 require('plugins')
 
 require('ui')
+require('lsp')
 
 --[[
 TODOS:
 
+* fix last bindings
 * make telescope preview wider
 * check the rust capabilities for LSP, and maybe fix the 'receive end before begin' error
 * sexy code_action with telescope
