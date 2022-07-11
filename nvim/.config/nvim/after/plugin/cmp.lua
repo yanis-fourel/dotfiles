@@ -33,7 +33,15 @@ cmp.setup({
 		['<C-f>'] = cmp.mapping.scroll_docs(4),
 		['<C-e>'] = cmp.mapping.abort(),
 		['<C-Space>'] = cmp.mapping.complete(),
-		['<Tab>'] = cmp.mapping.confirm({ select = true, 'i', 'c'}),
+		['<C-n>'] = cmp.mapping(function(fallback)
+			if cmp.visible() then
+				cmp.confirm({ select = true })
+			elseif luasnip.expand_or_jumpable() then
+				luasnip.expand_or_jump()
+			else
+				fallback()
+			end
+		end, { 'i', 'c' }),
 		['<Up>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
 		['<Down>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select })
 	},

@@ -26,7 +26,7 @@ require('packer').startup(function(use)
 	use  'ray-x/lsp_signature.nvim'
 	use  'L3MON4D3/LuaSnip'
 
-	use {'simrat39/rust-tools.nvim', config = function() require('rust-tools').setup({}) end }
+	use  'simrat39/rust-tools.nvim'
 
 	-- LUA
 	use 'euclidianAce/BetterLua.vim'

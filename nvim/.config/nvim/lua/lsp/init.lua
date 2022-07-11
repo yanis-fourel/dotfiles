@@ -15,8 +15,6 @@ vim.keymap.set('n', '<leader>gi', 'gi') -- overwritten 'go into insert mode at p
 -- local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 
-capabilities.textDocument.completion.completionItem.snippetSupport = false
-table.remove(capabilities.textDocument.completion.completionItemKind.valueSet, 15) -- removing 'snippet'
 -- vim.pretty_print(capabilities)
 
 
