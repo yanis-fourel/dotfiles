@@ -30,7 +30,7 @@ require('packer').startup(function(use)
 
 	-- LUA
 	use 'euclidianAce/BetterLua.vim'
---	use 'tjdevries/nlua.nvim' -- check if hrsh7th/cmp-nvim-lua isn't enough
+	-- use 'tjdevries/nlua.nvim' -- check if hrsh7th/cmp-nvim-lua isn't enough
 
 	-- Git
 	use {'lewis6991/gitsigns.nvim', config = function() require('gitsigns').setup() end }
@@ -39,14 +39,13 @@ require('packer').startup(function(use)
 	-- look
 	use  'ellisonleao/gruvbox.nvim'
 	use {'kyazdani42/nvim-web-devicons', config = function() require('nvim-web-devicons').setup() end }
-	use  'p00f/nvim-ts-rainbow'
 	use  'lukas-reineke/indent-blankline.nvim'
 	use {'norcalli/nvim-colorizer.lua', config = function() require('colorizer').setup() end }
 
 	use  'feline-nvim/feline.nvim'
 
 	-- misc
-	use {'rmagatti/auto-session', config = function() require('auto-session').setup() end }
+	use {'rmagatti/auto-session', config = function() require('auto-session').setup({}) end }
 	use  'numToStr/Comment.nvim'
 	use  'godlygeek/tabular'
 	use  'romainl/vim-cool'
@@ -56,6 +55,7 @@ require('packer').startup(function(use)
 	use  'tpope/vim-abolish'
 	use  'tpope/vim-eunuch'
 	use  'tpope/vim-unimpaired'
+	-- use  'tpope/vim-sleuth'
 	use  'vimwiki/vimwiki'
 	use {'unblevable/quick-scope', config = function() vim.cmd( -- config doesn't work if ran in 'after/plugin'
 		[[

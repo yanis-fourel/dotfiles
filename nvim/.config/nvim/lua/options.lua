@@ -4,6 +4,7 @@ vim.o.number         = true
 vim.o.scrolloff      = 8
 vim.o.shiftwidth     = 4
 vim.o.tabstop        = 4
+vim.o.expandtab      = false
 vim.o.list           = true
 vim.o.title          = true
 vim.o.ignorecase     = true
@@ -22,3 +23,8 @@ vim.o.termguicolors  = true
 
 -- Compiling file: obj/encode/json/print.o -> src/encode/json/print.c:186:78: error: format sp
 vim.o.errorformat = vim.o.errorformat .. '%.%#Compiling file%.%# -> %f:%l:%c%.%#'
+
+
+
+local dirtyfix_group = vim.api.nvim_create_augroup('dirtyfix_group', { clear = true })
+vim.api.nvim_create_autocmd('BufEnter', { pattern = '*', command = "set noexpandtab", group = dirtyfix_group })

@@ -31,7 +31,7 @@ M.setup = function(capabilities)
 			inlay_hints = {
 
 				-- Only show inlay hints for the current line
-				only_current_line = false,
+				only_current_line = true,
 
 				-- Event which triggers a refersh of the inlay hints.
 				-- You can make this "CursorMoved" or "CursorMoved,CursorMovedI" but
@@ -46,7 +46,7 @@ M.setup = function(capabilities)
 
 				-- whether to show variable name before type hints with the inlay hints or not
 				-- default: false
-				show_variable_name = false,
+				show_variable_name = true,
 
 				-- prefix for parameter hints
 				-- default: "<-"
