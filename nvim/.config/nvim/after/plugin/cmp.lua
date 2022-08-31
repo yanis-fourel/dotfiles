@@ -4,7 +4,6 @@ local luasnip = require('luasnip')
 vim.o.completeopt = "menu,menuone,preview,noinsert,longest"
 
 
-
 cmp.setup({
 	config = {
 		disable = true, -- disables default config
@@ -28,6 +27,17 @@ cmp.setup({
 			mode = 'symbol_text', -- show only symbol annotations
 			maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
 		})
+	},
+	sorting = {
+		comparators = {
+			cmp.config.compare.score,
+			cmp.config.compare.offset,
+			cmp.config.compare.exact,
+			-- cmp.config.compare.kind,
+			cmp.config.compare.sort_text,
+			cmp.config.compare.length,
+			cmp.config.compare.order,
+		}
 	},
 	mapping = {
 		['<C-b>'] = cmp.mapping.scroll_docs(-4),

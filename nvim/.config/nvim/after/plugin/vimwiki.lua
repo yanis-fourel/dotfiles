@@ -19,5 +19,5 @@ vim.keymap.set('v', '<leader><CR>', '<C-[>a]]<C-[>`<i[[<C-[>%l')
 
 
 -- Custom command to open Avesterra wiki
-vim.keymap.set('n', '<leader>wk', ':e ~/dev/ledr/Orchestra-AvesTerra.wiki/Home.md<CR>')
+vim.keymap.set('n', '<leader><leader>wk', ':e ~/dev/ledr/Orchestra-AvesTerra.wiki/Home.md<CR>')
 

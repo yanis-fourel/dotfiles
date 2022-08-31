@@ -65,5 +65,7 @@ require('packer').startup(function(use)
 			highlight QuickScopeSecondary guifg='#999999' gui=underline ctermfg=81 cterm=underline
 		]])
 	end }
+	use  'mechatroner/rainbow_csv'
+	use  'drybalka/tree-climber.nvim'
 end)
 

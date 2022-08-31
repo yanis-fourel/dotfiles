@@ -8,6 +8,8 @@ vim.keymap.set('n','<leader><leader>s', '<cmd>silent! source %<CR>')
 
 vim.keymap.set('n','/', '/\\v')
 
+vim.keymap.set('n','^', '0^', { noremap = true })
+
 -- TODO: vim.keymap.set('c','<expr>', '%% getcmdtype() == ':' ? expand('%:h').'/' : '%%'')
 
 vim.keymap.set('t','<Esc>', '<C-\\><C-n>')

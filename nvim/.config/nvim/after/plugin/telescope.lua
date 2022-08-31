@@ -45,6 +45,8 @@ require('telescope').setup {
 				},
 			},
 		},
+
+		sorting_strategy = "ascending",
 		file_sorter = require('telescope.sorters').get_fzf_sorter,
 
 		file_previewer   = require('telescope.previewers') .vim_buffer_cat.new,
@@ -62,9 +64,9 @@ require('telescope').setup {
 	}
 }
 
-vim.keymap.set("n", "<leader>ff"        , function() tele_builtin.find_files() end)
-vim.keymap.set("n", "<leader>fp"        , function() tele_builtin.oldfiles() end)
-vim.keymap.set("n", "<leader>fr"        , function() tele_builtin.registers() end)
-vim.keymap.set("n", "<leader>fg"        , function() tele_builtin.live_grep() end)
+vim.keymap.set("n", "<leader>ff"        , tele_builtin.find_files)
+vim.keymap.set("n", "<leader>fp"        , tele_builtin.oldfiles)
+vim.keymap.set("n", "<leader>fr"        , tele_builtin.registers)
+vim.keymap.set("n", "<leader>fg"        , tele_builtin.live_grep)
 vim.keymap.set("n", "<leader>fh"        , ":Telescope help_tags<CR>"                , { noremap = true})
 vim.keymap.set("n", "<leader><leader>ff", ":Telescope current_buffer_fuzzy_find<CR>", { noremap = true})
