@@ -122,6 +122,24 @@ mkcd ()
       cd -P -- "$1"
 }
 
+change_folder() {
+    # if no argument is provided, search from ~ else use argument
+    [[ -z $1 ]] && DIR=~ || DIR=$1
+    # choose file using rg and fzf
+    CHOSEN=$(fd --strip-cwd-prefix --full-path $DIR -H -t d | fzf --preview="exa -s type --icons {}" --bind="ctrl-space:toggle-preview" --preview-window=,30:hidden)
+
+    # quit if no path is selected else cd into the path
+    if [[ -z $CHOSEN ]]; then
+        echo $CHOSEN
+        return 1
+    else
+        cd "$CHOSEN"
+    fi
+
+    # show ls output if dir has less than 61 files
+    [[ $(ls | wc -l) -le 60 ]] && (pwd; ls)
+    return 0
+}
 
 # alias
 alias gl="git log --oneline --graph --decorate"
@@ -129,6 +147,7 @@ alias gla="git log --oneline --graph --decorate --all"
 alias gocc="cd ~/dev/ledr/Orchestra-AvesTerra/C_client/"
 alias gs="git status"
 alias fastclone="git clone --depth=1 --recurse-submodules --shallow-submodules "
+alias cf='change_folder'
 
 alias la="ls -A"
 alias vi="nvim"
@@ -138,6 +157,7 @@ alias python3="python3.10"
 
 alias fuck="killall -9"
 
+alias gresetsm="git submodule deinit -f . && git submodule update --init --recursive"
 alias wtyping="python /home/yanis/perso/WikipediaTypingPractice/wikityping.py --article"
 
 # make with multiple jobs and (most of the time) proper output
@@ -181,3 +201,5 @@ source "/home/yanis/tools/emsdk/emsdk_env.sh" &> /dev/null
 # }
 
 eval "$(starship init zsh)"
+
+alias luamake=/home/yanis/.cache/nvim/nlua/sumneko_lua/lua-language-server/3rd/luamake/luamake
