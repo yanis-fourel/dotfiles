@@ -3,6 +3,7 @@ require('packer').startup(function(use)
 	-- Core
 	use  'wbthomason/packer.nvim'
 	use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
+	use  'nvim-treesitter/playground'
 
 
 	-- Telescope
@@ -41,6 +42,8 @@ require('packer').startup(function(use)
 	use {'kyazdani42/nvim-web-devicons', config = function() require('nvim-web-devicons').setup() end }
 	use  'lukas-reineke/indent-blankline.nvim'
 	use {'norcalli/nvim-colorizer.lua', config = function() require('colorizer').setup() end }
+	use 'nvim-treesitter/nvim-treesitter-context'
+
 
 	use  'feline-nvim/feline.nvim'
 

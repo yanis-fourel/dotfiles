@@ -14,6 +14,8 @@ vim.keymap.set('n','^', '0^', { noremap = true })
 
 vim.keymap.set('t','<Esc>', '<C-\\><C-n>')
 
+vim.keymap.set('x','<leader>p', '"_dP')
+
 
 -- {{{ hjkl
 
@@ -51,4 +53,7 @@ vim.keymap.set('n','<leader><leader>re', 'yiw:%s///g<c-F>hhhhpla')
 
 vim.keymap.set('n','<leader><leader>x', '<cmd>source %<CR>')
 -- }}}
+
+
+vim.cmd[[command JsonFormat %!jq ]]
 
