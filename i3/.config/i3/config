@@ -9,7 +9,7 @@ set $mod Mod4
 
 # Configure border style <normal|1pixel|pixel xx|none|pixel>
 default_border pixel 1
-default_floating_border normal
+default_floating_border pixel 1
 
 # Hide borders
 hide_edge_borders none
@@ -66,7 +66,7 @@ bindsym $mod+e exec pcmanfm
 bindsym $mod+t exec --no-startup-id pkill picom
 bindsym $mod+Ctrl+t exec --no-startup-id picom -b
 bindsym $mod+Shift+d --release exec "killall dunst; exec notify-send 'restart dunst'"
-bindsym Print exec --no-startup-id i3-scrot
+bindsym Print exec --no-startup-id flameshot gui
 bindsym $mod+Print --release exec --no-startup-id i3-scrot -w
 bindsym $mod+Shift+Print --release exec --no-startup-id i3-scrot -s
 # bindsym $mod+Shift+h exec xdg-open /usr/share/doc/manjaro/i3_help.pdf # bind conflict with 'move left'
@@ -123,22 +123,20 @@ bindsym $mod+Shift+minus move scratchpad
 # If there are multiple scratchpad windows, this command cycles through them.
 bindsym $mod+equal scratchpad show
 
-#navigate workspaces next / previous
-bindsym $mod+Ctrl+Right workspace next
-bindsym $mod+Ctrl+Left workspace prev
-
 # Workspace names
 # to display names or symbols instead of plain workspace numbers you can use
 # something like: set $ws1 1:mail
 #                 set $ws2 2:
-set $ws1 web
-set $ws2 main
+set $ws1 1
+set $ws2 2
 set $ws3 3
-set $ws5 5
+set $ws4 4
 set $ws5 5
 set $ws6 6
 set $ws7 7
-set $ws8 music
+set $ws8 8
+set $ws9 9
+set $ws10 10
 
 
 # switch to workspace
@@ -150,6 +148,8 @@ bindsym $mod+5 workspace $ws5
 bindsym $mod+6 workspace $ws6
 bindsym $mod+7 workspace $ws7
 bindsym $mod+8 workspace $ws8
+bindsym $mod+9 workspace $ws9
+bindsym $mod+0 workspace $ws10
 
 # Move focused container to workspace
 bindsym $mod+Ctrl+1 move container to workspace $ws1
@@ -160,6 +160,8 @@ bindsym $mod+Ctrl+5 move container to workspace $ws5
 bindsym $mod+Ctrl+6 move container to workspace $ws6
 bindsym $mod+Ctrl+7 move container to workspace $ws7
 bindsym $mod+Ctrl+8 move container to workspace $ws8
+bindsym $mod+Ctrl+9 move container to workspace $ws9
+bindsym $mod+Ctrl+0 move container to workspace $ws10
 
 # Move to workspace with focused container
 bindsym $mod+Shift+1 move container to workspace $ws1; workspace $ws1
@@ -170,6 +172,11 @@ bindsym $mod+Shift+5 move container to workspace $ws5; workspace $ws5
 bindsym $mod+Shift+6 move container to workspace $ws6; workspace $ws6
 bindsym $mod+Shift+7 move container to workspace $ws7; workspace $ws7
 bindsym $mod+Shift+8 move container to workspace $ws8; workspace $ws8
+bindsym $mod+Shift+9 move container to workspace $ws9; workspace $ws9
+bindsym $mod+Shift+0 move container to workspace $ws10; workspace $ws10
+
+bindsym $mod+Ctrl+Left move workspace to output left
+bindsym $mod+Ctrl+Right move workspace to output right
 
 ################################################################################################
 ## Open applications on specific workspaces                                                   ##
@@ -225,7 +232,7 @@ bindsym $mod+Shift+r restart
 bindsym $mod+Shift+u exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 
 # Set shut down, restart and locking features
-bindsym $mod+0 mode "$mode_system"
+bindsym $mod+BackSpace mode "$mode_system"
 set $mode_system (l)ock, (e)xit, switch_(u)ser, (s)uspend, (h)ibernate, (r)eboot, (Shift+s)hutdown
 mode "$mode_system" {
     bindsym l exec --no-startup-id i3exit lock, mode "default"
@@ -260,7 +267,7 @@ mode "resize" {
 }
 
 # Lock screen
-bindsym $mod+9 exec --no-startup-id blurlock
+bindsym $mod+k exec --no-startup-id blurlock
 
 # Autostart applications
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
@@ -273,8 +280,8 @@ exec --no-startup-id clipit
 # exec_always --no-startup-id sbxkb
 # exec --no-startup-id start_conky_maia
 # exec --no-startup-id start_conky_green
-exec --no-startup-id xautolock -time 120 -locker blurlock
-exec --no-startup-id i3-msg 'workspace main'
+# exec --no-startup-id xautolock -time 120 -locker blurlock
+exec --no-startup-id i3-msg 'workspace 2'
 exec_always --no-startup-id ff-theme-util
 exec_always --no-startup-id fix_xcursor
 exec_always --no-startup-id unclutter --start-hidden --fork
@@ -415,4 +422,14 @@ mode "$mode_gaps_outer" {
 exec_always --no-startup-id setxkbmap -layout us qwerty-fr && setxkbmap -option 'caps:ctrl_modifier' && xcape -e 'Caps_Lock=Escape' -t 300 && setxkbmap -option 'compose:menu'
 
 # Desktop background : This will pick a random wallpaper from background folder (default /usr/share/background/)
-exec_always nitrogen --random --set-zoom-fill; sleep 1; picom -b
+exec_always nitrogen --random --set-zoom-fill --head=0 && nitrogen --random --set-zoom-fill --head=1
+exec_always picom -b
+
+# Blue light filter at night. The number are the latitude:longitude, may want to adjust
+exec_always redshift -l 1.3:103.8
+# France: 46.2:2.2
+# Taiwan: 23.7:121.0
+# South korea: 35.9:127.8
+
+exec_always flameshot
+exec_always source ~/.screenlayout/sg.sh
