@@ -1,7 +1,7 @@
 local lspconfig = require('lspconfig')
 local tele_builtin = require('telescope.builtin')
 
-require('nvim-lsp-installer').setup({})
+require('mason').setup({})
 
 
 vim.keymap.set('n', 'K',  vim.lsp.buf.hover)
@@ -33,7 +33,9 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 -- Language-specific config
 lspconfig.clangd.setup { capabilities = capabilities }
 lspconfig.tsserver.setup { capabilities = capabilities }
-lspconfig.pyright.setup { capabilities = capabilities }
+lspconfig.gopls.setup { capabilities = capabilities }
+lspconfig.jdtls.setup { capabilities = capabilities }
 require('lsp/lua').setup(capabilities)
 require('lsp/rust').setup(capabilities)
+require('lsp/python').setup(capabilities)
 

@@ -14,11 +14,11 @@ vim.o.list           = true
 vim.o.title          = true
 vim.o.ignorecase     = true
 vim.o.smartcase      = true
-vim.o.clipboard      = 'unnamed'
+vim.o.clipboard      = 'unnamedplus'
 vim.o.path           = vim.o.path .. '**'
 vim.o.wildignore     = vim.o.wildignore .. '**/node_modules/*'
 vim.o.history        = 200
-vim.o.wrap           = false
+vim.o.wrap           = true
 vim.o.linebreak      = true
 vim.o.undodir        = os.getenv("HOME") .. '/.nvim_undodir'
 vim.o.undofile       = true
@@ -30,7 +30,3 @@ vim.o.termguicolors  = true
 -- Compiling file: obj/encode/json/print.o -> src/encode/json/print.c:186:78: error: format sp
 vim.o.errorformat = vim.o.errorformat .. '%.%#Compiling file%.%# -> %f:%l:%c%.%#'
 
-
-
-local dirtyfix_group = vim.api.nvim_create_augroup('dirtyfix_group', { clear = true })
-vim.api.nvim_create_autocmd('BufEnter', { pattern = '*', command = "set noexpandtab", group = dirtyfix_group })

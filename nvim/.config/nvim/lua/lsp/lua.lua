@@ -3,7 +3,7 @@ local lspconfig = require('lspconfig')
 local M = {}
 
 M.setup = function(capabilities)
-	lspconfig.sumneko_lua.setup({
+	lspconfig.lua_ls.setup({
 		capabilities = capabilities,
 		settings = {
 			Lua = {

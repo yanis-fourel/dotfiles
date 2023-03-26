@@ -10,12 +10,17 @@ vim.keymap.set('n','/', '/\\v')
 
 vim.keymap.set('n','^', '0^', { noremap = true })
 
--- TODO: vim.keymap.set('c','<expr>', '%% getcmdtype() == ':' ? expand('%:h').'/' : '%%'')
+-- TODO luafy: vim.keymap.set('c','<expr>', '%% getcmdtype() == ':' ? expand('%:h').'/' : '%%'')
+vim.cmd([[ cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%' ]])
 
 vim.keymap.set('t','<Esc>', '<C-\\><C-n>')
 
 vim.keymap.set('x','<leader>p', '"_dP')
 
+vim.keymap.set('n','<leader>jq', '<cmd>%!jq --tab<CR>')
+vim.keymap.set('v','<leader>jq', "<cmd>'<,'>!jq --tab<CR>")
+vim.keymap.set('n','<leader><leader>jq', '<cmd>%!jq --tab -c<CR>')
+vim.keymap.set('v','<leader><leader>jq', "<cmd>'<,'>!jq --tab -c<CR>")
 
 -- {{{ hjkl
 
@@ -55,5 +60,13 @@ vim.keymap.set('n','<leader><leader>x', '<cmd>source %<CR>')
 -- }}}
 
 
-vim.cmd[[command JsonFormat %!jq ]]
-
+-- Format and clean current file
+vim.keymap.set('n', '<leader>w',
+	function ()
+		if vim.bo.filetype == "rust"
+		then
+			vim.cmd("silent !cargo fix")
+			-- vim.cmd("silent !cargo fmt")
+		end
+	end
+)

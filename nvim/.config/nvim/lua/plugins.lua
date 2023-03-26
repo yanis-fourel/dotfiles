@@ -11,11 +11,12 @@ require('packer').startup(function(use)
 	use {'nvim-telescope/telescope.nvim', requires = 'nvim-lua/plenary.nvim' }
 	use  'BurntSushi/ripgrep'
 	use {'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
+	use  'LinArcX/telescope-env.nvim'
 	-- check out https://github.com/nvim-telescope/telescope.nvim/wiki/Extensions lol
 
 	-- LSP + autocomplete
 	use  'neovim/nvim-lspconfig'
-	use  'williamboman/nvim-lsp-installer'
+	use  'williamboman/mason.nvim'
 
 	use  'hrsh7th/nvim-cmp'
 	use  'hrsh7th/cmp-nvim-lsp'
@@ -29,9 +30,10 @@ require('packer').startup(function(use)
 
 	use  'simrat39/rust-tools.nvim'
 
-	-- LUA
+	-- Language specific
 	use 'euclidianAce/BetterLua.vim'
 	-- use 'tjdevries/nlua.nvim' -- check if hrsh7th/cmp-nvim-lua isn't enough
+
 
 	-- Git
 	use {'lewis6991/gitsigns.nvim', config = function() require('gitsigns').setup() end }
@@ -43,6 +45,7 @@ require('packer').startup(function(use)
 	use  'lukas-reineke/indent-blankline.nvim'
 	use {'norcalli/nvim-colorizer.lua', config = function() require('colorizer').setup() end }
 	use 'nvim-treesitter/nvim-treesitter-context'
+	use 'rcarriga/nvim-notify'
 
 
 	use  'feline-nvim/feline.nvim'
@@ -59,7 +62,6 @@ require('packer').startup(function(use)
 	use  'tpope/vim-eunuch'
 	use  'tpope/vim-unimpaired'
 	-- use  'tpope/vim-sleuth'
-	use  'vimwiki/vimwiki'
 	use {'unblevable/quick-scope', config = function() vim.cmd( -- config doesn't work if ran in 'after/plugin'
 		[[
 			let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
@@ -69,6 +71,7 @@ require('packer').startup(function(use)
 		]])
 	end }
 	use  'mechatroner/rainbow_csv'
-	use  'drybalka/tree-climber.nvim'
+	use {'nvim-pack/nvim-spectre', config = function() require('spectre').setup({}) end }
+
 end)
 

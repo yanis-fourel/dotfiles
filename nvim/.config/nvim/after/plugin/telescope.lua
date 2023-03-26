@@ -3,6 +3,7 @@ local tele_builtin = require('telescope.builtin')
 
 
 require('telescope').load_extension('fzf')
+require('telescope').load_extension('env')
 
 require('telescope').setup {
 	defaults = {
@@ -70,3 +71,4 @@ vim.keymap.set("n", "<leader>fr"        , tele_builtin.registers)
 vim.keymap.set("n", "<leader>fg"        , tele_builtin.live_grep)
 vim.keymap.set("n", "<leader>fh"        , ":Telescope help_tags<CR>"                , { noremap = true})
 vim.keymap.set("n", "<leader><leader>ff", ":Telescope current_buffer_fuzzy_find<CR>", { noremap = true})
+vim.keymap.set("n", "<leader>fe"        , "<cmd>Telescope env<CR>")
