@@ -17,6 +17,7 @@ vim.keymap.set('t','<Esc>', '<C-\\><C-n>')
 
 vim.keymap.set('x','<leader>p', '"_dP')
 
+vim.keymap.set('n','<leader>yq', '<cmd>%!yq<CR>')
 vim.keymap.set('n','<leader>jq', '<cmd>%!jq --tab<CR>')
 vim.keymap.set('v','<leader>jq', "<cmd>'<,'>!jq --tab<CR>")
 vim.keymap.set('n','<leader><leader>jq', '<cmd>%!jq --tab -c<CR>')

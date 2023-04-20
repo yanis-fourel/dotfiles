@@ -7,7 +7,7 @@ M.setup = function(capabilities)
 		capabilities = capabilities,
 		settings = {
 			python = {
-				pythonPath = 'python3.10'
+
 			}
 		}
 	})
