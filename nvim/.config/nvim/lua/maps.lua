@@ -10,8 +10,6 @@ vim.keymap.set('n','/', '/\\v')
 
 vim.keymap.set('n','^', '0^', { noremap = true })
 
--- TODO luafy: vim.keymap.set('c','<expr>', '%% getcmdtype() == ':' ? expand('%:h').'/' : '%%'')
-vim.cmd([[ cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%' ]])
 
 vim.keymap.set('t','<Esc>', '<C-\\><C-n>')
 
@@ -61,13 +59,6 @@ vim.keymap.set('n','<leader><leader>x', '<cmd>source %<CR>')
 -- }}}
 
 
--- Format and clean current file
-vim.keymap.set('n', '<leader>w',
-	function ()
-		if vim.bo.filetype == "rust"
-		then
-			vim.cmd("silent !cargo fix")
-			-- vim.cmd("silent !cargo fmt")
-		end
-	end
-)
+--
+-- TODO luafy: vim.keymap.set('c','<expr>', '%% getcmdtype() == ':' ? expand('%:h').'/' : '%%'')
+vim.cmd([[ cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%' ]])

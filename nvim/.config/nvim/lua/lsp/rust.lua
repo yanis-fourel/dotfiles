@@ -87,6 +87,9 @@ M.setup = function(capabilities)
 					checkOnSave = {
 						command = "clippy"
 					},
+					diagnostics = {
+						disabled = { "unresolved-proc-macro" }
+					}
 				}
 			}
 		},

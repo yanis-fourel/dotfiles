@@ -14,6 +14,9 @@ require('packer').startup(function(use)
 	use  'LinArcX/telescope-env.nvim'
 	-- check out https://github.com/nvim-telescope/telescope.nvim/wiki/Extensions lol
 
+	-- Navigation
+	use  'ThePrimeagen/harpoon'
+
 	-- LSP + autocomplete
 	use  'neovim/nvim-lspconfig'
 	use  'williamboman/mason.nvim'
@@ -28,10 +31,10 @@ require('packer').startup(function(use)
 	use  'ray-x/lsp_signature.nvim'
 	use  'L3MON4D3/LuaSnip'
 
-	use  'simrat39/rust-tools.nvim'
 
 	-- Language specific
-	use 'euclidianAce/BetterLua.vim'
+	use  'euclidianAce/BetterLua.vim'
+	use  'simrat39/rust-tools.nvim'
 	-- use 'tjdevries/nlua.nvim' -- check if hrsh7th/cmp-nvim-lua isn't enough
 
 
