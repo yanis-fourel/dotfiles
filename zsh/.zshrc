@@ -34,12 +34,18 @@ mkcd ()
 }
 
 
+
 # alias
 alias ls="exa"
+export EXA_COLORS="da=0" # set the date field white
+
+
+# quick paths
+alias gooa="cd ~/ledr/Orchestra-AvesTerra/"
+alias gomh="cd ~/ledr/Cust-MH/Backend_Rust/"
 
 alias gl="git log --oneline --graph --decorate"
 alias gla="git log --oneline --graph --decorate --all"
-alias gocc="cd ~/dev/ledr/Orchestra-AvesTerra/C_client/"
 alias gs="git status"
 alias fastclone="git clone --depth=1 --recurse-submodules --shallow-submodules "
 
@@ -73,6 +79,7 @@ bindkey -s "^n" '. ranger ^M'
 
 export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib
 export PATH=$PATH:/usr/lib/cargo/bin
+export EDITOR=nvim
 
 source "/home/yanis/tools/emsdk/emsdk_env.sh" &> /dev/null
 
@@ -98,3 +105,9 @@ source "/home/yanis/tools/emsdk/emsdk_env.sh" &> /dev/null
 eval "$(starship init zsh)"
 
 alias luamake=/home/yanis/.cache/nvim/nlua/sumneko_lua/lua-language-server/3rd/luamake/luamake
+
+export AVIAL_REPO_PATH=/home/yanis/ledr/Orchestra-AvesTerra/
+
+autoload -Uz compinit
+zstyle ':completion:*' menu select
+fpath+=~/.zfunc
