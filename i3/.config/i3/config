@@ -53,6 +53,23 @@ bindsym $mod+Ctrl+m exec pavucontrol
 # bindsym XF86MonBrightnessUp exec "xbacklight -inc 10; notify-send 'brightness up'"
 # bindsym XF86MonBrightnessDown exec "xbacklight -dec 10; notify-send 'brightness down'"
 
+# Pulse Audio controls
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5% #increase sound volume
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5% #decrease sound volume
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle # mute sound
+
+# Sreen brightness controls
+bindsym XF86MonBrightnessUp exec xbacklight -inc 20 # increase screen brightness
+bindsym XF86MonBrightnessDown exec xbacklight -dec 20 # decrease screen brightness
+
+# Media player controls
+bindsym XF86AudioPlay exec playerctl play-pause
+bindsym XF86AudioPause exec playerctl play-pause
+bindsym XF86AudioNext exec playerctl next
+bindsym XF86AudioPrev exec playerctl previous
+
+
+
 # Start Applications
 bindsym $mod+Ctrl+b exec terminal -e 'bmenu'
 bindsym $mod+e exec pcmanfm
@@ -178,7 +195,7 @@ bindsym $mod+Ctrl+Right move workspace to output right
 ## Open applications on specific workspaces                                                   ##
 ################################################################################################
 # assign [class="google-chrome"] $ws1
-for_window [class="Google-chrome"] move to workspace $ws1
+# for_window [class="Google-chrome"] move to workspace $ws1
 
 
 # assign [class="Spotify"] $ws8
@@ -214,6 +231,7 @@ for_window [class="Skype"] floating enable border normal
 for_window [class="Timeset-gui"] floating enable border normal
 for_window [class="(?i)virtualbox"] floating enable border normal
 for_window [class="Xfburn"] floating enable
+for_window [class="rustracer"] floating enable
 
 # switch to workspace with urgent window automatically
 for_window [urgent=latest] focus
@@ -418,14 +436,15 @@ mode "$mode_gaps_outer" {
 exec_always --no-startup-id setxkbmap -layout us qwerty-fr && setxkbmap -option 'caps:ctrl_modifier' && xcape -e 'Caps_Lock=Escape' -t 300 && setxkbmap -option 'compose:menu'
 
 # Desktop background : This will pick a random wallpaper from background folder (default /usr/share/background/)
-exec_always nitrogen --random --set-zoom-fill --head=0 && nitrogen --random --set-zoom-fill --head=1
-exec_always picom -b
+exec_always --no-startup-id source ~/.screenlayout/sg.sh && nitrogen --random --set-zoom-fill --head=0 && nitrogen --random --set-zoom-fill --head=1
+exec_always --no-startup-id picom -b
 
 # Blue light filter at night. The number are the latitude:longitude, may want to adjust
-exec_always redshift -l 1.3:103.8
+exec_always --no-startup-id redshift -l 1.3:103.8
+# Singapore: 1.3:103.8
 # France: 46.2:2.2
 # Taiwan: 23.7:121.0
 # South korea: 35.9:127.8
 
-exec_always flameshot
-exec_always source ~/.screenlayout/sg.sh
+exec_always --no-startup-id flameshot
+exec_always --no-startup-id dunst
