@@ -5,6 +5,22 @@ local M = {}
 
 
 M.setup = function(capabilities)
+
+	-- Update this path - see  https://github.com/simrat39/rust-tools.nvim/wiki/Debugging
+	local extension_path = vim.env.HOME .. '/.vscode/extensions/vadimcn.vscode-lldb-1.9.1/'
+	local codelldb_path = extension_path .. 'adapter/codelldb'
+	local liblldb_path = extension_path .. 'lldb/lib/liblldb'
+	local this_os = vim.loop.os_uname().sysname;
+
+	-- The path in windows is different
+	if this_os:find "Windows" then
+		codelldb_path = package_path .. "adapter\\codelldb.exe"
+		liblldb_path = package_path .. "lldb\\bin\\liblldb.dll"
+	else
+		-- The liblldb extension is .so for linux and .dylib for macOS
+		liblldb_path = liblldb_path .. (this_os == "Linux" and ".so" or ".dylib")
+	end
+
 	rust_tools.setup({
 		capabilities = capabilities,
 		tools = { -- rust-tools options
@@ -94,11 +110,7 @@ M.setup = function(capabilities)
 		},
 
 		dap = {
-			adapter = {
-				type = "executable",
-				command = "lldb-vscode-14",
-				name = "rt_lldb",
-			},
+			adapter = require('rust-tools.dap').get_codelldb_adapter(codelldb_path, liblldb_path)
 		},
 	})
 end

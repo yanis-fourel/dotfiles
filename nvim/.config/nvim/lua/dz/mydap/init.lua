@@ -88,6 +88,19 @@ local dapui_setup_arg =
 }
 
 
+function continue_or_start_debug()
+	if is_debugging then
+		dap.continue()
+		return
+	end
+
+	if vim.bo.filetype == "rust" then
+		vim.cmd("RustDebuggables")
+	else
+		dap.continue()
+	end
+end
+
 M.setup = function()
 	require('telescope').load_extension('dap')
 
@@ -96,7 +109,8 @@ M.setup = function()
 
 	dapui.setup(dapui_setup_arg)
 
-	vim.keymap.set('n', '<M-Enter>', dap.continue)
+	vim.keymap.set('n', '<M-Enter>', continue_or_start_debug)
+
 	vim.keymap.set('n', '<M-S-h>', dap.step_over)
 	vim.keymap.set('n', '<M-S-/>', dap.step_into)
 	vim.keymap.set('n', '<M-S-k>', dap.toggle_breakpoint)
