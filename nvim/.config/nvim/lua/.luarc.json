@@ -57,7 +57,14 @@
         "/home/yanis/.local/share/nvim/site/pack/packer/start/playground/after",
         "/home/yanis/.local/share/nvim/site/pack/packer/start/tabular/after",
         "/home/yanis/.config/nvim/after",
-        "${3rd}/luassert/library"
+        "${3rd}/luassert/library",
+        "${3rd}/luv/library"
     ],
-    "workspace.checkThirdParty": false
+    "workspace.checkThirdParty": false,
+    "diagnostics.globals": [
+        "toggle"
+    ],
+    "diagnostics.disable": [
+        "lowercase-global"
+    ]
 }

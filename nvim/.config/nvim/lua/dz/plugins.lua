@@ -36,6 +36,7 @@ require('packer').startup(function(use)
 	use  'euclidianAce/BetterLua.vim'
 	use  'simrat39/rust-tools.nvim'
 	-- use 'tjdevries/nlua.nvim' -- check if hrsh7th/cmp-nvim-lua isn't enough
+	use  'folke/neodev.nvim'
 
 
 	-- Git
@@ -49,9 +50,17 @@ require('packer').startup(function(use)
 	use {'norcalli/nvim-colorizer.lua', config = function() require('colorizer').setup() end }
 	use 'nvim-treesitter/nvim-treesitter-context'
 	use 'rcarriga/nvim-notify'
-
-
 	use  'feline-nvim/feline.nvim'
+
+
+	-- Debug
+	use {'mfussenegger/nvim-dap'}
+	use {'mfussenegger/nvim-dap-python'}
+	use {'theHamsta/nvim-dap-virtual-text', config = function() require('nvim-dap-virtual-text').setup({}) end }
+	use {'nvim-telescope/telescope-dap.nvim'}
+	use {'rcarriga/nvim-dap-ui', requires = {'mfussenegger/nvim-dap'} }
+
+
 
 	-- misc
 	use {'rmagatti/auto-session', config = function() require('auto-session').setup({}) end }
@@ -60,7 +69,7 @@ require('packer').startup(function(use)
 	use  'romainl/vim-cool'
 	use  'mg979/vim-visual-multi'
 	use  'preservim/nerdtree'
-	use  'tpope/vim-surround'
+	use {'kylechui/nvim-surround', config = function() require("nvim-surround").setup({}) end }
 	use  'tpope/vim-abolish'
 	use  'tpope/vim-eunuch'
 	use  'tpope/vim-unimpaired'
@@ -75,6 +84,7 @@ require('packer').startup(function(use)
 	end }
 	use  'mechatroner/rainbow_csv'
 	use {'nvim-pack/nvim-spectre', config = function() require('spectre').setup({}) end }
+	use {'Wansmer/treesj', requires = { 'nvim-treesitter' }}
 
 end)
 

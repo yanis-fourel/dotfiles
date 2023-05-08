@@ -32,6 +32,12 @@ vim.keymap.set('v','<leader><leader>jq', "<cmd>'<,'>!jq --tab -c<CR>")
 vim.keymap.set('n','<Left>', 'h', { remap = true })
 vim.keymap.set('n','<Right>', 'l', { remap = true})
 
+
+vim.keymap.set('n', '<M-S-m>', '<C-w><Left>')
+vim.keymap.set('n', '<M-S-n>', '<C-w><Down>')
+vim.keymap.set('n', '<M-S-e>', '<C-w><Up>')
+vim.keymap.set('n', '<M-S-i>', '<C-w><Right>')
+
 -- }}}
 
 -- Don't jump to next match on * press
@@ -62,3 +68,21 @@ vim.keymap.set('n','<leader><leader>x', '<cmd>source %<CR>')
 --
 -- TODO luafy: vim.keymap.set('c','<expr>', '%% getcmdtype() == ':' ? expand('%:h').'/' : '%%'')
 vim.cmd([[ cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%' ]])
+
+
+
+
+local mydap = require('dz.mydap')
+
+
+function inspect_symbol()
+	if not mydap.is_debugging()
+	then
+		vim.lsp.buf.hover()
+		return
+	end
+
+	mydap.inspect_symbol()
+end
+vim.keymap.set('n', 'K', inspect_symbol)
+vim.keymap.set('v', 'K', inspect_symbol)

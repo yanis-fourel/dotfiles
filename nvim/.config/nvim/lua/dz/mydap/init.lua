@@ -1,0 +1,137 @@
+local M = {}
+
+
+local dap = require('dap')
+local dapui = require('dapui')
+
+
+-- should that be local to the tab or something ?
+local is_debugging = false
+M.is_debugging = function() return is_debugging end
+
+
+local dapui_setup_arg =
+{
+	controls =
+	{
+		element = "repl",
+		enabled = false,
+		icons =
+		{
+			disconnect = "",
+			pause = "",
+			play = "",
+			run_last = "",
+			step_back = "",
+			step_into = "",
+			step_out = "",
+			step_over = "",
+			terminate = ""
+		}
+	},
+	element_mappings = {},
+	expand_lines = true,
+	floating =
+	{
+		border = "single",
+		mappings =
+		{
+			close = { "q", "<Esc>" }
+		}
+	},
+	force_buffers = true,
+	icons =
+	{
+		collapsed = "",
+		current_frame = "",
+		expanded = ""
+	},
+	layouts =
+	{
+		{
+			elements =
+			{
+				{
+					id = "stacks",
+					size = 0.40
+				},
+				{
+					id = "scopes",
+					size = 0.40
+				},
+				{
+					id = "watches",
+					size = 0.20
+				},
+			},
+			position = "left",
+			size = 40
+		},
+		{
+			elements =
+			{
+				{
+					id = "console",
+					size = 1.0
+				}
+			},
+			position = "bottom",
+			size = 10
+		}
+	},
+	mappings = {},
+	render =
+	{
+		indent = 1,
+		max_value_lines = 100
+	}
+}
+
+
+M.setup = function()
+	require('telescope').load_extension('dap')
+
+	-- languages
+	require('dap-python').setup('python')
+
+	dapui.setup(dapui_setup_arg)
+
+	vim.keymap.set('n', '<M-Enter>', dap.continue)
+	vim.keymap.set('n', '<M-C-n>', dap.step_over)
+	vim.keymap.set('n', '<M-C-i>', dap.step_into)
+	vim.keymap.set('n', '<M-C-j>', dap.toggle_breakpoint)
+
+	vim.keymap.set('n', '<M-C-k>', dapui.toggle)
+	vim.keymap.set('n', '<M-C-l>', dapui.elements.watches.add)
+	vim.keymap.set('v', '<M-C-l>', dapui.elements.watches.add)
+	vim.keymap.set('n', '<leader>fb', ':Telescope dap list_breakpoints<CR>')
+
+
+
+	dap.listeners.after.event_initialized["dapui_config"] = function()
+		is_debugging = true
+	end
+	dap.listeners.before.event_terminated["dapui_config"] = function()
+		is_debugging = false
+	end
+	dap.listeners.before.event_exited["dapui_config"] = function()
+		is_debugging = false
+	end
+end
+
+
+
+
+--- Inspect what's below the cursor on a floating window
+--- calling it again will move cursor into the window
+M.inspect_symbol = function()
+	dapui.eval()
+end
+
+
+M.toggle_focus_depl = function()
+
+end
+
+return M
+

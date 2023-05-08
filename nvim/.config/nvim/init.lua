@@ -1,27 +1,22 @@
-vim.g.mapleader = ' '
+require('dz')
 
-require('options')
-require('maps')
-require('plugins')
+function reload_config()
+	for name,_ in pairs(package.loaded) do
+		if name:match('^dz') then
+			package.loaded[name] = nil
+		end
+	end
 
-require('ui')
-require('lsp')
+	require('dz')
 
+	-- Reload after/ directory
+	local glob = vim.fn.stdpath('config') .. '/after/**/*.lua'
+	local after_lua_filepaths = vim.fn.glob(glob, true, true)
 
---[[
-TODOS:
+	for _, filepath in ipairs(after_lua_filepaths) do
+		dofile(filepath)
+	end
 
-* fix last bindings
-* make telescope preview wider
-* check the rust capabilities for LSP, and maybe fix the 'receive end before begin' error
-* sexy code_action with telescope
-* check out treesitter extensions https://github.com/nvim-treesitter/nvim-treesitter/wiki/Extra-modules-and-plugins
-* nvim-treesitter/nvim-treesitter-context
-* different color of highlight for luasnip ? + cool luasnip config additons ?
-
-* which-key (and integrate with telescope, see https://github.com/nvim-telescope/telescope.nvim#telescope-setup-structure)
-
-* custom plugins (see tw)
-
-]]--
-
+	vim.notify("Nvim configuration reloaded!", vim.log.levels.INFO)
+end
+vim.keymap.set('n', '<leader><leader><leader>x', reload_config)

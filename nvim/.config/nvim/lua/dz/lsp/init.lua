@@ -4,7 +4,7 @@ local tele_builtin = require('telescope.builtin')
 require('mason').setup({})
 
 
-vim.keymap.set('n', 'K',  vim.lsp.buf.hover)
+
 vim.keymap.set('n', 'gd', tele_builtin.lsp_definitions)
 vim.keymap.set('n', 'ga', function() tele_builtin.diagnostics({severity = 1, root_dir = true}) end)
 vim.keymap.set('n', 'gq', function() tele_builtin.diagnostics({severity_limit = 2, root_dir = true}) end)
@@ -29,6 +29,10 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 
 -- vim.pretty_print(lspconfig)
 
+require('neodev').setup({
+	library = { plugins = { "nvim-dap-ui" }, types = true },
+}) -- IMPORTANT: setup BEFORE lua lsp
+
 
 -- Language-specific config
 lspconfig.clangd.setup { capabilities = capabilities }
@@ -36,7 +40,7 @@ lspconfig.tsserver.setup { capabilities = capabilities }
 lspconfig.gopls.setup { capabilities = capabilities }
 lspconfig.jdtls.setup { capabilities = capabilities }
 lspconfig.bashls.setup { capabilities = capabilities }
-require('lsp/lua').setup(capabilities)
-require('lsp/rust').setup(capabilities)
-require('lsp/python').setup(capabilities)
+require('dz.lsp.lua').setup(capabilities)
+require('dz.lsp.rust').setup(capabilities)
+require('dz.lsp.python').setup(capabilities)
 

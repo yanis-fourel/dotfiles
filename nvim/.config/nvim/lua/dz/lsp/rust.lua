@@ -1,7 +1,8 @@
-local lspconfig = require('lspconfig')
 local rust_tools = require('rust-tools')
 
 local M = {}
+
+
 
 M.setup = function(capabilities)
 	rust_tools.setup({
@@ -13,11 +14,6 @@ M.setup = function(capabilities)
 			-- the hints or just run :RustSetInlayHints.
 			-- default: true
 			autoSetHints = true,
-
-			-- whether to show hover actions inside the hover window
-			-- this overrides the default hover handler so something like lspsaga.nvim's hover would be overriden by this
-			-- default: true
-			hover_with_actions = true,
 
 			-- how to execute terminal commands
 			-- options right now: termopen / quickfix

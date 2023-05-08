@@ -7,12 +7,14 @@ M.setup = function(capabilities)
 		capabilities = capabilities,
 		settings = {
 			Lua = {
-				completion = {
+				{
+					callSnippet = 'Replace',
 					showWord = 'Disable'
 				},
-				diagnostics = {
-					globals = { 'vim' }
-				},
+				-- try without for now
+				-- diagnostics = {
+				-- 	globals = { 'vim' }
+				-- },
 				workspace = {
 					-- Make the server aware of Neovim runtime files
 					library = vim.api.nvim_get_runtime_file("", true),
