@@ -97,13 +97,13 @@ M.setup = function()
 	dapui.setup(dapui_setup_arg)
 
 	vim.keymap.set('n', '<M-Enter>', dap.continue)
-	vim.keymap.set('n', '<M-C-n>', dap.step_over)
-	vim.keymap.set('n', '<M-C-i>', dap.step_into)
-	vim.keymap.set('n', '<M-C-j>', dap.toggle_breakpoint)
+	vim.keymap.set('n', '<M-S-h>', dap.step_over)
+	vim.keymap.set('n', '<M-S-/>', dap.step_into)
+	vim.keymap.set('n', '<M-S-k>', dap.toggle_breakpoint)
 
-	vim.keymap.set('n', '<M-C-k>', dapui.toggle)
-	vim.keymap.set('n', '<M-C-l>', dapui.elements.watches.add)
-	vim.keymap.set('v', '<M-C-l>', dapui.elements.watches.add)
+	vim.keymap.set('n', '<M-S-j>', dapui.toggle)
+	vim.keymap.set('n', '<M-S-y>', dapui.elements.watches.add)
+	vim.keymap.set('v', '<M-S-y>', dapui.elements.watches.add)
 	vim.keymap.set('n', '<leader>fb', ':Telescope dap list_breakpoints<CR>')
 
 

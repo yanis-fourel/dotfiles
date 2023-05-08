@@ -37,6 +37,7 @@ require('packer').startup(function(use)
 	use  'simrat39/rust-tools.nvim'
 	-- use 'tjdevries/nlua.nvim' -- check if hrsh7th/cmp-nvim-lua isn't enough
 	use  'folke/neodev.nvim'
+	use  'Saecki/crates.nvim'
 
 
 	-- Git
@@ -85,6 +86,7 @@ require('packer').startup(function(use)
 	use  'mechatroner/rainbow_csv'
 	use {'nvim-pack/nvim-spectre', config = function() require('spectre').setup({}) end }
 	use {'Wansmer/treesj', requires = { 'nvim-treesitter' }}
+	use {'jose-elias-alvarez/null-ls.nvim'}
 
 end)
 

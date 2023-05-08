@@ -59,6 +59,7 @@ cmp.setup({
 	sources = cmp.config.sources({
 		{ name = 'nvim_lsp',  max_item_count = 50 },
 		{ name = 'nvim_lua' },
+        { name = "crates" }, -- rust cargo crates autocomplete
 		{ name = 'path' },
 		{ name = 'buffer', keyword_length = 5, max_item_count = 10 },
 	}),

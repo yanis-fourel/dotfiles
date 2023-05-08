@@ -85,9 +85,20 @@ M.setup = function(capabilities)
 					},
 					diagnostics = {
 						disabled = { "unresolved-proc-macro" }
-					}
+					},
+					cargo = {
+						allFeatures = true
+					},
 				}
 			}
+		},
+
+		dap = {
+			adapter = {
+				type = "executable",
+				command = "lldb-vscode-14",
+				name = "rt_lldb",
+			},
 		},
 	})
 end

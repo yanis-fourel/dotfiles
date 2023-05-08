@@ -76,13 +76,13 @@ local mydap = require('dz.mydap')
 
 
 function inspect_symbol()
-	if not mydap.is_debugging()
-	then
+	if vim.fn.expand('%:t') == 'Cargo.toml' and require('crates').popup_available() then
+		require('crates').show_popup()
+	elseif mydap.is_debugging() then
+		mydap.inspect_symbol()
+	else
 		vim.lsp.buf.hover()
-		return
 	end
-
-	mydap.inspect_symbol()
 end
 vim.keymap.set('n', 'K', inspect_symbol)
 vim.keymap.set('v', 'K', inspect_symbol)
