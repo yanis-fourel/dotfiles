@@ -86,3 +86,5 @@ function inspect_symbol()
 end
 vim.keymap.set('n', 'K', inspect_symbol)
 vim.keymap.set('v', 'K', inspect_symbol)
+
+vim.keymap.set('i', '<C-z>', '<cmd>normal zz<CR>')

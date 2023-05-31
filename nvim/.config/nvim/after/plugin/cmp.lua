@@ -15,24 +15,36 @@ cmp.setup({
 	},
 	formatting = {
 		format = require('lspkind').cmp_format({
+			--  WHAT DOES THIS DO?
 			menu = {
-				buffer = "[buf]",
-				nvim_lsp = "[LSP]",
-				nvim_lua = "[api]",
-				path = "[path]",
-				luasnip = "[snip]",
-				ghissues = "[issues]",
-				tn = "[TabNine]",
+				buffer = '[buf]',
+				nvim_lsp = '[LSP]',
+				nvim_lua = '[api]',
+				path = '[path]',
+				luasnip = '[snip]',
+				ghissues = '[issues]',
 			},
-			mode = 'symbol_text', -- show only symbol annotations
+			symbol_map = {
+				Copilot = '',
+				buffer = '󰈙',
+				nvim_lsp = '',
+				nvim_lua = '',
+				path = '',
+				luasnip = '',
+				ghissues = '',
+			},
+			mode = 'symbol_text',
 			maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
 		})
 	},
 	sorting = {
+		priority_weight = 2,
 		comparators = {
+			cmp.config.compare.exact,
+			-- require("copilot_cmp.comparators").prioritize,
+
 			cmp.config.compare.score,
 			cmp.config.compare.offset,
-			cmp.config.compare.exact,
 			-- cmp.config.compare.kind,
 			cmp.config.compare.sort_text,
 			cmp.config.compare.length,
@@ -47,6 +59,13 @@ cmp.setup({
 		['<C-n>'] = cmp.mapping(function(fallback)
 			if cmp.visible() then
 				cmp.confirm({ select = true })
+				-- local current = cmp.get_selected_entry()
+				--
+				-- if current ~= nil then
+				-- 	cmp.confirm()
+				-- else
+				-- 	require('copilot.suggestion').accept()
+				-- end
 			elseif luasnip.expand_or_jumpable() then
 				luasnip.expand_or_jump()
 			else
@@ -57,15 +76,23 @@ cmp.setup({
 		['<Down>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select })
 	},
 	sources = cmp.config.sources({
-		{ name = 'nvim_lsp',  max_item_count = 50 },
-		{ name = 'nvim_lua' },
-        { name = "crates" }, -- rust cargo crates autocomplete
-		{ name = 'path' },
-		{ name = 'buffer', keyword_length = 5, max_item_count = 10 },
+		{ name = 'nvim_lsp', group_index = 2, max_item_count = 25, 
+    entry_filter = function(entry, _)
+      return require('cmp.types').lsp.CompletionItemKind[entry:get_kind()] ~= 'Text'
+    end
+ },
+		{ name = 'nvim_lua', group_index = 2 },
+	-- }, {
+		-- { name = 'copilot' , group_index = 2 },
+        { name = 'crates'  , group_index = 2 } , -- rust cargo crates autocomplete
+		{ name = 'path'    , group_index = 2 },
+		-- { name = 'buffer'  , group_index = 2, max_item_count = 10, keyword_length = 5 },
 	}),
 	experimental = {
 		native_menu = false,
-		ghost_text = true
+		-- ghost_text = {
+		-- 	hl_group = "Comment"
+		-- }
 	},
 	matching = {
 		disallow_fuzzy_matching = false

@@ -30,6 +30,10 @@ require('packer').startup(function(use)
 	use  'onsails/lspkind.nvim' -- icons in the completion list
 	use  'ray-x/lsp_signature.nvim'
 	use  'L3MON4D3/LuaSnip'
+	use {'j-hui/fidget.nvim', config = function() require('fidget').setup({}) end }
+
+	use  'zbirenbaum/copilot.lua'
+	use  'zbirenbaum/copilot-cmp'
 
 
 	-- Language specific

@@ -20,3 +20,5 @@ function reload_config()
 	vim.notify("Nvim configuration reloaded!", vim.log.levels.INFO)
 end
 vim.keymap.set('n', '<leader><leader><leader>x', reload_config)
+
+

@@ -40,7 +40,19 @@ lspconfig.tsserver.setup { capabilities = capabilities }
 lspconfig.gopls.setup { capabilities = capabilities }
 lspconfig.jdtls.setup { capabilities = capabilities }
 lspconfig.bashls.setup { capabilities = capabilities }
+lspconfig.docker_compose_language_service.setup { capabilities = capabilities }
+lspconfig.dockerls.setup { capabilities = capabilities }
+
 require('dz.lsp.lua').setup(capabilities)
 require('dz.lsp.rust').setup(capabilities)
 require('dz.lsp.python').setup(capabilities)
+
+-- autocmd BufRead,BufNewFile .env lua vim.diagnostic.disable(<abuf>) 
+
+vim.api.nvim_create_autocmd({'BufEnter', 'BufNewFile'}, {
+	pattern = '.env',
+	callback = function(ev)
+		vim.diagnostic.disable(ev.buf)
+	end
+})
 
