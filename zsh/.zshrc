@@ -29,11 +29,30 @@ bindkey "^[[B" history-beginning-search-forward
 # functions
 mkcd ()
 {
-    mkdir -p -- "$1" &&
-      cd -P -- "$1"
+	mkdir -p -- "$1" && cd -P -- "$1"
+}
+
+# Repeast a command every second and print the output cleanly
+everysec ()
+{
+	emulate -LR sh # Inherit environment
+
+	CMD=$@
+
+	while true; do
+		output=$($CMD 2>&1)
+		clear
+		echo "$(date '+%R:%S') | $CMD"
+		echo "$output"
+		sleep 1
+	done
 }
 
 
+PATH=$PATH:$HOME/.local/scripts
+export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib
+export PATH=$PATH:/usr/lib/cargo/bin
+export EDITOR=nvim
 
 # alias
 alias ls="exa"
@@ -61,13 +80,13 @@ alias fuck="killall -9"
 alias gresetsm="git submodule deinit -f . && git submodule update --init --recursive"
 alias wtyping="python /home/yanis/perso/WikipediaTypingPractice/wikityping.py --article"
 
+bindkey -s ^f "tmux-sessionizer\n"
+
 # make with multiple jobs and (most of the time) proper output
 alias makej="make -j -Otarget --no-print-directory"
 
 # Vim Config
 alias vc="vi $NVIM_CONFIG_DIR/init.* --cmd 'cd %:h'"
-
-alias webidl_binder="$EMSDK/upstream/emscripten/tools/webidl_binder"
 
 
 #bindings
@@ -77,30 +96,6 @@ bindkey -s "^n" '. ranger ^M'
 
 ###############################################################################
 
-export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib
-export PATH=$PATH:/usr/lib/cargo/bin
-export EDITOR=nvim
-
-source "/home/yanis/tools/emsdk/emsdk_env.sh" &> /dev/null
-
-
-
-# source: https://gist.github.com/knadh/123bca5cfdae8645db750bfb49cb44b0
-# function preexec() {
-#   timer=$(($(date +%s%0N)*0.000000001))
-# }
-#
-# function precmd() {
-#   if [ $timer ]; then
-#     now=$(($(date +%s%0N)*0.000000001))
-#     elapsed=$(echo $(($now-$timer)) | awk '{printf "%.3f", $1}')
-#
-#     export RPROMPT="%F{cyan}${elapsed}s %{$reset_color%}"
-#     unset timer
-#   else
-#     export RPROMPT=""
-#   fi
-# }
 
 eval "$(starship init zsh)"
 
