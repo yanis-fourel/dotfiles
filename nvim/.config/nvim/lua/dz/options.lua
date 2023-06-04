@@ -26,6 +26,7 @@ vim.o.guifont        = 'FiraCode:h16'
 vim.o.mouse          = 'a'
 vim.o.laststatus     = 3
 vim.o.termguicolors  = true
+vim.o.colorcolumn    = '80'
 
 -- Compiling file: obj/encode/json/print.o -> src/encode/json/print.c:186:78: error: format sp
 vim.o.errorformat = vim.o.errorformat .. '%.%#Compiling file%.%# -> %f:%l:%c%.%#'
