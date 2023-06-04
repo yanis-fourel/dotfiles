@@ -88,3 +88,9 @@ vim.keymap.set('n', 'K', inspect_symbol)
 vim.keymap.set('v', 'K', inspect_symbol)
 
 vim.keymap.set('i', '<C-z>', '<cmd>normal zz<CR>')
+
+vim.keymap.set('n', '<C-k><C-d>', function ()
+	if vim.fn.expand('%:e') == 'rs' then
+		vim.cmd('silent !cargo fmt')
+	end
+end)
