@@ -56,6 +56,7 @@ require('packer').startup(function(use)
 	use 'nvim-treesitter/nvim-treesitter-context'
 	use 'rcarriga/nvim-notify'
 	use  'feline-nvim/feline.nvim'
+	use  'mbbill/undotree'
 
 
 	-- Debug
