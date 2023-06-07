@@ -58,6 +58,8 @@ export EDITOR=nvim
 alias ls="exa"
 export EXA_COLORS="da=0" # set the date field white
 
+alias avu="rlwrap --always-readline docker exec -it $(docker ps | grep avu | awk '{print $1}') /AvesTerra/Executables/avu"
+
 
 # quick paths
 alias gooa="cd ~/ledr/Orchestra-AvesTerra/"
