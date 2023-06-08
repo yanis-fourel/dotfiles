@@ -39,10 +39,13 @@ everysec ()
 
 	CMD=$@
 
+	CYAN='\033[0;36m'
+	NC='\033[0m' # No Color
+
 	while true; do
 		output=$($CMD 2>&1)
 		clear
-		echo "$(date '+%R:%S') | $CMD"
+		echo -e $CYAN"$(date '+%R:%S') | $CMD"$NC
 		echo "$output"
 		sleep 1
 	done
