@@ -62,6 +62,7 @@ alias ls="exa"
 export EXA_COLORS="da=0" # set the date field white
 
 alias avu="rlwrap --always-readline docker exec -it $(docker ps | grep avu | awk '{print $1}') /AvesTerra/Executables/avu"
+alias atlogs="docker logs -f $(docker ps | grep avesterra:latest | awk '{print $1}')"
 
 
 # quick paths
@@ -77,6 +78,7 @@ alias la="ls -a"
 alias ll="ls -l --time-style=long-iso"
 alias l="ll"
 alias lla="ls -la --time-style=long-iso"
+alias lt="exa -abghl --time-style=long-iso --tree"
 alias lll="exa -abghHliS --time-style=long-iso"
 alias vi="nvim"
 
