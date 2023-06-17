@@ -57,6 +57,7 @@ require('packer').startup(function(use)
 	use 'rcarriga/nvim-notify'
 	use  'feline-nvim/feline.nvim'
 	use  'mbbill/undotree'
+	use  'simrat39/symbols-outline.nvim'
 
 
 	-- Debug
