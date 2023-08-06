@@ -32,7 +32,7 @@ mkcd ()
 	mkdir -p -- "$1" && cd -P -- "$1"
 }
 
-# Repeast a command every second and print the output cleanly
+# Repeat a command every second and print the output cleanly
 everysec ()
 {
 	emulate -LR sh # Inherit environment
@@ -52,7 +52,11 @@ everysec ()
 }
 
 
+export GOPATH=$HOME/go
+
+PATH=$PATH:$GOPATH/bin
 PATH=$PATH:$HOME/.local/scripts
+PATH=$PATH:$HOME/opt/GNAT/2021/bin/
 export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib
 export PATH=$PATH:/usr/lib/cargo/bin
 export EDITOR=nvim
@@ -63,6 +67,7 @@ export EXA_COLORS="da=0" # set the date field white
 
 alias avu="rlwrap --always-readline docker exec -it $(docker ps | grep avu | awk '{print $1}') /AvesTerra/Executables/avu"
 alias atlogs="docker logs -f $(docker ps | grep avesterra:latest | awk '{print $1}')"
+alias dls='docker ps --format "table {{.ID}}\t{{.Names}}\t{{.RunningFor}}\t{{.Status}}"'
 
 
 # quick paths
