@@ -71,7 +71,7 @@ local dapui_setup_arg =
 			elements =
 			{
 				{
-					id = "console",
+					id = "repl",
 					size = 1.0
 				}
 			},
@@ -101,11 +101,13 @@ function continue_or_start_debug()
 	end
 end
 
+
 M.setup = function()
 	require('telescope').load_extension('dap')
 
 	-- languages
 	require('dap-python').setup('python')
+	require('dap-go').setup({})
 
 	dapui.setup(dapui_setup_arg)
 

@@ -1,4 +1,4 @@
--- require('copilot_cmp').setup()
+-- do return end
 
 
 require('copilot').setup({

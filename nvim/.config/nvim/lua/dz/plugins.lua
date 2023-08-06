@@ -29,8 +29,8 @@ require('packer').startup(function(use)
 	use  'hrsh7th/cmp-cmdline'
 	use  'onsails/lspkind.nvim' -- icons in the completion list
 	use  'ray-x/lsp_signature.nvim'
-	use  'L3MON4D3/LuaSnip'
-	use {'j-hui/fidget.nvim', config = function() require('fidget').setup({}) end }
+	use {'L3MON4D3/LuaSnip', tag = 'v2.*', run = 'make install_jsregexp' }
+	use {'j-hui/fidget.nvim', tag = 'legacy', config = function() require('fidget').setup({}) end }
 
 	use  'zbirenbaum/copilot.lua'
 	use  'zbirenbaum/copilot-cmp'
@@ -47,6 +47,7 @@ require('packer').startup(function(use)
 	-- Git
 	use {'lewis6991/gitsigns.nvim', config = function() require('gitsigns').setup() end }
 	use {'tpope/vim-fugitive', requires = 'tpope/vim-rhubarb' }
+	use {'rbong/vim-flog'}
 
 	-- look
 	use  'ellisonleao/gruvbox.nvim'
@@ -66,6 +67,7 @@ require('packer').startup(function(use)
 	use {'theHamsta/nvim-dap-virtual-text', config = function() require('nvim-dap-virtual-text').setup({}) end }
 	use {'nvim-telescope/telescope-dap.nvim'}
 	use {'rcarriga/nvim-dap-ui', requires = {'mfussenegger/nvim-dap'} }
+	use {'leoluz/nvim-dap-go'}
 
 
 
@@ -93,6 +95,8 @@ require('packer').startup(function(use)
 	use {'nvim-pack/nvim-spectre', config = function() require('spectre').setup({}) end }
 	use {'Wansmer/treesj', requires = { 'nvim-treesitter' }}
 	use {'jose-elias-alvarez/null-ls.nvim'}
+
+	use {'windwp/nvim-autopairs', config = function() require('nvim-autopairs').setup({}) end }
 
 end)
 
