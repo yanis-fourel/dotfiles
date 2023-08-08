@@ -1,0 +1,14 @@
+[user]
+	email = yanis.fourel@ledr.io
+	name = Yanis Fourel
+[core]
+	ediror = vi
+[credential]
+	helper = cache --timeout 7200
+	helper = oauth
+[pull]
+	ff = only
+[merge]
+	conflictstyle = diff3
+[push]
+	default = current
