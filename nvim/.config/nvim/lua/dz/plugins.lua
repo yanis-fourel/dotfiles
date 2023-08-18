@@ -53,7 +53,6 @@ require('packer').startup(function(use)
 	use  'ellisonleao/gruvbox.nvim'
 	use {'kyazdani42/nvim-web-devicons', config = function() require('nvim-web-devicons').setup() end }
 	use  'lukas-reineke/indent-blankline.nvim'
-	use {'norcalli/nvim-colorizer.lua', config = function() require('colorizer').setup() end }
 	use 'nvim-treesitter/nvim-treesitter-context'
 	use 'rcarriga/nvim-notify'
 	use  'feline-nvim/feline.nvim'
