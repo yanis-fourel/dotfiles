@@ -18,7 +18,7 @@ vim.o.clipboard      = 'unnamedplus'
 vim.o.path           = vim.o.path .. '**'
 vim.o.wildignore     = vim.o.wildignore .. '**/node_modules/*'
 vim.o.history        = 200
-vim.o.wrap           = true
+vim.o.wrap           = false
 vim.o.linebreak      = true
 vim.o.undodir        = os.getenv("HOME") .. '/.nvim_undodir'
 vim.o.undofile       = true
@@ -27,7 +27,4 @@ vim.o.mouse          = 'a'
 vim.o.laststatus     = 3
 vim.o.termguicolors  = true
 vim.o.colorcolumn    = '80'
-
--- Compiling file: obj/encode/json/print.o -> src/encode/json/print.c:186:78: error: format sp
-vim.o.errorformat = vim.o.errorformat .. '%.%#Compiling file%.%# -> %f:%l:%c%.%#'
 
