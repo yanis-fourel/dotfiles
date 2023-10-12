@@ -25,10 +25,19 @@ vim.keymap.set('v','<leader><leader>jq', "<cmd>'<,'>!jq --tab -c<CR>")
 
 -- Map j and k to gj/gk, but only when no count is given
 -- However, for larger jumps like 6j add the current position to the jump list
--- so that you can use <c-o>/<c-i> to jump to the previous position
--- TODO vim.keymap.set('n','<expr>', '<Down> v:count ? (v:count > 5 ? "m'" . v:count : '') . 'j' : 'gj'')
--- TODO vim.keymap.set('n','<expr>', '<Up>   v:count ? (v:count > 5 ? "m'" . v:count : '') . 'k' : 'gk'')
+local function mark_if_big(motion)
+	local BIG = 5
 
+	return function ()
+		local count = vim.v.count or 1
+		if count > BIG then
+			vim.cmd("mark '")
+		end
+		return motion
+	end
+end
+vim.keymap.set('n','<Up>', mark_if_big('gk'), { remap = true, expr = true })
+vim.keymap.set('n','<Down>', mark_if_big('gj'), { remap = true, expr = true })
 vim.keymap.set('n','<Left>', 'h', { remap = true })
 vim.keymap.set('n','<Right>', 'l', { remap = true})
 
