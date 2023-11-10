@@ -16,6 +16,7 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#44bbbb"
 
 NVIM_CONFIG_DIR="~/.dotfiles/nvim/.config/nvim/"
 
@@ -56,7 +57,9 @@ export GOPATH=$HOME/go
 
 PATH=$PATH:$GOPATH/bin
 PATH=$PATH:$HOME/.local/scripts
+PATH=$PATH:$HOME/.local/bin
 PATH=$PATH:$HOME/opt/GNAT/2021/bin/
+PATH=$PATH:/snap/bin
 export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib
 export PATH=$PATH:/usr/lib/cargo/bin
 export EDITOR=nvim
@@ -65,7 +68,6 @@ export EDITOR=nvim
 alias ls="exa"
 export EXA_COLORS="da=0" # set the date field white
 
-alias avu="rlwrap --always-readline docker exec -it $(docker ps | grep avu | awk '{print $1}') /AvesTerra/Executables/avu"
 alias atlogs="docker logs -f $(docker ps | grep avesterra:latest | awk '{print $1}')"
 alias dls='docker ps --format "table {{.ID}}\t{{.Names}}\t{{.RunningFor}}\t{{.Status}}"'
 
