@@ -3,9 +3,6 @@
 	name = Yanis Fourel
 [core]
 	ediror = vi
-[credential]
-	helper = cache --timeout 7200
-	helper = oauth
 [pull]
 	ff = only
 [merge]
