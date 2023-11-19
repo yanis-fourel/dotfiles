@@ -42,6 +42,7 @@ require('packer').startup(function(use)
 	-- use 'tjdevries/nlua.nvim' -- check if hrsh7th/cmp-nvim-lua isn't enough
 	use  'folke/neodev.nvim'
 	use  'Saecki/crates.nvim'
+	use  'tigion/nvim-asciidoc-preview'
 
 
 	-- Git
@@ -52,7 +53,7 @@ require('packer').startup(function(use)
 	-- look
 	use  'ellisonleao/gruvbox.nvim'
 	use {'kyazdani42/nvim-web-devicons', config = function() require('nvim-web-devicons').setup() end }
-	use  'lukas-reineke/indent-blankline.nvim'
+	use {'lukas-reineke/indent-blankline.nvim', tag = 'v2.20.8' }
 	use 'nvim-treesitter/nvim-treesitter-context'
 	use 'rcarriga/nvim-notify'
 	use  'feline-nvim/feline.nvim'
