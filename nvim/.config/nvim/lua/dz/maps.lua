@@ -106,3 +106,5 @@ vim.keymap.set('n', '<leader><leader>w', function ()
 		vim.cmd('silent !cargo fmt')
 	end
 end)
+
+vim.api.nvim_create_user_command('FixUnicode', [[%s/\\u\(\x\{4\}\)/\=nr2char('0x'.submatch(1),1)/g]], {})
