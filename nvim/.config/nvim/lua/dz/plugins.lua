@@ -72,6 +72,7 @@ require('packer').startup(function(use)
 	use  'feline-nvim/feline.nvim'
 	use  'mbbill/undotree'
 	use  'simrat39/symbols-outline.nvim'
+	use {'norcalli/nvim-colorizer.lua', config = function() require('colorizer').setup() end }
 
 
 	-- Debug
