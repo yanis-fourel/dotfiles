@@ -68,14 +68,13 @@ export EDITOR=nvim
 alias ls="exa"
 export EXA_COLORS="da=0" # set the date field white
 
-alias atlogs="docker logs -f $(docker ps | grep avesterra:latest | awk '{print $1}')"
-alias dls='docker ps --format "table {{.ID}}\t{{.Names}}\t{{.RunningFor}}\t{{.Status}}"'
+alias hy='hyprctl dispatch'
+
+# TODO: lazily get the container id from a script, in case it changes at runtime
+# alias atlogs="docker logs -f $(docker ps | grep avesterra:latest | awk '{print $1}')"
 
 
 # quick paths
-alias gooa="cd ~/ledr/Orchestra-AvesTerra/"
-alias gomh="cd ~/ledr/Cust-MH/Backend_Rust/"
-
 alias gl="git log --oneline --graph --decorate"
 alias gla="git log --oneline --graph --decorate --all"
 alias gs="git status"
@@ -91,21 +90,11 @@ alias vi="nvim"
 
 alias fuck="killall -9"
 
-alias gresetsm="git submodule deinit -f . && git submodule update --init --recursive"
-alias wtyping="python /home/yanis/perso/WikipediaTypingPractice/wikityping.py --article"
-
-bindkey -s ^f "tmux-sessionizer\n"
-
-# make with multiple jobs and (most of the time) proper output
-alias makej="make -j -Otarget --no-print-directory"
-
 # Vim Config
 alias vc="vi $NVIM_CONFIG_DIR/init.* --cmd 'cd %:h'"
 
 
 #bindings
-
-bindkey -s "^n" '. ranger ^M'
 
 
 ###############################################################################
