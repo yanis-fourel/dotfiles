@@ -1,0 +1,77 @@
+{
+    "layer": "top", // Waybar at top layer
+    "position": "top", // Waybar position (top|bottom|left|right)
+    "height": 20, // Waybar height (to be removed for auto height)
+    // "width": 1280, // Waybar width
+    "spacing": 4, // Gaps between modules (4px)
+    "modules-left": ["hyprland/workspaces", "hyprland/submap"],
+    "modules-center": ["hyprland/language"],
+    "modules-right": ["pulseaudio", "network", "cpu", "memory", "disk", "temperature", "battery", "clock", "tray"],
+    "clock": {
+        "format": "{:%Y-%m-%d %H:%M}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        "format-alt": "{:%Y-%m-%d}"
+    },
+    "cpu": {
+        "format": "{usage}% cpu",
+        "tooltip": false
+    },
+    "memory": {
+        "format": "ram: {used}GiB / {total}GiB | swap: {swapUsed}GiB / {swapTotal}GiB"
+    },
+    "temperature": {
+        // "thermal-zone": 2,
+        // "hwmon-path": "/sys/class/hwmon/hwmon2/temp1_input",
+        "critical-threshold": 80,
+        "format-critical": "CRITICAL: {temperatureC}°C",
+        "format": "{temperatureC}°C",
+    },
+    "battery": {
+        "states": {
+            // "good": 95,
+            "warning": 50,
+            "critical": 25
+        },
+        "format": "{capacity}% 󰁹",
+        "format-charging": "{capacity}% ",
+        "format-plugged": "{capacity}% ",
+    },
+    "network": {
+        // "interface": "wlp2*", // (Optional) To force the use of this interface
+        "format-wifi": "{essid} ({signalStrength}%) ",
+        "format-ethernet": "{ipaddr}/{cidr} ",
+        "tooltip-format": "{ifname} via {gwaddr} ",
+        "format-linked": "{ifname} (No IP) ",
+        "format-disconnected": "Disconnected ⚠",
+        "format-alt": "{ifname}: {ipaddr}/{cidr}"
+    },
+    "pulseaudio": {
+        // "scroll-step": 1, // %, can be a float
+        "format": "{volume}% {icon} {format_source}",
+        "format-bluetooth": "{volume}% {icon} {format_source}",
+        "format-bluetooth-muted": " {icon} {format_source}",
+        "format-muted": " {format_source}",
+        "format-source": "{volume}% ",
+        "format-source-muted": "",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
+        },
+        "on-click": "pavucontrol"
+    },
+    "disk": {
+        "interval": 30,
+        "format": "disk: {used} / {total}",
+        "path": "/home/yanis/"
+    },
+    "tray": {
+        "icon-size": 21,
+        "spacing": 10
+    }
+}
+
