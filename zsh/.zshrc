@@ -1,4 +1,10 @@
-if [ "$TMUX" = "" ]; then tmux new -s root; fi
+if [ "$TMUX" = "" ]; then 
+	if tmux has-session -t=root 2> /dev/null; then
+		tmux a -t root
+	else
+		tmux new -s root; 
+	fi
+fi
 
 export ZSH="/home/yanis/.oh-my-zsh"
 
