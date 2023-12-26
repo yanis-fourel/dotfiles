@@ -1,25 +1,29 @@
 #!/usr/bin/env bash
 
 if [[ $# -eq 1 ]]; then
-    selected=$1
+    selection=$1
 else
-    selected=$(find ~/ledr ~/perso -mindepth 1 -maxdepth 1 -type d | fzf)
+	choices=$(find ~/ledr ~/perso -mindepth 1 -maxdepth 1 -type d)
+	choices=$(echo "$choices" | sed "s|$HOME/||")
+
+	choices=$(echo -e "root\n$choices")
+	selection=$(echo "$choices" | tofi)
 fi
 
-if [[ -z $selected ]]; then
+if [[ -z $selection ]]; then
     exit 0
 fi
 
-selected_name=$(basename "$selected" | tr . _)
+selection_name=$(basename "$selection" | tr . _)
 tmux_running=$(pgrep tmux)
 
 if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
-    tmux new-session -s $selected_name -c $selected
+    tmux new-session -s $selection_name -c $selection
     exit 0
 fi
 
-if ! tmux has-session -t=$selected_name 2> /dev/null; then
-    tmux new-session -ds $selected_name -c $selected
+if ! tmux has-session -t=$selection_name 2> /dev/null; then
+    tmux new-session -ds $selection_name -c $selection
 fi
 
-tmux switch-client -t $selected_name
+tmux switch-client -t $selection_name

@@ -1,0 +1,20 @@
+dest=$1
+
+if [ -z "$dest" ]; then
+	echo "usage $0 <workspace>"
+	exit 1
+fi
+
+monitor_chain=$(tac ~/.config/monitor_order)
+
+prev=''
+for m in $monitor_chain; do
+	if [ -n "$prev" ]; then
+		hyprctl dispatch focusmonitor "$m"
+		hyprctl dispatch movecurrentworkspacetomonitor "$prev"
+	fi
+	prev="$m"
+done
+
+hyprctl dispatch moveworkspacetomonitor "$dest" "$m"
+hyprctl dispatch workspace "$dest"

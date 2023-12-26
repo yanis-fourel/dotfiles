@@ -1,3 +1,5 @@
+if [ "$TMUX" = "" ]; then tmux new -s root; fi
+
 export ZSH="/home/yanis/.oh-my-zsh"
 
 ZSH_THEME="robbyrussell"
@@ -109,3 +111,4 @@ export AVIAL_REPO_PATH=/home/yanis/ledr/Orchestra-AvesTerra/
 autoload -Uz compinit
 zstyle ':completion:*' menu select
 fpath+=~/.zfunc
+
