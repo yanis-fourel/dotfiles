@@ -17,7 +17,7 @@ disabled = true
 
 [status]
 disabled = false
-symbol = ""
+symbol = " "
 
 [directory]
 repo_root_style = "yellow dimmed"
