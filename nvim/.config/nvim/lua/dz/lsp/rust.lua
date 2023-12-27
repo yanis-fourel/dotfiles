@@ -3,6 +3,7 @@ local rust_tools = require('rust-tools')
 local M = {}
 
 
+local augroup = vim.api.nvim_create_augroup("RustAutoFmt", {})
 
 M.setup = function(capabilities)
 
@@ -106,13 +107,25 @@ M.setup = function(capabilities)
 						allFeatures = true
 					},
 				}
-			}
+			},
+			on_attach = function (_, bufnr)
+				vim.api.nvim_create_autocmd("BufWritePre", {
+					group = augroup,
+					buffer = bufnr,
+					callback = function()
+						vim.lsp.buf.format({ bufnr = bufnr })
+					end
+				})
+			end
 		},
 
 		dap = {
 			adapter = require('rust-tools.dap').get_codelldb_adapter(codelldb_path, liblldb_path)
 		},
 	})
+
+
+
 end
 
 return M
