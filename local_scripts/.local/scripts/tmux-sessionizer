@@ -3,11 +3,11 @@
 if [[ $# -eq 1 ]]; then
     selection=$1
 else
-	choices=$(find ~/ledr ~/perso -mindepth 1 -maxdepth 1 -type d)
+	choices=$(find ~/ledr ~/dz -mindepth 1 -maxdepth 1 -type d)
 	choices=$(echo "$choices" | sed "s|$HOME/||")
 
 	choices=$(echo -e "root\n$choices")
-	selection=$(echo "$choices" | tofi)
+	selection="$HOME/$(echo "$choices" | tofi)"
 fi
 
 if [[ -z $selection ]]; then
