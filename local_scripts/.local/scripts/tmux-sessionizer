@@ -7,11 +7,11 @@ else
 	choices=$(echo "$choices" | sed "s|$HOME/||")
 
 	choices=$(echo -e "root\n$choices")
-	selection="$HOME/$(echo "$choices" | tofi)"
-fi
-
-if [[ -z $selection ]]; then
-    exit 0
+	selection=$(echo "$choices" | tofi)
+	if [[ -z $selection ]]; then
+		exit 0
+	fi
+	selection="$HOME/$selection"
 fi
 
 selection_name=$(basename "$selection" | tr . _)
