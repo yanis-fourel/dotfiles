@@ -1,0 +1,15 @@
+PLAYGROUD_DIR=$HOME/dz/playgrouds
+TEMPLATE_DIR=$PLAYGROUD_DIR/_templates
+
+template=$(ls -1 $TEMPLATE_DIR | tofi)
+name=$(zenity --entry --text "name (empty defaults to current date)")
+
+if [ -z $name ]; then
+	name=$(date '+%Y_%m_%d_%Hh%Mm%Ss')
+fi
+
+dest_path="$PLAYGROUD_DIR/$template/$name"
+mkdir -p "$dest_path"
+
+cp -a "$TEMPLATE_DIR/$template/." "$dest_path"
+tmux-sessionizer "$dest_path"
