@@ -42,7 +42,7 @@ lspconfig.clangd.setup { capabilities = capabilities }
 lspconfig.tsserver.setup { capabilities = capabilities }
 -- lspconfig.jdtls.setup { capabilities = capabilities }
 lspconfig.bashls.setup { capabilities = capabilities }
--- lspconfig.als.setup { capabilities = capabilities }
+lspconfig.als.setup { capabilities = capabilities }
 -- lspconfig.docker_compose_language_service.setup { capabilities = capabilities }
 -- lspconfig.dockerls.setup { capabilities = capabilities }
 
