@@ -63,13 +63,14 @@ everysec ()
 
 export GOPATH=$HOME/go
 
-PATH=$PATH:$GOPATH/bin
-PATH=$PATH:$HOME/.local/scripts
-PATH=$PATH:$HOME/.local/bin
-PATH=$PATH:$HOME/opt/GNAT/2021/bin/
-PATH=$PATH:/snap/bin
-export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib
+export PATH=$PATH:$GOPATH/bin
+export PATH=$PATH:$HOME/.local/scripts
+export PATH=$PATH:$HOME/.local/bin
+export PATH=$PATH:$HOME/opt/GNAT/2021/bin/
+export PATH=$PATH:/snap/bin
 export PATH=$PATH:/usr/lib/cargo/bin
+export PATH=$PATH::$HOME/.cargo/bin
+export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib
 export EDITOR=nvim
 
 # alias
