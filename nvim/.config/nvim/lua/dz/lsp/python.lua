@@ -4,8 +4,34 @@ local M = {}
 
 local augroup = vim.api.nvim_create_augroup("BlackAutoFmt", {})
 
-M.setup = function(capabilities)
 
+local function autofmt_black(_, bufnr)
+	vim.api.nvim_create_autocmd("BufWritePre", {
+		group = augroup,
+		buffer = bufnr,
+		callback = function()
+			vim.lsp.buf.format({ bufnr = bufnr })
+		end
+	})
+end
+
+local function setup_pyright(capabilities)
+	lspconfig.pyright.setup({
+		capabilities = capabilities,
+		settings = {
+			python = {
+				analysis = {
+					diagnosticSeverityOverrides = {
+						reportInvalidTypeForm = 'none', -- causes problem with avial types
+					}
+				},
+			}
+		},
+		on_attach = autofmt_black,
+	})
+end
+
+local function setup_pylint(capabilities)
 	local venv = os.getenv("VIRTUAL_ENV")
 	local pylint_executable = "pylint"
 	if venv ~= nil then
@@ -20,7 +46,7 @@ M.setup = function(capabilities)
 
 	lspconfig.pylsp.setup({
 		capabilities = capabilities,
-        settings = {
+		settings = {
 			pylsp = {
 				plugins = {
 					autopep8 = {
@@ -53,17 +79,16 @@ M.setup = function(capabilities)
 					}
 				}
 			}
-        },
-		on_attach = function (_, bufnr)
-			vim.api.nvim_create_autocmd("BufWritePre", {
-				group = augroup,
-				buffer = bufnr,
-				callback = function()
-					vim.lsp.buf.format({ bufnr = bufnr })
-				end
-			})
-		end
+		},
+		on_attach = autofmt_black,
 	})
+end
+
+
+
+M.setup = function(capabilities)
+	setup_pyright(capabilities)
+	-- setup_pylint(capabilities)
 end
 
 return M
