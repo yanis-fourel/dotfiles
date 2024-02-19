@@ -2,12 +2,12 @@ PLAYGROUD_DIR=$HOME/dz/playgrouds
 TEMPLATE_DIR=$PLAYGROUD_DIR/_templates
 
 template=$(ls -1 $TEMPLATE_DIR | tofi)
-if [ -a "$template" ]; then
+if [[ -z "$template" ]]; then
 	exit 0
 fi
 
 name=$(zenity --entry --text "name (empty defaults to current date)")
-if [ -z "$name" ]; then
+if [[ -z "$name" ]]; then
 	name=$(date '+%Y_%m_%d_%Hh%Mm%Ss')
 fi
 

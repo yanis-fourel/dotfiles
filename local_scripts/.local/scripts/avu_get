@@ -1,1 +1,1 @@
-docker cp $(docker ps | grep avu | awk '{ print $1 }'):AvesTerra/$1 .
+docker cp "$(docker ps | grep avu | awk '{ print $1 }'):AvesTerra/$1" .
