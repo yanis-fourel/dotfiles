@@ -103,15 +103,7 @@ require('packer').startup(function(use)
 	use  'tpope/vim-abolish'
 	use  'tpope/vim-eunuch'
 	use  'tpope/vim-unimpaired'
-	-- use  'tpope/vim-sleuth'
-	use {'unblevable/quick-scope', config = function() vim.cmd( -- config doesn't work if ran in 'after/plugin'
-		[[
-			let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
-
-			highlight QuickScopePrimary guifg='#5fffff' gui=underline ctermfg=155 cterm=underline
-			highlight QuickScopeSecondary guifg='#999999' gui=underline ctermfg=81 cterm=underline
-		]])
-	end }
+	use  'jinh0/eyeliner.nvim'
 	use  'mechatroner/rainbow_csv'
 	use {'nvim-pack/nvim-spectre', config = function() require('spectre').setup({}) end }
 	use {'Wansmer/treesj', requires = { 'nvim-treesitter' }}
