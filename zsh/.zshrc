@@ -82,8 +82,8 @@ alias hy='hyprctl dispatch'
 # TODO: lazily get the container id from a script, in case it changes at runtime
 # alias atlogs="docker logs -f $(docker ps | grep avesterra:latest | awk '{print $1}')"
 
+alias zz.st="curl -F 'file=@-' 0x0.st"
 
-# quick paths
 alias gl="git log --oneline --graph --decorate"
 alias gla="git log --oneline --graph --decorate --all"
 alias gs="git status"
@@ -119,3 +119,5 @@ autoload -Uz compinit
 zstyle ':completion:*' menu select
 fpath+=~/.zfunc
 
+
+eval "$(zoxide init --cmd cd zsh)"
