@@ -85,10 +85,18 @@ local function setup_pylint(capabilities)
 end
 
 
+local function setup_ruff(capabilities)
+	lspconfig.ruff_lsp.setup({
+		capabilities = capabilities,
+		settings = {},
+		on_attach = autofmt_black,
+	})
+end
 
 M.setup = function(capabilities)
 	setup_pyright(capabilities)
 	-- setup_pylint(capabilities)
+	-- setup_ruff(capabilities)
 end
 
 return M
