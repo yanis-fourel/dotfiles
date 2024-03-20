@@ -84,6 +84,7 @@ require('packer').startup(function(use)
 
 	-- Debug
 	use {'mfussenegger/nvim-dap'}
+	use { "nvim-neotest/nvim-nio" }
 	use {'mfussenegger/nvim-dap-python'}
 	use {'theHamsta/nvim-dap-virtual-text', config = function() require('nvim-dap-virtual-text').setup({}) end }
 	use {'nvim-telescope/telescope-dap.nvim'}
