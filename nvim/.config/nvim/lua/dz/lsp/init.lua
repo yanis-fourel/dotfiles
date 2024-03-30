@@ -38,7 +38,6 @@ require('neodev').setup({
 -- for the name of the properties
 
 -- Language-specific config
-lspconfig.clangd.setup { capabilities = capabilities }
 lspconfig.tsserver.setup { capabilities = capabilities }
 -- lspconfig.jdtls.setup { capabilities = capabilities }
 lspconfig.bashls.setup { capabilities = capabilities }
@@ -46,6 +45,7 @@ lspconfig.als.setup { capabilities = capabilities }
 -- lspconfig.docker_compose_language_service.setup { capabilities = capabilities }
 -- lspconfig.dockerls.setup { capabilities = capabilities }
 
+require('dz.lsp.clangd').setup(capabilities)
 require('dz.lsp.lua').setup(capabilities)
 require('dz.lsp.rust').setup(capabilities)
 require('dz.lsp.python').setup(capabilities)
