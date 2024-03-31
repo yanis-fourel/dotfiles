@@ -7,6 +7,9 @@ null_ls.setup({
 		-- TODO: check that: null_ls.builtins.formatting.autopep8
 		-- TODO:    or that: null_ls.builtins.formatting.black
 
+		-- C/C++
+		null_ls.builtins.formatting.clang_format,
+
 		-- Go
         null_ls.builtins.formatting.gofmt,
         -- null_ls.builtins.formatting.goimports_reviser
