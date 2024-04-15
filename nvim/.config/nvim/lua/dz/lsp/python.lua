@@ -86,6 +86,11 @@ end
 
 
 local function setup_ruff(capabilities)
+	-- Used when in combinaison with pyright
+	capabilities.documentFormattingProvider = false
+	capabilities.hoverProvider = false
+	capabilities.renameProvider = false
+
 	lspconfig.ruff_lsp.setup({
 		capabilities = capabilities,
 		settings = {},
@@ -96,7 +101,7 @@ end
 M.setup = function(capabilities)
 	setup_pyright(capabilities)
 	-- setup_pylint(capabilities)
-	-- setup_ruff(capabilities)
+	setup_ruff(capabilities)
 end
 
 return M

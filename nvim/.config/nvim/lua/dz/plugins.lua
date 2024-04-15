@@ -34,6 +34,7 @@ require('packer').startup(function(use)
 	-- LSP + autocomplete
 	use  'neovim/nvim-lspconfig'
 	use  'williamboman/mason.nvim'
+	use  'danarth/sonarlint.nvim'
 
 	use  'hrsh7th/nvim-cmp'
 	use  'hrsh7th/cmp-nvim-lsp'
