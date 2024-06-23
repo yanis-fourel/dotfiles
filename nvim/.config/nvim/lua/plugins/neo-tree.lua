@@ -20,6 +20,11 @@ return {
 		},
 	},
 	init = function()
+		vim.keymap.set("n", "<leader>pl", function()
+			local glob = vim.fn.stdpath("config") .. "**/plugins/"
+			local plugindir = vim.fn.glob(glob)
+			vim.cmd(":Neotree dir=" .. plugindir)
+		end)
 		vim.keymap.set("n", "<leader>e", function()
 			local curr_buf = vim.fn.expand("%")
 			if vim.fn.filereadable(curr_buf) == 1 then

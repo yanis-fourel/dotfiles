@@ -54,3 +54,11 @@ vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
+
+vim.o.title = true
+vim.o.wrap = false
+vim.o.linebreak = true
+vim.o.undodir = os.getenv("HOME") .. "/.nvim_undodir"
+vim.o.undofile = true
+vim.o.laststatus = 3
+vim.o.colorcolumn = "80"

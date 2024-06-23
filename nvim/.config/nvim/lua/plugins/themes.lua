@@ -15,6 +15,7 @@ return {
 
 		vim.g.backround = "dark"
 		vim.g.everforest_background = "hard"
+
 		vim.cmd.colorscheme("tokyonight-moon")
 	end,
 }

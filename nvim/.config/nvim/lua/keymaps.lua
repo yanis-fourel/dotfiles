@@ -9,6 +9,18 @@ vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next [D]iagn
 vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic [E]rror messages" })
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
 
+vim.keymap.set("n", "<leader><leader>x", ":source %<CR>", { desc = "Sources current file" })
+vim.keymap.set("n", "/", "/\\v")
+vim.keymap.set("n", "^", "0^", { noremap = true })
+
+vim.keymap.set("x", "<leader>p", '"_dP')
+
+vim.keymap.set("n", "<leader>yq", "<cmd>%!yq<CR>")
+vim.keymap.set("n", "<leader>jq", "<cmd>%!jq --tab<CR>")
+vim.keymap.set("v", "<leader>jq", "<cmd>'<,'>!jq --tab<CR>")
+vim.keymap.set("n", "<leader><leader>jq", "<cmd>%!jq --tab -c<CR>")
+vim.keymap.set("v", "<leader><leader>jq", "<cmd>'<,'>!jq --tab -c<CR>")
+
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
@@ -46,16 +58,19 @@ vim.keymap.set("n", "<M-S-i>", "<C-w><Right>", { desc = "Move focus to the upper
 -- TODO luafy: vim.keymap.set('c','<expr>', '%% getcmdtype() == ':' ? expand('%:h').'/' : '%%'')
 vim.cmd([[ cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%' ]])
 
--- [[ Basic Autocommands ]]
---  See `:help lua-guide-autocommands`
+vim.keymap.set("n", "<leader>1", "1gt")
+vim.keymap.set("n", "<leader>2", "2gt")
+vim.keymap.set("n", "<leader>3", "3gt")
+vim.keymap.set("n", "<leader>4", "4gt")
+vim.keymap.set("n", "<leader>5", "5gt")
+vim.keymap.set("n", "<leader>6", "6gt")
+vim.keymap.set("n", "<leader>7", "7gt")
+vim.keymap.set("n", "<leader>8", "8gt")
+vim.keymap.set("n", "<leader>9", "9gt")
 
--- Highlight when yanking (copying) text
---  Try it with `yap` in normal mode
---  See `:help vim.highlight.on_yank()`
-vim.api.nvim_create_autocmd("TextYankPost", {
-	desc = "Highlight when yanking (copying) text",
-	group = vim.api.nvim_create_augroup("kickstart-highlight-yank", { clear = true }),
-	callback = function()
-		vim.highlight.on_yank()
-	end,
-})
+-- Rename all occurences of the word under cursor
+vim.keymap.set("n", "<leader><leader>re", "yiw:%s///g<c-F>hhhhpla")
+
+vim.keymap.set("i", "<C-z>", "<cmd>normal zz<CR>")
+
+vim.api.nvim_create_user_command("UnicodeFix", [[%s/\\u\(\x\{4\}\)/\=nr2char('0x'.submatch(1),1)/g]], {})
