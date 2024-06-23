@@ -34,6 +34,7 @@ require('packer').startup(function(use)
 	-- LSP + autocomplete
 	use  'neovim/nvim-lspconfig'
 	use  'williamboman/mason.nvim'
+	use  'danarth/sonarlint.nvim'
 
 	use  'hrsh7th/nvim-cmp'
 	use  'hrsh7th/cmp-nvim-lsp'
@@ -111,8 +112,6 @@ require('packer').startup(function(use)
 	use {'jose-elias-alvarez/null-ls.nvim'}
 
 	use {'windwp/nvim-autopairs', config = function() require('nvim-autopairs').setup({}) end }
-
-	use { 'nvim-neorg/neorg', run = ':Neorg sync-parsers', requires = "nvim-lua/plenary.nvim" }
 
 
 	if packer_bootstrap then
