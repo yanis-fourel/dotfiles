@@ -1,6 +1,8 @@
 -- autopairs
 -- https://github.com/windwp/nvim-autopairs
 
+vim.print("From autopairs")
+
 return {
   'windwp/nvim-autopairs',
   event = 'InsertEnter',
