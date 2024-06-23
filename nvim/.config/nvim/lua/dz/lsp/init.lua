@@ -45,11 +45,16 @@ lspconfig.als.setup { capabilities = capabilities }
 -- lspconfig.docker_compose_language_service.setup { capabilities = capabilities }
 -- lspconfig.dockerls.setup { capabilities = capabilities }
 
+-- For svelte :TSInstall typescript scss svelte
+lspconfig.svelte.setup { capabilities = capabilities }
+lspconfig.eslint.setup { capabilities = capabilities }
+
 require('dz.lsp.clangd').setup(capabilities)
 require('dz.lsp.lua').setup(capabilities)
 require('dz.lsp.rust').setup(capabilities)
 require('dz.lsp.python').setup(capabilities)
 require('dz.lsp.go').setup(capabilities)
+require('dz.lsp.zig').setup(capabilities)
 
 -- autocmd BufRead,BufNewFile .env lua vim.diagnostic.disable(<abuf>) 
 

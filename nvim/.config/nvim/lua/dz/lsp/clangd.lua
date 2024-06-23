@@ -8,6 +8,8 @@ local clangformat_config = [[
 BasedOnStyle: LLVM
 IndentWidth: 4
 AllowShortFunctionsOnASingleLine: Empty # Prevents oneliner function
+IndentPPDirectives: AfterHash
+QualifierAlignment: Left
 ]]
 
 local function write_clangformat_config()
