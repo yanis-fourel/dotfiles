@@ -24,7 +24,7 @@ return {
 			local glob = vim.fn.stdpath("config") .. "**/plugins/"
 			local plugindir = vim.fn.glob(glob)
 			vim.cmd(":Neotree dir=" .. plugindir)
-		end)
+		end, { desc = "Open [PL]ugin dir" })
 		vim.keymap.set("n", "<leader>e", function()
 			local curr_buf = vim.fn.expand("%")
 			if vim.fn.filereadable(curr_buf) == 1 then
@@ -32,6 +32,6 @@ return {
 			else
 				vim.cmd(":Neotree toggle")
 			end
-		end)
+		end, { desc = "Toggle neo-tree" })
 	end,
 }
