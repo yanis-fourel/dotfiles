@@ -5,13 +5,13 @@ require'nvim-treesitter.configs'.setup {
   },
   indent = {
     enable = true,
-    disable = {},
+    disable = { "c", "cpp" },
   },
   ensure_installed = {
     "c",
+    "cpp",
     "lua",
     "rust",
-    "cpp",
     "python",
     "json",
     "yaml",

@@ -1,4 +1,4 @@
--- do return end
+do return end
 
 
 require('copilot').setup({
