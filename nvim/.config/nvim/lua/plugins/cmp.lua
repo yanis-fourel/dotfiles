@@ -28,11 +28,27 @@ return {
 		},
 		"saadparwaiz1/cmp_luasnip",
 
+		{
+			"folke/lazydev.nvim",
+			ft = "lua", -- only load on lua files
+			opts = {
+				library = {
+					-- See the configuration section for more details
+					-- Load luvit types when the `vim.uv` word is found
+					{ path = "luvit-meta/library", words = { "vim%.uv" } },
+				},
+			},
+		},
+		{ "Bilal2453/luvit-meta", lazy = true }, -- optional `vim.uv` typings
+
 		-- Adds other completion capabilities.
 		--  nvim-cmp does not ship with all sources by default. They are split
 		--  into multiple repos for maintenance purposes.
 		"hrsh7th/cmp-nvim-lsp",
 		"hrsh7th/cmp-path",
+		"hrsh7th/cmp-cmdline",
+		"onsails/lspkind.nvim", -- icons in the completion list
+		{ "ray-x/lsp_signature.nvim", event = "VeryLazy", opts = {} },
 	},
 	config = function()
 		-- See `:help cmp`
@@ -83,6 +99,10 @@ return {
 				{ name = "nvim_lsp" },
 				{ name = "luasnip" },
 				{ name = "path" },
+				{ name = "lazydev" },
+			},
+			matching = {
+				disallow_fuzzy_matching = false,
 			},
 		})
 	end,

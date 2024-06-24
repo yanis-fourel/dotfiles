@@ -7,10 +7,6 @@ return {
 		"WhoIsSethDaniel/mason-tool-installer.nvim",
 
 		{ "j-hui/fidget.nvim", opts = {} },
-
-		-- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
-		-- used for completion, annotations and signatures of Neovim apis
-		{ "folke/neodev.nvim", opts = {} },
 	},
 	config = function()
 		--  This function gets run when an LSP attaches to a particular buffer.
@@ -24,6 +20,12 @@ return {
 					vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
 				end
 
+				map("ga", function()
+					require("telescope.builtin").diagnostics({ severity = 1, root_dir = true })
+				end, "Goto lsp error+warn list")
+				map("gb", function()
+					require("telescope.builtin").diagnostics({ severity = 2, root_dir = true })
+				end, "Goto lsp warning list")
 				map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
 				map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
 				map("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
@@ -63,18 +65,14 @@ return {
 		--  - settings (table): Override the default settings passed when initializing the server.
 		--        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
 		local servers = {
-			-- clangd = {},
-			-- gopls = {},
-			-- pyright = {},
-			-- rust_analyzer = {},
-			-- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
-			--
-			-- Some languages (like typescript) have entire language plugins that can be useful:
+			-- Typescript has an entire language plugins that can be useful:
 			--    https://github.com/pmizio/typescript-tools.nvim
-			--
-			-- But for many setups, the LSP (`tsserver`) will work just fine
-			-- tsserver = {},
-			--
+			-- but for me, tsserver is enough
+			tsserver = {},
+			svelte = {},
+			eslint = {},
+			bashls = {},
+			als = {},
 
 			lua_ls = {
 				settings = {
@@ -82,19 +80,20 @@ return {
 						completion = {
 							callSnippet = "Replace",
 						},
-						-- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-						-- diagnostics = { disable = { 'missing-fields' } },
+						diagnostics = { disable = { "missing-fields" } },
 					},
 				},
 			},
+			gopls = {
+				filetype = { "go", "gomod", "gowork" },
+			},
+			zls = {},
+			rust_analyzer = {}, -- TODO: has issues starting
 		}
 
-		-- Ensure the servers and tools above are installed
-		--  To check the current status of installed tools and/or manually install
-		--  other tools, you can run
-		--    :Mason
-		--
-		--  You can press `g?` for help in this menu.
+		vim.list_extend(servers, require("lspconf.clangd")(capabilities))
+		vim.list_extend(servers, require("lspconf.python")(capabilities))
+
 		require("mason").setup()
 
 		-- You can add other tools here that you want Mason to install
@@ -102,6 +101,8 @@ return {
 		local ensure_installed = vim.tbl_keys(servers or {})
 		vim.list_extend(ensure_installed, {
 			"stylua", -- Used to format Lua code
+			"clang-format",
+			"black",
 		})
 		require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 

@@ -45,7 +45,12 @@ return {
 		vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
 			group = lint_augroup,
 			callback = function()
-				require("lint").try_lint()
+				local buf = vim.api.nvim_get_current_buf()
+				local bufname = vim.api.nvim_buf_get_name(buf)
+				-- Fixes markdownlint error when stepping into a markdown tooltip or a help page
+				if not vim.bo[buf].readonly and not bufname == "Scratch" then
+					require("lint").try_lint()
+				end
 			end,
 		})
 	end,
