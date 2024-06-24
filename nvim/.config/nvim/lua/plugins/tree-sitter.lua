@@ -1,5 +1,8 @@
 return {
 	"nvim-treesitter/nvim-treesitter",
+	dependencies = {
+		"luckasRanarison/tree-sitter-hypr",
+	},
 	build = ":TSUpdate",
 	opts = {
 		ensure_installed = {
@@ -33,6 +36,15 @@ return {
 		require("nvim-treesitter.install").prefer_git = true
 		---@diagnostic disable-next-line: missing-fields
 		require("nvim-treesitter.configs").setup(opts)
+
+		require("nvim-treesitter.parsers").hypr = {
+			install_info = {
+				url = "https://github.com/luckasRanarison/tree-sitter-hypr",
+				files = { "src/parser.c" },
+				branch = "master",
+			},
+			filetype = "hypr",
+		}
 
 		-- There are additional nvim-treesitter modules that you can use to interact
 		-- with nvim-treesitter. You should go explore a few and see what interests you:

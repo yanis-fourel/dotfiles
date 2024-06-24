@@ -13,6 +13,7 @@ return {
 		},
 		{ "nvim-telescope/telescope-ui-select.nvim" },
 		{ "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
+		"LinArcX/telescope-env.nvim",
 	},
 	config = function()
 		-- [[ Configure Telescope ]]
@@ -87,8 +88,7 @@ return {
 			builtin.current_buffer_fuzzy_find,
 			{ desc = "[/] Fuzzily search in current buffer" }
 		)
-		-- TODO: add pluging for that
-		-- vim.keymap.set('n', '<leader>fe', '<cmd>Telescope env<CR>')
+		vim.keymap.set("n", "<leader>fe", "<cmd>Telescope env<CR>")
 
 		vim.keymap.set("n", "<leader>f/", function()
 			builtin.live_grep({
