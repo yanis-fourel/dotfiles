@@ -50,7 +50,7 @@ require('dz.lsp.lua').setup(capabilities)
 require('dz.lsp.rust').setup(capabilities)
 require('dz.lsp.python').setup(capabilities)
 require('dz.lsp.go').setup(capabilities)
--- require('dz.lsp.sonarlint').setup()
+require('dz.lsp.sonarlint').setup()
 
 -- autocmd BufRead,BufNewFile .env lua vim.diagnostic.disable(<abuf>) 
 

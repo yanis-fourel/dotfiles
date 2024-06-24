@@ -22,7 +22,9 @@ M.setup = function()
 						['typescript:S101'] = { level = 'on', parameters = { format = '^[A-Z][a-zA-Z0-9]*$' } },
 						['typescript:S103'] = { level = 'on', parameters = { maximumLineLength = 180 } },
 						['typescript:S106'] = { level = 'on' },
-						['typescript:S107'] = { level = 'on', parameters = { maximumFunctionParameters = 7 } }
+						['typescript:S107'] = { level = 'on', parameters = { maximumFunctionParameters = 7 } },
+						['python:S1192'] = { level = 'off' },
+
 					}
 				}
 			}

@@ -88,15 +88,16 @@ end
 local function setup_ruff(capabilities)
 	-- Used when in combinaison with pyright
 	capabilities.documentFormattingProvider = false
-	capabilities.hoverProvider = false
-	capabilities.renameProvider = false
+	-- capabilities.hoverProvider = false
+	-- capabilities.renameProvider = false
 
 	lspconfig.ruff_lsp.setup({
 		capabilities = capabilities,
 		settings = {},
-		on_attach = autofmt_black,
+		-- on_attach = autofmt_black, -- disabled when used in combination with pyright
 	})
 end
+
 
 M.setup = function(capabilities)
 	setup_pyright(capabilities)
