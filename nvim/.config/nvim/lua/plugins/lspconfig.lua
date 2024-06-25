@@ -32,7 +32,7 @@ return {
 				map("gt", require("telescope.builtin").lsp_type_definitions, "[G]oto [T]ype")
 				map("g0", require("telescope.builtin").lsp_document_symbols, "Document Symbols")
 				map("gw", require("telescope.builtin").lsp_dynamic_workspace_symbols, "Workspace [S]ymbols")
-				map("<leader>re", vim.lsp.buf.rename, "[Re]name")
+				map("<leader>r", vim.lsp.buf.rename, "[Re]name")
 				map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
 				map("K", vim.lsp.buf.hover, "Hover Documentation")
 				map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
@@ -91,8 +91,12 @@ return {
 			rust_analyzer = {}, -- TODO: has issues starting
 		}
 
-		vim.list_extend(servers, require("lspconf.clangd")(capabilities))
-		vim.list_extend(servers, require("lspconf.python")(capabilities))
+		servers = vim.tbl_extend(
+			"error",
+			servers,
+			require("lspconf.python")(capabilities),
+			require("lspconf.clangd")(capabilities)
+		)
 
 		require("mason").setup()
 
@@ -109,12 +113,14 @@ return {
 		require("mason-lspconfig").setup({
 			handlers = {
 				function(server_name)
-					local server = servers[server_name] or {}
-					-- This handles overriding only values explicitly passed
-					-- by the server configuration above. Useful when disabling
-					-- certain features of an LSP (for example, turning off formatting for tsserver)
-					server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
-					require("lspconfig")[server_name].setup(server)
+					local setup_args = servers[server_name]
+					if setup_args == nil then
+						return
+					end
+					if setup_args.capabilities == nil then
+						setup_args.capabilities = capabilities
+					end
+					require("lspconfig")[server_name].setup(setup_args)
 				end,
 			},
 		})
