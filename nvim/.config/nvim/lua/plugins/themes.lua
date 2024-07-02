@@ -17,6 +17,6 @@ return {
 		vim.g.backround = "dark"
 		vim.g.everforest_background = "hard"
 
-		vim.cmd.colorscheme("catppuccin-frappe")
+		vim.cmd.colorscheme("tokyonight-storm")
 	end,
 }
