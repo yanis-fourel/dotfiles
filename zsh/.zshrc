@@ -121,3 +121,4 @@ fpath+=~/.zfunc
 
 
 eval "$(zoxide init --cmd cd zsh)"
+alias unpushed='git log --branches --not --remotes --no-walk --decorate --oneline'
