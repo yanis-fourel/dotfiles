@@ -6,7 +6,8 @@ if [ "$TMUX" = "" ]; then
 	fi
 fi
 
-export ZSH="/home/yanis/.oh-my-zsh"
+export ZSH="/usr/share/oh-my-zsh/"
+export ZSH_CUSTOM='/usr/share/zsh/'
 
 ZSH_THEME="robbyrussell"
 
@@ -88,6 +89,7 @@ alias gl="git log --oneline --graph --decorate"
 alias gla="git log --oneline --graph --decorate --all"
 alias gs="git status"
 alias fastclone="git clone --depth=1 --recurse-submodules --shallow-submodules "
+alias unpushed='git log --branches --not --remotes --no-walk --decorate --oneline'
 
 alias la="ls -a"
 alias ll="ls -l --time-style=long-iso"
@@ -102,6 +104,8 @@ alias fuck="killall -9"
 # Vim Config
 alias vc="vi $NVIM_CONFIG_DIR/init.* --cmd 'cd %:h'"
 
+
+alias lk="sudo docker compose --profile lk"
 
 #bindings
 
@@ -121,4 +125,3 @@ fpath+=~/.zfunc
 
 
 eval "$(zoxide init --cmd cd zsh)"
-alias unpushed='git log --branches --not --remotes --no-walk --decorate --oneline'
