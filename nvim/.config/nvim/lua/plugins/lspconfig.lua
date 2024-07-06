@@ -84,9 +84,7 @@ return {
 				filetype = { "go", "gomod", "gowork" },
 			},
 			zls = {},
-			rust_analyzer = {
-				capabilities = {}, -- something in the capabilities is breaking the server and it doesn't start :(
-			},
+			rust_analyzer = {},
 		}
 
 		servers = vim.tbl_extend(
@@ -115,9 +113,11 @@ return {
 					if setup_args == nil then
 						return
 					end
+
 					if setup_args.capabilities == nil then
 						setup_args.capabilities = capabilities
 					end
+
 					require("lspconfig")[server_name].setup(setup_args)
 				end,
 			},

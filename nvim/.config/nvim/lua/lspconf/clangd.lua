@@ -21,10 +21,11 @@ end
 write_clangformat_config()
 
 return function(capabilities)
-	capabilities["offsetEncoding"] = "utf-8"
+	local clangd_cap = vim.deepcopy(capabilities)
+	clangd_cap["offsetEncoding"] = "utf-8"
 	return {
 		clangd = {
-			capabilities = capabilities,
+			capabilities = clangd_cap,
 		},
 	}
 end
