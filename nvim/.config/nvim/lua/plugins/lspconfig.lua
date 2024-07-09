@@ -19,7 +19,7 @@ return {
 				map("ga", function()
 					require("telescope.builtin").diagnostics({ severity = 1, root_dir = true })
 				end, "Goto lsp error+warn list")
-				map("gb", function()
+				map("gq", function()
 					require("telescope.builtin").diagnostics({ severity = 2, root_dir = true })
 				end, "Goto lsp warning list")
 				map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
