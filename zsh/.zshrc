@@ -123,5 +123,3 @@ autoload -Uz compinit
 zstyle ':completion:*' menu select
 fpath+=~/.zfunc
 
-
-eval "$(zoxide init --cmd cd zsh)"
