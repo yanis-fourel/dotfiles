@@ -48,7 +48,14 @@ return {
 		"hrsh7th/cmp-path",
 		"hrsh7th/cmp-cmdline",
 		"onsails/lspkind.nvim", -- icons in the completion list
-		{ "ray-x/lsp_signature.nvim", event = "VeryLazy", opts = {} },
+		{
+			"ray-x/lsp_signature.nvim",
+			event = "VeryLazy",
+			opts = {},
+			config = function(_, opts)
+				require("lsp_signature").setup(opts)
+			end,
+		},
 	},
 	config = function()
 		-- See `:help cmp`
