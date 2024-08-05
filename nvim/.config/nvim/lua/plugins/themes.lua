@@ -8,6 +8,7 @@ return {
 		"sainnhe/sonokai",
 		{ "navarasu/onedark.nvim", opts = { style = "darker" } },
 		{ "catppuccin/nvim", name = "catppuccin", opts = { integrations = { diffview = true } } },
+		{ "Mofiqul/dracula.nvim" },
 	},
 	init = function()
 		vim.keymap.set("n", "<leader>fc", function()
@@ -17,6 +18,6 @@ return {
 		vim.g.backround = "dark"
 		vim.g.everforest_background = "hard"
 
-		vim.cmd.colorscheme("tokyonight-storm")
+		vim.cmd.colorscheme("dracula")
 	end,
 }
