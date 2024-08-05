@@ -29,11 +29,7 @@ return {
 
 					horizontal = {
 						preview_width = function(_, cols, _)
-							if cols > 200 then
-								return math.floor(cols * 0.4)
-							else
-								return math.floor(cols * 0.6)
-							end
+							return math.floor(cols * 0.4)
 						end,
 					},
 
