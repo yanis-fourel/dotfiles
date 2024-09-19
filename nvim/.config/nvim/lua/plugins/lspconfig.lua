@@ -64,7 +64,7 @@ return {
 			-- Typescript has an entire language plugins that can be useful:
 			--    https://github.com/pmizio/typescript-tools.nvim
 			-- but for me, tsserver is enough
-			tsserver = {},
+			ts_ls = {},
 			svelte = {},
 			eslint = {},
 			bashls = {},
