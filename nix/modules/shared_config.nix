@@ -36,7 +36,6 @@
   hardware.bluetooth.powerOnBoot = true; # powers up the default Bluetooth controller on boot
   services.blueman.enable = true;
 
-
   nixpkgs.overlays = [
     inputs.fenix.overlays.default
     inputs.mynvim.overlays.default
@@ -119,6 +118,7 @@
     pkgs.noto-fonts
     pkgs.noto-fonts-cjk-sans
     pkgs.noto-fonts-emoji
+    pkgs.nerd-fonts.symbols-only
   ];
 
   programs.gnupg.agent.enable = true;
