@@ -1,8 +1,0 @@
-[core]
-	ediror = vi
-[pull]
-	ff = only
-[merge]
-	conflictstyle = diff3
-[push]
-	default = current
