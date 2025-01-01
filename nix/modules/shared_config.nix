@@ -1,0 +1,269 @@
+{
+  config,
+  pkgs,
+  inputs,
+  pkg_ghostty,
+  ...
+}:
+{
+  imports = [
+    ./keyboard.nix
+    ./shell.nix
+  ];
+
+  users.users.yanis = {
+    isNormalUser = true;
+    extraGroups = [
+      "wheel"
+    ];
+    shell = pkgs.nushell;
+  };
+  services.syncthing = {
+    enable = true;
+    group = "users";
+    user = "yanis";
+    dataDir = "/home/yanis/Sync"; # Default folder for new synced folders
+    configDir = "/home/yanis/Sync/.config/syncthing"; # Folder for Syncthing's settings and keys
+  };
+
+  virtualisation.virtualbox.host.enable = true;
+  users.extraGroups.vboxusers.members = [ "yanis" ];
+
+  nix.settings.allowed-users = [ "yanis" ];
+  security.sudo.wheelNeedsPassword = false;
+
+  hardware.bluetooth.enable = true;
+  hardware.bluetooth.powerOnBoot = true; # powers up the default Bluetooth controller on boot
+  services.blueman.enable = true;
+
+
+  nixpkgs.overlays = [
+    inputs.fenix.overlays.default
+    inputs.mynvim.overlays.default
+  ];
+
+  environment.systemPackages = [
+    pkgs.vim # needed for rvim
+    pkgs.nvim-pkg # my custom nvim overlay
+    pkgs.pavucontrol
+    pkgs.wget
+    pkgs.lshw
+    pkgs.tmux
+    pkgs.git
+    pkgs.dunst
+    pkgs.stow
+    pkgs.grim
+    pkgs.slurp
+    pkgs.swappy
+    pkgs.zsh
+    pkgs.oh-my-zsh
+    pkgs.zsh-autocomplete
+    pkgs.zsh-autosuggestions
+    pkgs.brave
+    pkgs.fzf
+    pkgs.zig
+    pkgs.clang
+    pkgs.unzip
+    pkgs.python3
+    pkgs.nodejs_22
+    pkgs.go
+    pkgs.waybar
+    pkgs.man
+    pkgs.man-pages
+    pkgs.brightnessctl
+    pkgs.ripgrep
+    pkgs.wl-clipboard
+    pkgs.fd
+    pkgs.tig
+    pkgs.rclone
+    pkgs.rsync
+    pkgs.gnupg
+    pkgs.nix-search-cli
+    pkgs.cachix
+    (pkgs.fenix.complete.withComponents [
+      "cargo"
+      "clippy"
+      "rust-src"
+      "rustc"
+      "rustfmt"
+    ])
+    pkgs.rust-analyzer-nightly
+    pkgs.file
+    pkgs.openai-whisper
+    pkgs.cryptomator
+    pkgs.obsidian
+    pkgs.tofi
+    pkgs.libreoffice
+    pkgs.okular
+    pkgs.gimp
+    pkgs.i3
+    pkgs.lmms
+    pkgs.gammastep
+    pkgs.openssl # needed to dev on nushell, TODO make it nix shell?
+    # When cleaning this up, also need to remove PKG_CONFIG_PATH sessionVariables
+    pkgs.yazi
+    pkgs.btop
+    pkg_ghostty
+    pkgs.trash-cli
+  ];
+
+  environment.sessionVariables = {
+    PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
+  };
+
+  system.activationScripts = {
+    cleartoficache.text = "rm -f /home/yanis/.cache/tofi-drun"; # https://github.com/philj56/tofi/issues/115
+  };
+
+  fonts.packages = [
+    pkgs.noto-fonts
+    pkgs.noto-fonts-cjk-sans
+    pkgs.noto-fonts-emoji
+  ];
+
+  programs.gnupg.agent.enable = true;
+
+  services.greetd = {
+    enable = true;
+    settings = {
+      initial_session = {
+        command = "Hyprland";
+        user = "yanis";
+      };
+      default_session = {
+        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --user-menu --cmd Hyprland";
+        user = "greeter";
+      };
+    };
+  };
+
+  hardware.opentabletdriver.enable = true;
+  hardware.opentabletdriver.daemon.enable = true;
+
+  # Needed for NVIDIA, might want to only allow unfree NVIDIA
+  nixpkgs.config.allowUnfree = true;
+
+  hardware.graphics = {
+    enable = true;
+  };
+
+  # Load nvidia driver for Xorg and Wayland
+  services.xserver.videoDrivers = [ "nvidia" ];
+
+  hardware.nvidia = {
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
+
+    # Modesetting is required
+    modesetting.enable = true;
+
+    # Nvidia power management. Experimental, and can cause sleep/supend to fail.
+    # Enable this is you have graphical corruption issues or application crashes after waking
+    # up from sleep. This fixes it by saving the entire VRAM memory to /tmp/ instead
+    # of just the base essentials.
+    powerManagement.enable = false;
+
+    # Fine-grained power management. Turns off GPU when not in use.
+    # Experimental and only works on modern Nvidia GPUs (Turing or newer).
+    powerManagement.finegrained = false;
+
+    # Use the NVidia open source kernel module (not to be confused with the
+    # independant third-party "nouveau" open source driver).
+    # Support is limited to the Turing and later architectures. Full list of
+    # supported GPUs is at:
+    # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus
+    # Only available from driver 515.43.04+
+    # Currently alpha-quality/buggy, so false is currently the recommanded setting.
+    open = false;
+
+    # Enable the Nvidia settings menu,
+    # accessible via `nvidia-settings`.
+    nvidiaSettings = true;
+
+    prime = {
+      offload = {
+        enable = true;
+        enableOffloadCmd = true;
+      };
+      # Found using `lshw -c display`
+      intelBusId = "PCI:0:2:0";
+      nvidiaBusId = "PCI:1:0:0";
+    };
+  };
+
+  # Pick only one of the below networking options.
+  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  networking.networkmanager.enable = true; # Easiest to use and most distros use this by default.
+
+  # Set your time zone.
+  time.timeZone = "Europe/Paris";
+
+  # Configure network proxy if necessary
+  # networking.proxy.default = "http://user:password@proxy:port/";
+  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
+
+  # Select internationalisation properties.
+  # i18n.defaultLocale = "en_US.UTF-8";
+  # console = {
+  #   font = "Lat2-Terminus16";
+  #   keyMap = "us";
+  #   useXkbConfig = true; # use xkb.options in tty.
+  # };
+
+  # Enable the X11 windowing system.
+  # services.xserver.enable = true;
+
+  programs.hyprland.enable = true;
+  # Hints electron apps to use wayland
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  # TODO: hyprcursor https://gitlab.com/Pummelfisch/future-cyan-hyprcursor
+
+  environment.sessionVariables = {
+    VISUAL = "nvim";
+    EDITOR = "nvim";
+    SUDO_EDITOR = "rvim";
+  };
+
+  # Configure keymap in X11
+  # services.xserver.xkb.layout = "us";
+  # services.xserver.xkb.options = "eurosign:e,caps:escape";
+
+  # Enable CUPS to print documents.
+  # services.printing.enable = true;
+
+  # Enable sound.
+  # hardware.pulseaudio.enable = true;
+  # OR
+  services.pipewire = {
+    enable = true;
+    pulse.enable = true;
+  };
+
+  # Enable touchpad support (enabled default in most desktopManager).
+  # services.libinput.enable = true;
+
+  # Some programs need SUID wrappers, can be configured further or are
+  # started in user sessions.
+  # programs.mtr.enable = true;
+
+  # List services that you want to enable:
+
+  # Enable the OpenSSH daemon.
+  # services.openssh.enable = true;
+
+  # Open ports in the firewall.
+  # networking.firewall.allowedTCPPorts = [ ... ];
+  # networking.firewall.allowedUDPPorts = [ ... ];
+  # Or disable the firewall altogether.
+  # networking.firewall.enable = false;
+
+  # Copy the NixOS configuration file and link it from the resulting system
+  # (/run/current-system/configuration.nix). This is useful in case you
+  # accidentally delete configuration.nix.
+  # NOTE: currently not compatible with flakes
+  system.copySystemConfiguration = false;
+
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
+}
