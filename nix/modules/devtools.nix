@@ -14,6 +14,7 @@
     pkgs.bash-language-server
 
     pkgs.lua-language-server
+    pkgs.stylua
 
     pkgs.go
     pkgs.gopls
