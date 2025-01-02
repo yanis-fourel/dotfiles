@@ -91,7 +91,7 @@ return {
 			},
 			zls = {},
 			rust_analyzer = {},
-			rnix = {},
+			nil_ls = {},
 		}
 
 		servers = vim.tbl_extend(
