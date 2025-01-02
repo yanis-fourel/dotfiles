@@ -15,6 +15,8 @@
   networking.hostName = "ledr-yanix";
 
 
+
+  services.resolved.enable = true;
   services.openvpn.servers = {
     ledr = {
       config = ''config /home/yanis/Sync/LEDR/vpn/yanis-fourel.corp.ledr.io-openvpn-config.ovpn ''; 
