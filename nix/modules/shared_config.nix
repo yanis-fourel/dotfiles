@@ -117,6 +117,7 @@
     pkg_ghostty
     pkgs.trash-cli
     pkgs.spotify
+    pkgs.rlwrap
   ];
 
 
