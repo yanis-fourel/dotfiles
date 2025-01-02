@@ -16,7 +16,10 @@
 
 
   services.openvpn.servers = {
-    ledr = { config = ''config /home/yanis/Sync/LEDR/vpn/yanis-fourel.corp.ledr.io-openvpn-config.ovpn ''; };
+    ledr = {
+      config = ''config /home/yanis/Sync/LEDR/vpn/yanis-fourel.corp.ledr.io-openvpn-config.ovpn ''; 
+      updateResolvConf = true;
+    };
   };
 
   # This option defines the first version of NixOS you have installed on this particular machine,
