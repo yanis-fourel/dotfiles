@@ -92,6 +92,7 @@ return {
 			zls = {},
 			rust_analyzer = {},
 			nil_ls = {},
+			nushell = {},
 		}
 
 		servers = vim.tbl_extend(
