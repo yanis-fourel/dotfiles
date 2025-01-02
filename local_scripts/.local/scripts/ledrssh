@@ -1,1 +1,1 @@
-ssh -i "/home/yanis/Synced/ssh/ledr_my_key" yanis.fourel@10.255.224.4
+ssh -i "/home/yanis/Sync/LEDR/ssh/ledr_my_key" yanis.fourel@10.255.224.4
