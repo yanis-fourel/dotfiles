@@ -1,6 +1,5 @@
 {
   pkgs,
-  inputs,
   ...
 }:
 {
@@ -22,7 +21,7 @@
     pkgs.zig
     pkgs.zls
 
-    inputs.rnix
+    pkgs.nil # NIx Language server
 
     pkgs.clang
     pkgs.clang-tools

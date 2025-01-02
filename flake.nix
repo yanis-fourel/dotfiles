@@ -14,10 +14,6 @@
     ghostty = {
       url = "github:ghostty-org/ghostty";
     };
-
-    rnix = {
-      url = "github:nix-community/rnix-lsp";
-    };
   };
 
   outputs =
