@@ -9,6 +9,7 @@
   imports = [
     ./keyboard.nix
     ./shell.nix
+    ./devtools.nix
   ];
 
   users.users.yanis = {
@@ -41,12 +42,11 @@
 
   nixpkgs.overlays = [
     inputs.fenix.overlays.default
-    inputs.mynvim.overlays.default
   ];
 
   environment.systemPackages = [
     pkgs.vim # needed for rvim
-    pkgs.nvim-pkg # my custom nvim overlay
+    pkgs.neovim
     pkgs.pavucontrol
     pkgs.wget
     pkgs.lshw
@@ -57,18 +57,13 @@
     pkgs.grim
     pkgs.slurp
     pkgs.swappy
-    pkgs.zsh
+    pkgs.zsh # TODO: remove
     pkgs.oh-my-zsh
     pkgs.zsh-autocomplete
     pkgs.zsh-autosuggestions
     pkgs.brave
     pkgs.fzf
-    pkgs.zig
-    pkgs.clang
     pkgs.unzip
-    pkgs.python3
-    pkgs.nodejs_22
-    pkgs.go
     pkgs.waybar
     pkgs.man
     pkgs.man-pages
@@ -82,16 +77,8 @@
     pkgs.gnupg
     pkgs.nix-search-cli
     pkgs.cachix
-    (pkgs.fenix.complete.withComponents [
-      "cargo"
-      "clippy"
-      "rust-src"
-      "rustc"
-      "rustfmt"
-    ])
-    pkgs.rust-analyzer-nightly
     pkgs.file
-    pkgs.openai-whisper
+    pkgs.openai-whisper # TODO: remove
     pkgs.cryptomator
     pkgs.obsidian
     pkgs.tofi

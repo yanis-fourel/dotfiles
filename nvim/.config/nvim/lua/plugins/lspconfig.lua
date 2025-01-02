@@ -1,11 +1,6 @@
 return {
 	"neovim/nvim-lspconfig",
 	dependencies = {
-		-- Automatically install LSPs and related tools to stdpath for Neovim
-		{ "williamboman/mason.nvim", config = true },
-		"williamboman/mason-lspconfig.nvim",
-		"WhoIsSethDaniel/mason-tool-installer.nvim",
-
 		{ "j-hui/fidget.nvim", opts = {} },
 	},
 	config = function()
@@ -95,33 +90,26 @@ return {
 			require("lspconf.clangd")(capabilities)
 		)
 
-		require("mason").setup()
+		-- -- You can add other tools here that you want Mason to install
+		-- -- for you, so that they are available from within Neovim.
+		-- local ensure_installed = vim.tbl_keys(servers or {})
+		-- vim.list_extend(ensure_installed, {
+		-- 	"stylua", -- Used to format Lua code
+		-- 	"clang-format",
+		-- 	"black",
+		-- })
 
-		-- You can add other tools here that you want Mason to install
-		-- for you, so that they are available from within Neovim.
-		local ensure_installed = vim.tbl_keys(servers or {})
-		vim.list_extend(ensure_installed, {
-			"stylua", -- Used to format Lua code
-			"clang-format",
-			"black",
-		})
-		require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
+		for server_name in servers do
+			local setup_args = servers[server_name]
+			if setup_args == nil then
+				return
+			end
 
-		require("mason-lspconfig").setup({
-			handlers = {
-				function(server_name)
-					local setup_args = servers[server_name]
-					if setup_args == nil then
-						return
-					end
+			if setup_args.capabilities == nil then
+				setup_args.capabilities = capabilities
+			end
 
-					if setup_args.capabilities == nil then
-						setup_args.capabilities = capabilities
-					end
-
-					require("lspconfig")[server_name].setup(setup_args)
-				end,
-			},
-		})
+			require("lspconfig")[server_name].setup(setup_args)
+		end
 	end,
 }

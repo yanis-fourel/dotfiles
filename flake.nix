@@ -4,7 +4,6 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
-    mynvim.url = "path:./nvim/";
 
     # rust toolchain
     fenix = {
@@ -14,6 +13,10 @@
 
     ghostty = {
       url = "github:ghostty-org/ghostty";
+    };
+
+    rnix = {
+      url = "github:nix-community/rnix-lsp";
     };
   };
 

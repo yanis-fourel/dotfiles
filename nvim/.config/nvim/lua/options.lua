@@ -1,11 +1,10 @@
 vim.g.have_nerd_font = true
 
--- [[ Setting options ]]
-
 vim.opt.relativenumber = true
 vim.opt.number = true
 
 vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = "a"
@@ -58,7 +57,8 @@ vim.opt.scrolloff = 10
 vim.o.title = true
 vim.o.wrap = false
 vim.o.linebreak = true
-vim.o.undodir = os.getenv("HOME") .. "/.nvim_undodir"
+-- Do I Need that?
+-- vim.o.undodir = os.getenv("HOME") .. "/.nvim_undodir"
 vim.o.undofile = true
 vim.o.laststatus = 3
 vim.o.colorcolumn = "80"
