@@ -15,6 +15,10 @@
   networking.hostName = "ledr-yanix";
 
 
+  services.openvpn.servers = {
+    ledr = { config = ''config /home/yanis/Sync/LEDR/vpn/yanis-fourel.corp.ledr.io-openvpn-config.ovpn ''; };
+  };
+
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
   #
