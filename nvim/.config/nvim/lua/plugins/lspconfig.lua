@@ -63,13 +63,24 @@ return {
 			svelte = {},
 			eslint = {},
 			bashls = {},
-			als = {},
 
 			lua_ls = {
 				settings = {
 					Lua = {
 						completion = {
 							callSnippet = "Replace",
+						},
+						runtime = {
+							version = "LuaJIT",
+						},
+						workspace = {
+							checkThirdParty = false,
+							library = {
+								vim.env.VIMRUNTIME,
+								-- Depending on the usage, you might want to add additional paths here.
+								-- "${3rd}/luv/library"
+								-- "${3rd}/busted/library",
+							},
 						},
 						diagnostics = { disable = { "missing-fields" } },
 					},
@@ -99,17 +110,16 @@ return {
 		-- 	"black",
 		-- })
 
-		for server_name in servers do
-			local setup_args = servers[server_name]
-			if setup_args == nil then
+		for name, config in pairs(servers) do
+			if config == nil then
 				return
 			end
 
-			if setup_args.capabilities == nil then
-				setup_args.capabilities = capabilities
+			if config.capabilities == nil then
+				config.capabilities = capabilities
 			end
 
-			require("lspconfig")[server_name].setup(setup_args)
+			require("lspconfig")[name].setup(config)
 		end
 	end,
 }

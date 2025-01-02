@@ -84,6 +84,6 @@ return function(capabilities)
 	return {
 		pyright = pyright(capabilities),
 		-- pylint = pylint(capabilities),
-		ruff_lsp = ruff(capabilities_ruff),
+		ruff = ruff(capabilities_ruff),
 	}
 end
