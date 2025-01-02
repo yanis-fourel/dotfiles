@@ -24,11 +24,24 @@
   services.tailscale.enable = true;
 
   
-  services.cron = {
-    enable = true;
-    systemCronJobs = [
-      "*/1 * * * *      root    cd /home/yanis/dotfiles && git fetch"
-    ];
+  systemd.timers."dotfile-fetch" = {
+    wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnBootSec = "1m";
+        OnUnitActiveSec = "1m";
+        Unit = "dotfile-fetch.service";
+      };
+  };
+
+  systemd.services."dotfile-fetch" = {
+    script = ''
+      set -eu
+      cd /home/yanis/dotfiles/ && ${pkgs.git}/bin/git fetch
+    '';
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+    };
   };
 
   services.syncthing = {
