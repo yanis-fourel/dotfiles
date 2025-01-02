@@ -94,6 +94,9 @@
     pkgs.btop
     pkg_ghostty
     pkgs.trash-cli
+    pkgs.spotify
+    pkgs.docker
+    pkgs.docker-compose
   ];
 
   environment.sessionVariables = {

@@ -16,6 +16,7 @@
 
   nixpkgs.config.allowUnfree = true; # microsoft teams
 
+
   services.openvpn.servers = {
     ledr = {
       config = ''config /home/yanis/Sync/LEDR/vpn/yanis-fourel.corp.ledr.io-openvpn-config.ovpn ''; 
