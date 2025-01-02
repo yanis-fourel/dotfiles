@@ -23,6 +23,13 @@
 
   services.tailscale.enable = true;
 
+  
+  services.cron = {
+    enable = true;
+    systemCronJobs = [
+      "*/1 * * * *      root    cd /home/yanis/dotfiles && git fetch"
+    ];
+  };
 
   services.syncthing = {
     enable = true;
