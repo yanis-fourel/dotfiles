@@ -14,7 +14,7 @@
 
   networking.hostName = "ledr-yanix";
 
-
+  nixpkgs.config.allowUnfree = true; # microsoft teams
 
   services.openvpn.servers = {
     ledr = {
