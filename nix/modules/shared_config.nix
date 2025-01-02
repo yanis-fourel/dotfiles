@@ -10,6 +10,7 @@
     ./keyboard.nix
     ./shell.nix
     ./devtools.nix
+    ./docker.nix
   ];
 
   users.users.yanis = {
@@ -21,6 +22,7 @@
   };
 
   services.tailscale.enable = true;
+
 
   services.syncthing = {
     enable = true;
@@ -95,9 +97,9 @@
     pkg_ghostty
     pkgs.trash-cli
     pkgs.spotify
-    pkgs.docker
-    pkgs.docker-compose
   ];
+
+
 
   environment.sessionVariables = {
     PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
