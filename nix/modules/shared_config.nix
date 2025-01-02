@@ -18,6 +18,9 @@
     ];
     shell = pkgs.nushell;
   };
+
+  services.tailscale.enable = true;
+
   services.syncthing = {
     enable = true;
     group = "users";
