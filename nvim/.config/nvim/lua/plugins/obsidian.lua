@@ -13,6 +13,7 @@ return {
 	-- },
 	dependencies = {
 		"nvim-lua/plenary.nvim",
+		"nvim-telescope/telescope.nvim",
 	},
 	config = function()
 		require("obsidian").setup({
@@ -51,7 +52,71 @@ return {
 					opts = { buffer = true, expr = true },
 				},
 			},
-			disable_frontmatter = true,
+			note_frontmatter_func = function(note)
+				-- Add the title of the note as an alias.
+				if note.title then
+					note:add_alias(note.title)
+				end
+
+				local out = {
+					id = note.id,
+					aliases = note.aliases,
+					tags = note.tags,
+					area = "",
+					project = "",
+				}
+
+				-- `note.metadata` contains any manually added fields in the frontmatter.
+				-- So here we just make sure those fields are kept in the frontmatter.
+				if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
+					for k, v in pairs(note.metadata) do
+						out[k] = v
+					end
+				end
+
+				return out
+			end,
+			note_id_func = function(title)
+				local res = ""
+				if title ~= nil then
+					-- If title is given, transform it into valid file name.
+					res = title:gsub(" ", "-"):gsub("[^A-Za-z0-9-]", ""):lower()
+				else
+					local suffix = ""
+					for _ = 1, 4 do
+						suffix = suffix .. string.char(math.random(65, 90))
+					end
+					res = "New file " .. suffix
+				end
+				return res
+			end,
+
+			-- Optional, for templates (see below).
+			templates = {
+				folder = "Templates",
+				date_format = "%Y-%m-%d",
+				time_format = "%H:%M",
+				-- A map for custom variables, the key should be the variable and the value a function
+				substitutions = {},
+			},
+			picker = {
+				-- Set your preferred picker. Can be one of 'telescope.nvim', 'fzf-lua', or 'mini.pick'.
+				name = "telescope.nvim",
+				-- Optional, configure key mappings for the picker. These are the defaults.
+				-- Not all pickers support all mappings.
+				note_mappings = {
+					-- Create a new note from your query.
+					new = "<C-x>",
+					-- Insert a link to the selected note.
+					insert_link = "<C-l>",
+				},
+				tag_mappings = {
+					-- Add tag(s) to current note.
+					tag_note = "<C-x>",
+					-- Insert a tag at the current location.
+					insert_tag = "<C-l>",
+				},
+			},
 		})
 
 		local vault_location = "/home/yanis/Sync/Obsidian/Second brain/**.md"
@@ -63,7 +128,6 @@ return {
 			desc = "Opens the current buffer in Obsidian",
 		})
 
-		vim.notify("ok, setup obsidian command group")
 		vim.o.conceallevel = 2
 	end,
 }
