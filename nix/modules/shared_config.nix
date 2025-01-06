@@ -118,6 +118,7 @@
     pkgs.trash-cli
     pkgs.spotify
     pkgs.rlwrap
+    pkgs.virtualenv
   ];
 
 
