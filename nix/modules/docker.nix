@@ -7,4 +7,5 @@
   virtualisation.docker.enable = true;
 
   users.users.yanis.extraGroups = [ "docker" ];
+
 }
