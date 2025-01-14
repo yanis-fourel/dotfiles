@@ -934,6 +934,11 @@ export def thenullptr [] bytes->nothing {
     $in | curl -F 'file=@-' 0x0.st
 }
 
+export def gg [] nothing->nothing {
+    let target = git branch | fzf | str trim
+    git switch $target
+}
+
 # Starts Yazi and change the current working directory 
 # when exiting Yazi with `q`.
 # Exit with `Q` instead to not change current working directory
@@ -974,3 +979,8 @@ alias vi = nvim
 alias fuck = killall -9
 
 alias lk = sudo docker compose --profile lk
+
+
+
+# copy/pasted from carapace setup
+source ~/.cache/carapace/init.nu
