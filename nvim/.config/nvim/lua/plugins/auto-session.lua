@@ -1,4 +1,4 @@
-return {
-	"rmagatti/auto-session",
-	opts = {},
-}
+-- return {
+-- 	"rmagatti/auto-session",
+-- 	opts = {},
+-- }
