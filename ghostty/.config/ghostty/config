@@ -1,5 +1,7 @@
 window-decoration = false
 confirm-close-surface = false
 font-family = "Comic Code Ligatures"
-font-size = 16
+font-size = 14
 theme = GruvboxDark
+
+keybind = ctrl+space=ignore

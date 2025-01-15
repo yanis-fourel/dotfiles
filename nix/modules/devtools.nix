@@ -4,6 +4,8 @@
 }:
 {
   environment.systemPackages = [
+    pkgs.sonarlint-ls
+
     pkgs.typescript
     pkgs.typescript-language-server
     pkgs.svelte-language-server
@@ -21,7 +23,7 @@
     pkgs.zig
     pkgs.zls
 
-    pkgs.nil # NIx Language server
+    pkgs.nil # Nix Language server
 
     pkgs.clang
     pkgs.clang-tools
