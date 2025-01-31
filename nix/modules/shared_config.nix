@@ -3,6 +3,7 @@
   pkgs,
   inputs,
   pkg_ghostty,
+  pkg_zen-browser,
   ...
 }:
 {
@@ -84,6 +85,7 @@
     pkgs.zsh-autocomplete
     pkgs.zsh-autosuggestions
     pkgs.brave
+    pkg_zen-browser
     pkgs.fzf
     pkgs.unzip
     pkgs.waybar
