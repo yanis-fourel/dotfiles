@@ -4,7 +4,6 @@
     ./hardware.nix
     ./sync.nix
     ../../modules/shared_config.nix
-    ../../modules/lfs_packages.nix
   ];
 
   networking.hostName = "yanix";
