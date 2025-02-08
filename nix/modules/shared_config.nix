@@ -124,6 +124,7 @@
     pkgs.hyprcursor # check if that fixes the cursor
     pkgs.gromit-mpx # draw on screen
     pkgs.ghidra
+    pkgs.direnv
   ];
 
 
