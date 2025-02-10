@@ -14,6 +14,7 @@
     ghostty = {
       url = "github:ghostty-org/ghostty";
     };
+    zen-browser.url = "github:MarceColl/zen-browser-flake";
   };
 
   outputs =
@@ -22,6 +23,7 @@
       nixpkgs-unstable,
       fenix,
       ghostty,
+      zen-browser,
       ...
     }@inputs:
     {
@@ -32,6 +34,7 @@
           system = "x86_64-linux";
           inherit inputs;
           pkg_ghostty = ghostty.packages.${system}.default;
+          pkg_zen-browser = zen-browser.packages.${system}.specific;
         };
         modules = [ ./nix/hosts/yanix/config.nix ];
       };
