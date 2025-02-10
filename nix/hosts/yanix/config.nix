@@ -1,4 +1,8 @@
-{ pkgs, ... }:
+{ 
+  pkgs,
+  pkg_zen-browser,
+  ...
+}:
 {
   imports = [
     ./hardware.nix
@@ -20,7 +24,8 @@
 
 
   environment.systemPackages = [
-    pkgs.sparrow
+    pkgs.sparrow # adds user to extragroups = plugdev
+    pkg_zen-browser
   ];
   users.users.yanis.extraGroups = [ "plugdev" ];
 
