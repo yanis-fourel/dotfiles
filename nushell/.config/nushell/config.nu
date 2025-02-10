@@ -939,6 +939,10 @@ export def gg [] nothing->nothing {
     git switch $target
 }
 
+export def ox [path: path] nothing->nothing {
+    open $path | explore
+}
+
 # Starts Yazi and change the current working directory 
 # when exiting Yazi with `q`.
 # Exit with `Q` instead to not change current working directory
