@@ -26,6 +26,7 @@
   environment.systemPackages = [
     pkgs.sparrow # adds user to extragroups = plugdev
     pkg_zen-browser
+    pkgs.anki
   ];
   users.users.yanis.extraGroups = [ "plugdev" ];
 
