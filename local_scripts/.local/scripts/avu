@@ -1,2 +1,2 @@
-id=$(sudo docker ps | grep avu | awk '{ print $1 }')
-sudo rlwrap --always-readline docker exec -it $id /AvesTerra/Executables/avu
+id=$(docker ps | grep avu | cut -d ' ' -f 1)
+rlwrap --always-readline docker exec -it $id /AvesTerra/Executables/avu
