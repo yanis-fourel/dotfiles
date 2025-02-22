@@ -104,6 +104,7 @@
     pkgs.cryptomator
     pkgs.obsidian
     pkgs.tofi
+    pkgs.wofi
     pkgs.libreoffice
     pkgs.okular
     pkgs.gimp
