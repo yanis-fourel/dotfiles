@@ -41,6 +41,14 @@ return {
 				end
 			end,
 		})
+		vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+			pattern = ".env",
+			callback = function(ev)
+				vim.diagnostic.enable(false, {
+					bufnr = ev.buf,
+				})
+			end,
+		})
 
 		-- LSP servers and clients are able to communicate to each other what features they support.
 		--  By default, Neovim doesn't support everything that is in the LSP specification.
