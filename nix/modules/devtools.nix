@@ -20,7 +20,6 @@
     pkgs.go
     pkgs.gopls
 
-    pkgs.zig
     pkgs.zls
 
     pkgs.nil # Nix Language server
