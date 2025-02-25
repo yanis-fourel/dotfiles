@@ -971,6 +971,7 @@ alias gla = git log --oneline --graph --decorate --all
 alias gs = git status
 alias fastclone = git clone --depth=1 --recurse-submodules --shallow-submodules 
 alias unpushed = git log --branches --not --remotes --no-walk --decorate --oneline
+alias ld = lazydocker
 
 alias la = ls -a
 alias ll = ls -l
