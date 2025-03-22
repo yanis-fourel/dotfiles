@@ -20,8 +20,6 @@
     pkgs.go
     pkgs.gopls
 
-    pkgs.zls
-
     pkgs.nil # Nix Language server
 
     pkgs.clang
