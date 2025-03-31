@@ -120,7 +120,8 @@
     pkgs.spotify
     pkgs.rlwrap
     pkgs.virtualenv
-    pkgs.hyprcursor # check if that fixes the cursor
+    pkgs.hyprcursor
+    pkgs.hyprlock
     pkgs.gromit-mpx # draw on screen
     pkgs.ghidra
     pkgs.direnv
