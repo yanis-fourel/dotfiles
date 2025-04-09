@@ -106,7 +106,7 @@
     pkgs.tofi
     pkgs.wofi
     pkgs.libreoffice
-    pkgs.okular
+    pkgs.kdePackages.okular
     pkgs.gimp
     pkgs.i3
     pkgs.lmms
