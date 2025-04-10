@@ -20,10 +20,11 @@ in
     fcitx5 = {
       waylandFrontend = true;
       addons = [
-        pkgs.fcitx5-mozc
+        pkgs.fcitx5-mozc # TODO: remove, that's japanese?
         pkgs.fcitx5-gtk
         pkgs.fcitx5-chewing
         pkgs.fcitx5-hangul
+        # TODO: try fcitx5-fluent or fcitx5-nord-unstable, there're themes
       ];
     };
   };

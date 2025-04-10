@@ -4,4 +4,5 @@ font-family = "Comic Code Ligatures"
 font-size = 14
 theme = GruvboxDark
 
-keybind = ctrl+space=ignore
+keybind = unconsumed:ctrl+enter=ignore
+keybind = unconsumed:ctrl+shift+n=ignore
