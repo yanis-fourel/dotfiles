@@ -125,6 +125,7 @@
     pkgs.gromit-mpx # draw on screen
     pkgs.ghidra
     pkgs.direnv
+    pkgs.devenv
   ];
 
 
