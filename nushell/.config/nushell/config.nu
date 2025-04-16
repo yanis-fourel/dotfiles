@@ -30,6 +30,13 @@ export def "from .env" []: string -> record {
 }
 
 
+export def "from requirements.txt" []: string -> table {
+    from csv --comment '-' --separator '=' -n 
+        | rename name _ version 
+        | reject _
+}
+
+
 use std # does that hit statup time?
 use ~/.cache/starship/init.nu
 
@@ -105,6 +112,8 @@ alias vi = nvim
 alias fuck = killall -9
 
 alias lk = sudo docker compose --profile lk
+
+alias ta = tmux a
 
 
 
