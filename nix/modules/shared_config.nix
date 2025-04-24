@@ -126,6 +126,7 @@
     pkgs.ghidra
     pkgs.direnv
     pkgs.devenv
+    pkgs.aichat # llm cli
   ];
 
 
