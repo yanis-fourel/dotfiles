@@ -13,7 +13,7 @@ return {
 			auto_trigger = true,
 			debounce = 0,
 			keymap = {
-				accept = "<M-n>",
+				accept = "<Right>",
 				-- accept_word = false,
 				-- accept_line = false,
 				-- next = "<C-Enter>",
