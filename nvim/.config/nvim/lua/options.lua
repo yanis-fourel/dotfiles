@@ -10,7 +10,7 @@ vim.opt.shiftwidth = 4
 vim.opt.mouse = "a"
 
 -- Don't show the mode, since it's already in the status line
-vim.opt.showmode = true
+vim.opt.showmode = false
 
 -- Sync clipboard between OS and Neovim.
 vim.opt.clipboard = "unnamedplus"
@@ -54,11 +54,13 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
-vim.o.title = true
-vim.o.wrap = false
-vim.o.linebreak = true
+vim.opt.title = true
+vim.opt.wrap = false
+vim.opt.linebreak = true
 -- Do I Need that?
--- vim.o.undodir = os.getenv("HOME") .. "/.nvim_undodir"
-vim.o.undofile = true
-vim.o.laststatus = 3
-vim.o.colorcolumn = "80"
+-- vim.opt.undodir = os.getenv("HOME") .. "/.nvim_undodir"
+vim.opt.undofile = true
+vim.opt.laststatus = 3
+vim.opt.colorcolumn = "80"
+
+vim.opt.fixendofline = false
