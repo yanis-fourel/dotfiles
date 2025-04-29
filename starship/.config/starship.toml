@@ -35,3 +35,6 @@ format = "([$ahead_behind ]($style))"
 ahead = "⇡${count}"
 diverged = "⇕⇡${ahead_count}⇣${behind_count}"
 behind = "⇣${count}"
+
+[gcloud]
+disabled = true
