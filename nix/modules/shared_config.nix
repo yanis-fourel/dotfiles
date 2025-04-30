@@ -127,6 +127,7 @@
     pkgs.direnv
     pkgs.devenv
     pkgs.aichat # llm cli
+    pkgs.obs-studio
   ];
 
 
