@@ -11,6 +11,7 @@
     ./shell.nix
     ./devtools.nix
     ./docker.nix
+    ./wireshark.nix
   ];
 
   users.users.yanis = {
