@@ -4,6 +4,7 @@
     pkgs.wireshark-cli
   ];
 
-  users.groups.wireshark.members = [ "yanis" ];
+  users.groups.wireshark = {};
+  users.users.yanis.extraGroups = [ "wireshark" ];
 }
 
