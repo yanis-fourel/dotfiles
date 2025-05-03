@@ -4,7 +4,6 @@
     pkgs.wireshark-cli
   ];
 
-  users.users.yanis.extraGroups = [ "wireshark" ];
-
+  users.users.yanis.extraGroups = [ "toto" ];
 }
 
