@@ -6,7 +6,7 @@
   };
 
   environment.systemPackages = [
-    pkgs.wireshark-cli
+    pkgs.wireshark
   ];
 
   users.users.yanis.extraGroups = [ "wireshark" ];
