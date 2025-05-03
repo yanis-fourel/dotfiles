@@ -101,6 +101,7 @@ return {
 			rust_analyzer = {},
 			nil_ls = {},
 			nushell = {},
+			yamlls = {},
 		}
 
 		servers = vim.tbl_extend(
