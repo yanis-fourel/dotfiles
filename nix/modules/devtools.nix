@@ -1,5 +1,6 @@
 {
   pkgs,
+  upkgs,
   ...
 }:
 {
@@ -40,5 +41,8 @@
       "rustfmt"
     ])
     pkgs.rust-analyzer-nightly
+
+    upkgs.zls
+    upkgs.zig
   ];
 }

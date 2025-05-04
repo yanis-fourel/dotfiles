@@ -26,6 +26,9 @@
       zen-browser,
       ...
     }@inputs:
+    let
+      upkgs = inputs.nixpkgs-unstable.legacyPackages.x86_64-linux;
+    in
     {
       packages.x86_64-linux.default = fenix.packages.x86_64-linux.minimal.toolchain;
 
@@ -33,6 +36,7 @@
         specialArgs = rec {
           system = "x86_64-linux";
           inherit inputs;
+          inherit upkgs;
           pkg_ghostty = ghostty.packages.${system}.default;
           pkg_zen-browser = zen-browser.packages.${system}.specific;
         };
