@@ -71,6 +71,36 @@ export def ox [path: path] {
     open $path | explore
 }
 
+export def rootauth []: nothing -> string {
+    let $path = (docker volume inspect appliance_Data | from json | get Mountpoint | get 0)
+    sudo cat $"($path)/Authorities.txt"
+}
+
+export def retry [expr: closure, --max_attempts: int = 5] {
+    error make { msg: "That script doesn't work yet" }
+
+    mut attempts = 0;
+    while $attempts < $max_attempts {
+        $attempts += 1
+        let _attempts = $attempts
+
+        try {
+            do $expr
+            if $env.LAST_EXIT_CODE == 0 {
+                break
+            }
+            error make { msg: $"Command exited with non-zero status ($env.LAST_EXIT_CODE)" }
+        } catch { |e|
+            print $"Attempt ($_attempts)/($max_attempts): ($e.msg), retrying..."
+        }
+    }
+    error make { msg: $"Failed after ($max_attempts) attempts" }
+}
+
+export def findandreplace [search: string, replace: string] {
+    rg --hidden $search --no-ignore --files-with-matches | xargs sed -i $"s/($search)/($replace)/g"
+}
+
 # Starts Yazi and change the current working directory 
 # when exiting Yazi with `q`.
 # Exit with `Q` instead to not change current working directory
@@ -114,6 +144,8 @@ alias fuck = killall -9
 alias lk = sudo docker compose --profile lk
 
 alias ta = tmux a
+alias dc = docker compose
+alias dca = docker compose --profile '*'
 
 
 
