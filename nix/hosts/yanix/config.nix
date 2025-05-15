@@ -6,14 +6,10 @@
 {
   imports = [
     ./hardware.nix
-    ./sync.nix
     ../../modules/shared_config.nix
   ];
 
   networking.hostName = "yanix";
-
-  # my custom sync service (deprecated)
-  services.sync.enable = true;
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
