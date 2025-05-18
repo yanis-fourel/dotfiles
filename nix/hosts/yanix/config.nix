@@ -18,6 +18,7 @@
   boot.loader.grub.efiSupport = true;
   boot.loader.grub.useOSProber = true;
 
+  services.openssh.enable = true;
 
   environment.systemPackages = [
     pkgs.sparrow # adds user to extragroups = plugdev
