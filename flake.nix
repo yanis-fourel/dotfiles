@@ -47,6 +47,7 @@
         specialArgs = rec {
           system = "x86_64-linux";
           inherit inputs;
+          inherit upkgs;
           pkg_ghostty = ghostty.packages.${system}.default;
         };
         modules = [ ./nix/hosts/ledr-yanix/config.nix ];
