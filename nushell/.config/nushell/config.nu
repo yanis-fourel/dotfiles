@@ -18,6 +18,8 @@
 # them for future reference.
 
 $env.config.show_banner = false
+$env.config.history.isolation = true
+$env.config.history.sync_on_enter = false
 
 export def "from .env" []: string -> record {
   lines 
