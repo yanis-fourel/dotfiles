@@ -130,6 +130,9 @@
     pkgs.aichat # llm cli
     pkgs.obs-studio
     pkgs.ncdu
+    pkgs.tokei # code statistics
+    pkgs.dua # disk usage analyzer
+    pkgs.ripgrep-all # like ripgrep but for all file types (pdf, docx, zip, etc.)
   ];
 
 
