@@ -104,8 +104,8 @@
     pkgs.openai-whisper # TODO: remove
     pkgs.cryptomator
     pkgs.obsidian
-    pkgs.tofi
-    pkgs.wofi
+    pkgs.tofi # TODO: remove
+    pkgs.wofi # TODO: remove
     pkgs.libreoffice
     pkgs.kdePackages.okular
     pkgs.gimp
@@ -133,6 +133,7 @@
     pkgs.tokei # code statistics
     pkgs.dua # disk usage analyzer
     pkgs.ripgrep-all # like ripgrep but for all file types (pdf, docx, zip, etc.)
+    pkgs.ulauncher
   ];
 
 
