@@ -24,7 +24,8 @@ in
         pkgs.fcitx5-mozc # Japanese input
         pkgs.fcitx5-hangul # Korean input
         pkgs.fcitx5-chewing # ZhuYin Chinese input
-        pkgs.fcitx5-chinese-addons # PinYin Chinese input
+        pkgs.fcitx5-rime
+        pkgs.rime-data
         # TODO: try fcitx5-fluent or fcitx5-nord-unstable, there're themes
       ];
     };
