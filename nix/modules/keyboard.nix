@@ -20,10 +20,11 @@ in
     fcitx5 = {
       waylandFrontend = true;
       addons = [
-        pkgs.fcitx5-mozc
         pkgs.fcitx5-gtk
-        pkgs.fcitx5-chewing
-        pkgs.fcitx5-hangul
+        pkgs.fcitx5-mozc # Japanese input
+        pkgs.fcitx5-hangul # Korean input
+        pkgs.fcitx5-chewing # ZhuYin Chinese input
+        pkgs.fcitx5-chinese-addons # PinYin Chinese input
         # TODO: try fcitx5-fluent or fcitx5-nord-unstable, there're themes
       ];
     };
