@@ -25,10 +25,7 @@
     pkg_zen-browser
     pkgs.anki
   ];
-  # services.udev.packages = with pkgs; [
-  #   ledger-udev-rules
-  # ];
-  users.groups.plugdev = {};
+  # users.groups.plugdev = {};
   users.users.yanis.extraGroups = [ "plugdev" ];
 
   nix.settings.trusted-users = [ "root" "yanis" ];
