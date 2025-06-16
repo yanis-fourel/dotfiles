@@ -25,6 +25,7 @@
     pkg_zen-browser
     pkgs.anki
   ];
+  services.udisks2.enable = true;
   users.users.yanis.extraGroups = [ "plugdev" ];
 
   nix.settings.trusted-users = [ "root" "yanis" ];
