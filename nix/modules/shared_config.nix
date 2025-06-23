@@ -133,6 +133,7 @@
     pkgs.tokei # code statistics
     pkgs.dua # disk usage analyzer
     pkgs.ripgrep-all # like ripgrep but for all file types (pdf, docx, zip, etc.)
+    pkgs.ncspot # ncurses spotify client
   ];
 
 
