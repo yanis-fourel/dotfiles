@@ -25,6 +25,7 @@
     pkg_zen-browser
     pkgs.anki
   ];
+  # users.groups.plugdev = {};
   users.users.yanis.extraGroups = [ "plugdev" ];
 
   nix.settings.trusted-users = [ "root" "yanis" ];
