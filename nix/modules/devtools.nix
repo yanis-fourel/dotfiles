@@ -28,7 +28,7 @@
     pkgs.clang
     pkgs.clang-tools
 
-    pkgs.python3
+    pkgs.python311 # LEDR uses python 3.11
     pkgs.black
     pkgs.pyright
     pkgs.ruff
