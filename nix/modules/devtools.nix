@@ -12,6 +12,7 @@
     pkgs.svelte-language-server
     pkgs.vscode-langservers-extracted # for eslint and more
     pkgs.nodejs_22
+    pkgs.eslint_d
 
     pkgs.yaml-language-server
 
