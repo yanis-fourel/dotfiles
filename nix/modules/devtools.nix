@@ -13,6 +13,7 @@
     pkgs.vscode-langservers-extracted # for eslint and more
     pkgs.nodejs_22
     pkgs.eslint_d
+    pkgs.nodemon
 
     pkgs.yaml-language-server
 
