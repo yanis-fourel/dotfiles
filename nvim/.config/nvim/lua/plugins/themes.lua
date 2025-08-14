@@ -6,6 +6,7 @@ return {
 		"folke/tokyonight.nvim",
 		"EdenEast/nightfox.nvim",
 		"sainnhe/sonokai",
+		"rebelot/kanagawa.nvim",
 		{ "navarasu/onedark.nvim", opts = { style = "darker" } },
 		{ "catppuccin/nvim", name = "catppuccin", opts = { integrations = { diffview = true } } },
 		{ "Mofiqul/dracula.nvim" },
@@ -18,6 +19,6 @@ return {
 		vim.g.backround = "dark"
 		vim.g.everforest_background = "hard"
 
-		vim.cmd.colorscheme("dracula")
+		vim.cmd.colorscheme("kanagawa")
 	end,
 }
