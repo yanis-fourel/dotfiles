@@ -18,8 +18,9 @@
 # them for future reference.
 
 $env.config.show_banner = false
+$env.config.history.file_format = "sqlite" # required for isolation
 $env.config.history.isolation = true
-$env.config.history.sync_on_enter = false
+# $env.config.history.sync_on_enter = false # Has no effert for sqlite
 
 export def "from .env" []: string -> record {
   lines 
@@ -116,6 +117,20 @@ def --env y [...args] {
     rm -fp $tmp
 }
 
+
+def cikick [] {
+    git tag -f cikick;
+    git push -f origin cikick
+}
+
+def branch []: nothing -> string {
+    git rev-parse --abbrev-ref HEAD
+}
+
+def --env tmp [] {
+    cd (mktemp -d -t "yanis-tmp.XXXXXX")
+}
+
 use std/util "path add"
 
 $env.GOPATH = ($env.HOME | path join "go")
@@ -148,6 +163,7 @@ alias lk = sudo docker compose --profile lk
 alias ta = tmux a
 alias dc = docker compose
 alias dca = docker compose --profile '*'
+alias "docker compose" = echo 'use `dc` for docker compose'
 
 
 
