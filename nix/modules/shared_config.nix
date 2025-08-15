@@ -84,7 +84,6 @@
     pkgs.zsh-autocomplete
     pkgs.zsh-autosuggestions
     pkgs.brave
-    pkgs.upower # brave queries that
     pkgs.kdePackages.kwallet # brave needs
     pkgs.kdePackages.kwalletmanager # brave needs
     pkgs.fzf
@@ -173,6 +172,8 @@
   };
 
   security.pam.services.hyprland.kwallet.enable = true;
+
+  services.upower.enable = true; # brave wants
 
   hardware.opentabletdriver.enable = true;
   hardware.opentabletdriver.daemon.enable = true;
