@@ -24,14 +24,13 @@
 
   services.tailscale.enable = true;
 
-  
   systemd.timers."dotfile-fetch" = {
     wantedBy = [ "timers.target" ];
-      timerConfig = {
-        OnBootSec = "1m";
-        OnUnitActiveSec = "1m";
-        Unit = "dotfile-fetch.service";
-      };
+    timerConfig = {
+      OnBootSec = "1m";
+      OnUnitActiveSec = "1m";
+      Unit = "dotfile-fetch.service";
+    };
   };
 
   systemd.services."dotfile-fetch" = {
@@ -85,6 +84,9 @@
     pkgs.zsh-autocomplete
     pkgs.zsh-autosuggestions
     pkgs.brave
+    pkgs.upower # brave queries that
+    pkgs.kdePackages.kwallet # brave needs
+    pkgs.kdePackages.kwalletmanager # brave needs
     pkgs.fzf
     pkgs.unzip
     pkgs.waybar
@@ -136,9 +138,8 @@
     pkgs.ncspot # ncurses spotify client
     pkgs.audacity
     pkgs.code-cursor
+    pkgs.xdg-desktop-portal-hyprland
   ];
-
-
 
   environment.sessionVariables = {
     PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
@@ -170,6 +171,8 @@
       };
     };
   };
+
+  security.pam.services.hyprland.kwallet.enable = true;
 
   hardware.opentabletdriver.enable = true;
   hardware.opentabletdriver.daemon.enable = true;
