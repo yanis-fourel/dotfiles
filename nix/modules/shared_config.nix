@@ -183,6 +183,9 @@
 
   hardware.graphics = {
     enable = true;
+    extraPackages = [
+      pkgs.mesa
+    ];
   };
 
   # Load nvidia driver for Xorg and Wayland
