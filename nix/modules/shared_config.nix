@@ -138,6 +138,7 @@
     pkgs.audacity
     pkgs.code-cursor
     pkgs.xdg-desktop-portal-hyprland
+    pkgs.kitty
   ];
 
   environment.sessionVariables = {
