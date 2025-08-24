@@ -1,5 +1,6 @@
 { 
   pkgs,
+  upkgs,
   pkg_zen-browser,
   ...
 }:
@@ -23,7 +24,7 @@
   environment.systemPackages = [
     pkgs.sparrow # adds user to extragroups = plugdev
     pkg_zen-browser
-    pkgs.anki
+    upkgs.anki
   ];
   # users.groups.plugdev = {};
   users.users.yanis.extraGroups = [ "plugdev" ];
