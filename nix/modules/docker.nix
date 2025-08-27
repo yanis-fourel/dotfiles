@@ -4,6 +4,7 @@
     pkgs.docker
     pkgs.docker-compose
     pkgs.lazydocker
+    pkgs.nvidia-container-toolkit
   ];
   virtualisation.docker.enable = true;
 
