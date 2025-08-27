@@ -139,6 +139,7 @@
     pkgs.code-cursor
     pkgs.xdg-desktop-portal-hyprland
     pkgs.kitty
+    pkgs.vlc
   ];
 
   environment.sessionVariables = {
