@@ -31,6 +31,11 @@
 
   nix.settings.trusted-users = [ "root" "yanis" ];
 
+  # Disable keyboard backlight on boot
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="leds", KERNEL=="*kbd_backlight*", ATTR{brightness}="0"
+  '';
+
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
   #
