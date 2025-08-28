@@ -73,7 +73,13 @@ end
 local function ruff(capabilities)
 	return {
 		capabilities = capabilities,
-		settings = {},
+		init_options = {
+			settings = {
+				lint = {
+					ignore = { "F405" }, -- name may be undefined, or defined from star imports
+				},
+			},
+		},
 	}
 end
 
