@@ -141,7 +141,7 @@
     pkgs.kitty
     pkgs.mpv
     pkgs.qbittorrent
-    pkgs.tor
+    pkgs.tor-browser
   ];
 
   environment.sessionVariables = {
