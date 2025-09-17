@@ -140,6 +140,7 @@
     pkgs.xdg-desktop-portal-hyprland
     pkgs.kitty
     pkgs.mpv
+    pkgs.qbittorrent
   ];
 
   environment.sessionVariables = {
