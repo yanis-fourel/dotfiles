@@ -140,6 +140,7 @@
     pkgs.xdg-desktop-portal-hyprland
     pkgs.kitty
     pkgs.mpv
+    pkgs.vlc
     pkgs.qbittorrent
     pkgs.tor-browser
     pkgs.protonvpn-gui
