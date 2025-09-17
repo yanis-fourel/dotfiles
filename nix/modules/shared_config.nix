@@ -144,6 +144,7 @@
     pkgs.qbittorrent
     pkgs.tor-browser
     pkgs.protonvpn-gui
+    pkgs.ffmpeg
   ];
 
   environment.sessionVariables = {
