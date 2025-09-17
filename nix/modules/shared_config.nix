@@ -142,6 +142,7 @@
     pkgs.mpv
     pkgs.qbittorrent
     pkgs.tor-browser
+    pkgs.protonvpn-gui
   ];
 
   environment.sessionVariables = {
