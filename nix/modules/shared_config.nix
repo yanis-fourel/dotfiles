@@ -145,6 +145,7 @@
     pkgs.tor-browser
     pkgs.protonvpn-gui
     pkgs.ffmpeg
+    pkgs.typst
   ];
 
   environment.sessionVariables = {
