@@ -146,6 +146,9 @@
     pkgs.protonvpn-gui
     pkgs.ffmpeg
     pkgs.typst
+    pkgs.nvidia-vaapi-driver # VA-API for NVIDIA
+    pkgs.libvdpau-va-gl # idk
+    pkgs.vaapiVdpau # idk
   ];
 
   environment.sessionVariables = {
