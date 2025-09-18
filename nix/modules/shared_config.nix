@@ -164,6 +164,7 @@
   ];
 
   programs.gnupg.agent.enable = true;
+  programs.nix-ld.enable = true;
 
   services.greetd = {
     enable = true;
