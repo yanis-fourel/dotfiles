@@ -250,7 +250,7 @@
 
 
   # Set your time zone.
-  time.timeZone = "Asia/Bangkok";
+  time.timeZone = "Asia/Tokyo";
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
