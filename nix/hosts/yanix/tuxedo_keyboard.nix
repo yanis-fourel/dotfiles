@@ -22,7 +22,7 @@ let
     ];
 
     buildFlags = [ ];
-    installTargets = [ ];  # Omit; use custom installPhase instead.
+    installTargets = [ ];  # Use custom installPhase
 
     prePatch = ''
       # Patch DMI matches for Aftershock compatibility.
@@ -34,11 +34,9 @@ let
     installPhase = ''
       runHook preInstall
 
-      # Create directory structure for kernel modules.
       mkdir -p $out/lib/modules/${kernel.modDirVersion}/kernel/drivers/platform/x86
       mkdir -p $out/lib/modules/${kernel.modDirVersion}/kernel/drivers/platform/tuxedo_io
 
-      # Copy built modules to appropriate locations.
       cp src/tuxedo_keyboard.ko $out/lib/modules/${kernel.modDirVersion}/kernel/drivers/platform/x86/
       cp src/clevo_wmi.ko $out/lib/modules/${kernel.modDirVersion}/kernel/drivers/platform/x86/
       cp src/clevo_acpi.ko $out/lib/modules/${kernel.modDirVersion}/kernel/drivers/platform/x86/
@@ -60,8 +58,8 @@ in
 
   boot.kernelModules = [ "tuxedo_keyboard" ];
 
-  # Disable backlight entirely via module parameters.
+  # Enhanced disablement for all zones, including potential power button LED.
   boot.extraModprobeConfig = ''
-    options tuxedo_keyboard brightness=0
+    options tuxedo_keyboard state=0 brightness=0 color_left=0x000000 color_center=0x000000 color_right=0x000000 color_extra=0x000000
   '';
 }
