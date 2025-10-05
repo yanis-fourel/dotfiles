@@ -60,6 +60,6 @@ in
 
   # Enhanced disablement for all zones, including potential power button LED.
   boot.extraModprobeConfig = ''
-    options tuxedo_keyboard state=0 brightness=0 color_left=0x000000 color_center=0x000000 color_right=0x000000 color_extra=0x000000
+    options tuxedo_keyboard mode=0 brightness=0 color_left=0x000000 color_center=0x000000 color_right=0x000000 color_extra=0x000000
   '';
 }
