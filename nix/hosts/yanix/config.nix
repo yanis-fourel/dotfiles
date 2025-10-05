@@ -8,6 +8,7 @@
   imports = [
     ./hardware.nix
     ../../modules/shared_config.nix
+    ./tuxedo_keyboard.nix
   ];
 
   networking.hostName = "yanix";
