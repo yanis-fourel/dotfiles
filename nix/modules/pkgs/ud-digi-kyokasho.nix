@@ -5,8 +5,8 @@ pkgs.stdenv.mkDerivation {
   version = "1.00";
 
   src = pkgs.fetchurl {
-    url = "https://github.com/Bluemoondragon07/UD-Digi-Kyokasho-Font/raw/refs/heads/main/UDDigiKyokashoN-R-01.ttf";
-    sha256 = "0yfagwb17nf27i302rg23irw7ykg3nk4w0h1rvc1mm0p488im316";
+    url = "https://github.com/Bluemoondragon07/UD-Digi-Kyokasho-Font/raw/refs/heads/main/UDDigiKyokashoNP-R-02.ttf";
+    sha256 = "0ci5fyxjzc8ibffz6zmb9l7k0q2qxgjpdpphbmf04jqax5g1phdy";
   };
 
   dontUnpack = true;
