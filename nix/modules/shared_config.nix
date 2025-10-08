@@ -170,6 +170,7 @@ in
       pkgs.noto-fonts-cjk-sans
       pkgs.noto-fonts-emoji
       pkgs.nerd-fonts.symbols-only
+      pkgs.pkgs.ipafont
       kouzan-gyousho
       kouzan-sousho
     ];
