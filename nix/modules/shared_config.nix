@@ -5,6 +5,10 @@
   pkg_ghostty,
   ...
 }:
+let
+  kouzan-gyousho = pkgs.callPackage ./pkgs/kouzan-gyousho.nix { };
+  kouzan-sousho = pkgs.callPackage ./pkgs/kouzan-sousho.nix { };
+in
 {
   imports = [
     ./keyboard.nix
@@ -159,12 +163,17 @@
     cleartoficache.text = "rm -f /home/yanis/.cache/tofi-drun"; # https://github.com/philj56/tofi/issues/115
   };
 
-  fonts.packages = [
-    pkgs.noto-fonts
-    pkgs.noto-fonts-cjk-sans
-    pkgs.noto-fonts-emoji
-    pkgs.nerd-fonts.symbols-only
-  ];
+  fonts ={
+    fontDir.enable = true;
+    packages = [
+      pkgs.noto-fonts
+      pkgs.noto-fonts-cjk-sans
+      pkgs.noto-fonts-emoji
+      pkgs.nerd-fonts.symbols-only
+      kouzan-gyousho
+      kouzan-sousho
+    ];
+  };
 
   programs.gnupg.agent.enable = true;
   programs.nix-ld.enable = true;
