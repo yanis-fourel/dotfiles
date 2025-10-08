@@ -5,13 +5,17 @@ pkgs.stdenv.mkDerivation {
   version = "1.00";
 
   src = pkgs.fetchurl {
-    url = "https://github.com/Bluemoondragon07/UD-Digi-Kyokasho-Font/raw/refs/heads/main/UDDigiKyokashoNP-R-02.ttf";
-    sha256 = "0ci5fyxjzc8ibffz6zmb9l7k0q2qxgjpdpphbmf04jqax5g1phdy";
+    url = "https://github.com/Bluemoondragon07/UD-Digi-Kyokasho-Font/archive/refs/heads/main.zip";
+    sha256 = "0ikqlbkpysm8xhhl5kjf6s0fmzzlf1in3zf7ws2kmkin33gw102i";
   };
 
-  dontUnpack = true;
+  nativeBuildInputs = [ pkgs.unzip ];
+
+  unpackPhase = ''
+    unzip $src
+  '';
 
   installPhase = ''
-    install -m444 -Dt $out/share/fonts/truetype $src
+    install -m444 -Dt $out/share/fonts/truetype UD-Digi-Kyokasho-Font-main/*.ttf
   '';
 }
