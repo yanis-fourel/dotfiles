@@ -6,8 +6,7 @@
   ...
 }:
 let
-  kouzan-gyousho = pkgs.callPackage ./pkgs/kouzan-gyousho.nix { };
-  kouzan-sousho = pkgs.callPackage ./pkgs/kouzan-sousho.nix { };
+  ud-digi-kyokasho = pkgs.callPackage ./pkgs/ud-digi-kyokasho.nix { };
 in
 {
   imports = [
@@ -171,8 +170,7 @@ in
       pkgs.noto-fonts-emoji
       pkgs.nerd-fonts.symbols-only
       pkgs.pkgs.ipafont
-      kouzan-gyousho
-      kouzan-sousho
+      ud-digi-kyokasho
     ];
   };
 
