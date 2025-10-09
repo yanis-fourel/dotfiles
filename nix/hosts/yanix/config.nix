@@ -9,6 +9,7 @@
     ./hardware.nix
     ../../modules/shared_config.nix
     ./tuxedo_keyboard.nix
+    ./matobadrive.nix
   ];
 
   networking.hostName = "yanix";

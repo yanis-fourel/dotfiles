@@ -6,13 +6,23 @@ let
     #!/bin/bash
 
     ACTION=$1
-    DEVBASE=$2
     DEVICE_ID="6a0796b5-7774-4b55-822e-d8aab9865740"
     DEVICE="/dev/disk/by-uuid/$DEVICE_ID"
     MAPPER_NAME="matoba"
     MAPPER_DEVICE="/dev/mapper/$MAPPER_NAME"
     MOUNT_POINT="/home/yanis/Videos/x2r/"
     PASSWORD_FILE="/root/pwd"
+
+    do_remove() {
+      if mountpoint -q "$MOUNT_POINT"; then
+        umount "$MOUNT_POINT"
+        echo "Unmounted $MOUNT_POINT."
+      fi
+      if [ -b "$MAPPER_DEVICE" ]; then
+        ${pkgs.cryptsetup}/bin/cryptsetup luksClose "$MAPPER_NAME"
+        echo "Closed $MAPPER_NAME."
+      fi
+    }
 
     do_add() {
       if [ -b "$MAPPER_DEVICE" ]; then
@@ -30,25 +40,13 @@ let
       fi
 
       mkdir -p "$MOUNT_POINT"
-      eval $(${pkgs.util-linux}/bin/blkid -o udev "$MAPPER_DEVICE")
       OPTS="defaults,noatime"
       if ! mount -o "$OPTS" "$MAPPER_DEVICE" "$MOUNT_POINT"; then
         echo "Mount failed."
-        do_remove()
+        do_remove
         exit 1
       fi
       echo "Mounted $MAPPER_DEVICE at $MOUNT_POINT."
-    }
-
-    do_remove() {
-      if mountpoint -q "$MOUNT_POINT"; then
-        umount "$MOUNT_POINT"
-        echo "Unmounted $MOUNT_POINT."
-      fi
-      if [ -b "$MAPPER_DEVICE" ]; then
-        ${pkgs.cryptsetup}/bin/cryptsetup luksClose "$MAPPER_NAME"
-        echo "Closed $MAPPER_NAME."
-      fi
     }
 
     case "$ACTION" in
@@ -59,6 +57,9 @@ let
         do_remove
         ;;
       *)
+        echo "Invalid action: $ACTION"
+        exit 1
+        ;;
     esac
   '';
 in
@@ -66,10 +67,10 @@ in
   # Enable required packages
   environment.systemPackages = with pkgs; [ cryptsetup util-linux mountScript ];
 
-  # Udev rules to detect USB block devices and trigger service
+  # Udev rules to detect the specific USB block device and trigger service
   services.udev.extraRules = ''
-    KERNEL=="sd[a-z][0-9]", SUBSYSTEMS=="usb", ACTION=="add", RUN+="${pkgs.systemd}/bin/systemctl start external-mount@%k.service"
-    KERNEL=="sd[a-z][0-9]", SUBSYSTEMS=="usb", ACTION=="remove", RUN+="${pkgs.systemd}/bin/systemctl stop external-mount@%k.service"
+    KERNEL=="sd[a-z][0-9]", SUBSYSTEMS=="usb", ENV{ID_FS_UUID}=="6a0796b5-7774-4b55-822e-d8aab9865740", ACTION=="add", RUN+="${pkgs.systemd}/bin/systemctl start external-mount@%k.service"
+    KERNEL=="sd[a-z][0-9]", SUBSYSTEMS=="usb", ENV{ID_FS_UUID}=="6a0796b5-7774-4b55-822e-d8aab9865740", ACTION=="remove", RUN+="${pkgs.systemd}/bin/systemctl stop external-mount@%k.service"
   '';
 
   # Systemd service template for mounting
@@ -81,5 +82,12 @@ in
       ExecStart = "${mountScript}/bin/external-drive-mount.sh add %i";
       ExecStop = "${mountScript}/bin/external-drive-mount.sh remove %i";
     };
+  };
+
+  # Optional: Declare the filesystem for systemd awareness
+  fileSystems."/home/yanis/Videos/x2r" = {
+    device = "/dev/mapper/matoba";
+    fsType = "ext4";  # Adjust to match your inner filesystem type (e.g., ext4, xfs)
+    options = [ "noauto" "nofail" ];
   };
 }
