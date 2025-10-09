@@ -14,6 +14,7 @@ let
     PASSWORD_FILE="/root/pwd"
 
     do_remove() {
+      echo "do_remove called"
       if mountpoint -q "$MOUNT_POINT"; then
         umount "$MOUNT_POINT"
         echo "Unmounted $MOUNT_POINT."
@@ -25,6 +26,7 @@ let
     }
 
     do_add() {
+      echo "do_add called"
       if [ -b "$MAPPER_DEVICE" ]; then
         echo "Device $MAPPER_DEVICE already exists."
         return 0
