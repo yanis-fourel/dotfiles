@@ -15,8 +15,8 @@ let
 
     do_remove() {
       echo "do_remove called"
-      if mountpoint -q "$MOUNT_POINT"; then
-        umount "$MOUNT_POINT"
+      if ${pkgs.util-linux}/bin/mountpoint -q "$MOUNT_POINT"; then
+        ${pkgs.util-linux}/bin/umount "$MOUNT_POINT"
         echo "Unmounted $MOUNT_POINT."
       fi
       if [ -b "$MAPPER_DEVICE" ]; then
@@ -43,7 +43,7 @@ let
 
       mkdir -p "$MOUNT_POINT"
       OPTS="defaults,noatime"
-      if ! mount -o "$OPTS" "$MAPPER_DEVICE" "$MOUNT_POINT"; then
+      if ! ${pkgs.util-linux}/bin/mount -o "$OPTS" "$MAPPER_DEVICE" "$MOUNT_POINT"; then
         echo "Mount failed."
         do_remove
         exit 1
