@@ -16,7 +16,7 @@ let
     do_remove() {
       echo "do_remove called"
       if ${pkgs.util-linux}/bin/mountpoint -q "$MOUNT_POINT"; then
-        ${pkgs.util-linux}/bin/umount "$MOUNT_POINT"
+        ${pkgs.util-linux}/bin/umount "$MOUNT_POINT" --lazy
         echo "Unmounted $MOUNT_POINT."
       fi
       if [ -b "$MAPPER_DEVICE" ]; then
