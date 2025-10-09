@@ -33,7 +33,7 @@ let
         echo "Device $DEVICE not found."
         exit 1
       fi
-      cat "$PASSWORD_FILE" | ${pkgs.cryptsetup}/bin/cryptsetup luksOpen "$DEVICE" "$MAPPER_NAME" --key-file=-
+      cat "$PASSWORD_FILE" | ${pkgs.cryptsetup}/bin/cryptsetup luksOpen "$DEVICE" "$MAPPER_NAME"
       if [ $? -ne 0 ]; then
         echo "Decryption failed."
         exit 1
