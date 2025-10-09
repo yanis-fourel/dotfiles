@@ -28,8 +28,12 @@ let
     do_add() {
       echo "do_add called"
       if [ -b "$MAPPER_DEVICE" ]; then
-        echo "Device $MAPPER_DEVICE already exists."
-        return 0
+        if ${pkgs.util-linux}/bin/findmnt -S "$MAPPER_DEVICE" > /dev/null; then
+          echo "Device $MAPPER_DEVICE already exists and is mounted."
+          return 0
+        else
+          ${pkgs.cryptsetup}/bin/cryptsetup close "$MAPPER_NAME"
+        fi
       fi
       if [ ! -b "$DEVICE" ]; then
         echo "Device $DEVICE not found."
