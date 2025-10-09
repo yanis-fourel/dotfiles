@@ -69,8 +69,8 @@ in
 
   # Udev rules to detect the specific USB block device and trigger service
   services.udev.extraRules = ''
-    KERNEL=="sd[a-z][0-9]", SUBSYSTEMS=="usb", ENV{ID_FS_UUID}=="6a0796b5-7774-4b55-822e-d8aab9865740", ACTION=="add", RUN+="${pkgs.systemd}/bin/systemctl start external-mount@%k.service"
-    KERNEL=="sd[a-z][0-9]", SUBSYSTEMS=="usb", ENV{ID_FS_UUID}=="6a0796b5-7774-4b55-822e-d8aab9865740", ACTION=="remove", RUN+="${pkgs.systemd}/bin/systemctl stop external-mount@%k.service"
+    KERNEL=="sd[a-z][0-9]", SUBSYSTEMS=="usb", ACTION=="add", RUN+="${pkgs.systemd}/bin/systemctl start external-mount@%k.service"
+    KERNEL=="sd[a-z][0-9]", SUBSYSTEMS=="usb", ACTION=="remove", RUN+="${pkgs.systemd}/bin/systemctl stop external-mount@%k.service"
   '';
 
   # Systemd service template for mounting
