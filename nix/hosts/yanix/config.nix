@@ -27,7 +27,6 @@
     pkgs.sparrow # adds user to extragroups = plugdev
     pkg_zen-browser
     upkgs.anki
-    pkgs.katago
   ];
   # users.groups.plugdev = {};
   users.users.yanis.extraGroups = [ "plugdev" ];
