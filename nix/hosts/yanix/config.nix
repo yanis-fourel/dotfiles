@@ -27,6 +27,7 @@
     pkgs.sparrow # adds user to extragroups = plugdev
     pkg_zen-browser
     upkgs.anki
+    pkgs.osu-lazer-bin
   ];
   # users.groups.plugdev = {};
   users.users.yanis.extraGroups = [ "plugdev" ];
