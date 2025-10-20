@@ -46,5 +46,8 @@
 
     upkgs.zls
     upkgs.zig
+
+    pkgs.kotlin
+    pkgs.kotlin-language-server
   ];
 }
