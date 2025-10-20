@@ -49,5 +49,6 @@
 
     pkgs.kotlin
     pkgs.kotlin-language-server
+    pkgs.openjdk
   ];
 }
