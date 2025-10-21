@@ -1,5 +1,6 @@
 {
   config,
+  upkgs,
   pkgs,
   inputs,
   pkg_ghostty,
@@ -86,7 +87,7 @@ in
     pkgs.oh-my-zsh
     pkgs.zsh-autocomplete
     pkgs.zsh-autosuggestions
-    pkgs.brave
+    upkgs.brave
     pkgs.kdePackages.kwallet # brave needs
     pkgs.kdePackages.kwalletmanager # brave needs
     pkgs.fzf
