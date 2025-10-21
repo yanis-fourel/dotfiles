@@ -28,6 +28,7 @@
     pkg_zen-browser
     upkgs.anki
     pkgs.osu-lazer-bin
+    pkgs.openai-whisper
   ];
   # users.groups.plugdev = {};
   users.users.yanis.extraGroups = [ "plugdev" ];
