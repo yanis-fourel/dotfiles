@@ -153,6 +153,7 @@ in
     pkgs.nvidia-vaapi-driver # VA-API for NVIDIA
     pkgs.libvdpau-va-gl # idk
     pkgs.vaapiVdpau # idk
+    pkgs.google-chrome
   ];
 
   environment.sessionVariables = {
