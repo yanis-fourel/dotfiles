@@ -154,6 +154,7 @@ in
     pkgs.libvdpau-va-gl # idk
     pkgs.vaapiVdpau # idk
     pkgs.google-chrome
+    pkgs.ags
   ];
 
   environment.sessionVariables = {

@@ -29,6 +29,7 @@
     upkgs.anki
     pkgs.osu-lazer-bin
     pkgs.openai-whisper
+    # pkgs.minecraft # currently broken, how to fix?
   ];
   # users.groups.plugdev = {};
   users.users.yanis.extraGroups = [ "plugdev" ];
