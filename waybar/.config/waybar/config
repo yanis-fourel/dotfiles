@@ -4,9 +4,9 @@
     "height": 20, // Waybar height (to be removed for auto height)
     // "width": 1280, // Waybar width
     "spacing": 4, // Gaps between modules (4px)
-    "modules-left": ["hyprland/workspaces", "hyprland/submap"],
-    "modules-center": ["hyprland/language"],
-    "modules-right": ["pulseaudio", "network", "cpu", "memory", "disk", "temperature", "battery", "clock", "tray"],
+    "modules-left": ["hyprland/workspaces", "hyprland/submap", "custom/process-check"],
+    "modules-center": ["hyprland/window"],
+    "modules-right": ["pulseaudio", "network", "memory", "disk", "temperature", "battery", "clock"],
     "clock": {
         "format": "{:%Y-%m-%d %H:%M}",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
@@ -72,6 +72,13 @@
     "tray": {
         "icon-size": 21,
         "spacing": 10
-    }
+	},
+	"hyprland/window": {
+		"format": " {}",
+		"max-length": 50,
+		"rewrite": {
+			".* - Brave": "🌐 $1",
+			".* - zsh": ".Terminal"
+		}
+	}
 }
-
