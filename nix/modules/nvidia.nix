@@ -56,7 +56,5 @@
   };
 
   # TODO: recompilation takes forever and uses all my ram
-  # nixpkgs.config.cudaSupport = true;  # Enables CUDA globally (may trigger recompilations for some packages).
-
-  
+  nixpkgs.config.cudaSupport = true;  # Enables CUDA globally (may trigger recompilations for some packages).
 }
