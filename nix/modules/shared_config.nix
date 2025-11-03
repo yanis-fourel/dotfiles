@@ -19,6 +19,19 @@ in
     ./nvidia.nix
   ];
 
+  # Especially useful for NVIDIA CUDA-specific builds that are not available
+  # in binary caches.
+  nix.settings = {
+    substituters = [
+      "https://cache.nixos.org"
+      "https://nix-community.cachix.org"
+    ];
+    trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "nix-community.cachix.org-1:mB9FShS5r688iDXLoMkBAyZUnDQt4Iv+2qTalRl8="
+    ];
+  };
+
   users.users.yanis = {
     isNormalUser = true;
     extraGroups = [
@@ -114,7 +127,6 @@ in
     pkgs.wofi
     pkgs.libreoffice
     pkgs.kdePackages.okular
-    pkgs.gimp
     pkgs.i3
     pkgs.lmms
     pkgs.gammastep
