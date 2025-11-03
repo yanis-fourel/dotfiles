@@ -21,6 +21,10 @@
   boot.loader.grub.efiSupport = true;
   boot.loader.grub.useOSProber = true;
 
+  boot.kernel.sysctl = {
+    "vm.swappiness" = 80;
+  };
+
   services.openssh.enable = true;
 
   environment.systemPackages = [
