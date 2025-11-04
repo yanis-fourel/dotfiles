@@ -33,7 +33,7 @@
     upkgs.anki
     pkgs.osu-lazer-bin
     pkgs.openai-whisper
-    # pkgs.prismlauncher # minecraft launcher
+    pkgs.prismlauncher # minecraft launcher
   ];
   # users.groups.plugdev = {};
   users.users.yanis.extraGroups = [ "plugdev" ];
