@@ -55,6 +55,7 @@
     };
   };
 
-  # TODO: recompilation takes forever and uses all my ram
+  hardware.nvidia-container-toolkit.enable = true;  # Installs and configures the NVIDIA Container Toolkit declaratively.
+
   nixpkgs.config.cudaSupport = true;  # Enables CUDA globally (may trigger recompilations for some packages).
 }

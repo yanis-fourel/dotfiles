@@ -40,6 +40,13 @@ in
     shell = pkgs.nushell;
   };
 
+  programs.nh = {
+    enable = true;
+    clean.enable = true;
+    clean.extraArgs = "--keep-since 4d --keep 3";
+    flake = "/home/user/dotfiles"; # sets NH_OS_FLAKE variable for you
+  };
+
   services.tailscale.enable = true;
 
   systemd.timers."dotfile-fetch" = {
