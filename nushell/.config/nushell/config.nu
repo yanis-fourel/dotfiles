@@ -157,6 +157,7 @@ alias lll = exa -abghHliS
 alias vi = nvim
 
 alias fuck = killall -9
+alias fu = tmux kill-session -t v
 
 alias lk = sudo docker compose --profile lk
 

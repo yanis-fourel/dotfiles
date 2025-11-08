@@ -232,7 +232,7 @@ in
 
 
   # Set your time zone.
-  time.timeZone = "Asia/Tokyo";
+  time.timeZone = "Asia/Taipei";
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
