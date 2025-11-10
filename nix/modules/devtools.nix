@@ -46,5 +46,7 @@
 
     upkgs.zls
     upkgs.zig
+
+    pkgs.gdb
   ];
 }
