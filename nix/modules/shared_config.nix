@@ -294,7 +294,7 @@ in
   networking.firewall = {
     enable = true;
     allowedUDPPorts = [ 4445 ];  # minecraft lan discovery
-    allowedTCPPorts = [ 38777 ]; # temporary minecraft lan
+    allowedTCPPorts = [ 25565 ]; # temporary minecraft lan
   };
 
   # Copy the NixOS configuration file and link it from the resulting system
