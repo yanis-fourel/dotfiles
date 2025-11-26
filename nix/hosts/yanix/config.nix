@@ -35,6 +35,7 @@
     pkgs.openai-whisper
     pkgs.prismlauncher # minecraft launcher
     upkgs.sillytavern
+    pkgs.ollama
   ];
   # users.groups.plugdev = {};
   users.users.yanis.extraGroups = [ "plugdev" ];
