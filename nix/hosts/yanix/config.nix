@@ -34,6 +34,7 @@
     pkgs.osu-lazer-bin
     pkgs.openai-whisper
     pkgs.prismlauncher # minecraft launcher
+    upkgs.sillytavern
   ];
   # users.groups.plugdev = {};
   users.users.yanis.extraGroups = [ "plugdev" ];
