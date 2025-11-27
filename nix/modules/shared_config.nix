@@ -8,6 +8,7 @@
 }:
 let
   ud-digi-kyokasho = pkgs.callPackage ./pkgs/ud-digi-kyokasho.nix { };
+  gyosho = pkgs.callPackage ./pkgs/gyosho.nix { };
 in
 {
   imports = [
@@ -194,6 +195,7 @@ in
       pkgs.nerd-fonts.symbols-only
       pkgs.pkgs.ipafont
       ud-digi-kyokasho
+      gyosho # 日本語行書
     ];
   };
 
