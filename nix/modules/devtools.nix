@@ -5,7 +5,6 @@
 }:
 {
   environment.systemPackages = [
-    pkgs.sonarlint-ls
 
     pkgs.typescript
     pkgs.typescript-language-server

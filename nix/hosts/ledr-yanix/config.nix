@@ -30,6 +30,8 @@ pkgs,
   environment.systemPackages = [
     pkgs.clamav
     pkgs.clamtk
+
+    pkgs.sonarlint-ls
   ];
 
   services = {

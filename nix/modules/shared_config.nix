@@ -173,7 +173,7 @@ in
     pkgs.typst
     pkgs.nvidia-vaapi-driver # VA-API for NVIDIA
     pkgs.libvdpau-va-gl # idk
-    pkgs.vaapiVdpau # idk
+    pkgs.libva-vdpau-driver # idk
     pkgs.google-chrome
     pkgs.ags
   ];
@@ -191,7 +191,7 @@ in
     packages = [
       pkgs.noto-fonts
       pkgs.noto-fonts-cjk-sans
-      pkgs.noto-fonts-emoji
+      pkgs.noto-fonts-color-emoji
       pkgs.nerd-fonts.symbols-only
       pkgs.pkgs.ipafont
       ud-digi-kyokasho
