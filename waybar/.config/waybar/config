@@ -80,5 +80,15 @@
 			".* - Brave": "🌐 $1",
 			".* - zsh": ".Terminal"
 		}
+	},
+	"custom/process-check": {
+		"exec": "/home/yanis/.config/waybar/check.sh",
+		"return-type": "json",
+		"format": "{icon} {text}",
+		"format-icons": {
+			"active": "o",
+			"inactive": "x"
+		},
+		"restart-interval": 1  // Restart the script if it exits unexpectedly
 	}
 }

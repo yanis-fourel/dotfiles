@@ -8,7 +8,6 @@
     enable = true;
     extraPackages = [
       pkgs.mesa
-      pkgs.cudaPackages.cudatoolkit  # Installs the CUDA toolkit; use cudaPackages_12.cudatoolkit for a specific version if required.
     ];
   };
 
@@ -55,7 +54,5 @@
     };
   };
 
-  hardware.nvidia-container-toolkit.enable = true;  # Installs and configures the NVIDIA Container Toolkit declaratively.
-
-  nixpkgs.config.cudaSupport = true;  # Enables CUDA globally (may trigger recompilations for some packages).
+  hardware.nvidia-container-toolkit.enable = true; # Installs and configures the NVIDIA Container Toolkit declaratively.
 }

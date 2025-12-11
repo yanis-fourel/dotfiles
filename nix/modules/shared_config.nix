@@ -1,5 +1,4 @@
 {
-  config,
   upkgs,
   pkgs,
   inputs,
@@ -8,7 +7,9 @@
 }:
 let
   ud-digi-kyokasho = pkgs.callPackage ./pkgs/ud-digi-kyokasho.nix { };
-  gyosho = pkgs.callPackage ./pkgs/gyosho.nix { };
+  mogiha-pen = pkgs.callPackage ./pkgs/mogiha-pen.nix { };
+  _851tegaki_zatsu = pkgs.callPackage ./pkgs/851tegaki_zatsu.nix { };
+  chirufont = pkgs.callPackage ./pkgs/chirufont.nix { };
 in
 {
   imports = [
@@ -20,8 +21,6 @@ in
     ./nvidia.nix
   ];
 
-  # Especially useful for NVIDIA CUDA-specific builds that are not available
-  # in binary caches.
   nix.settings = {
     substituters = [
       "https://cache.nixos.org"
@@ -186,7 +185,7 @@ in
     cleartoficache.text = "rm -f /home/yanis/.cache/tofi-drun"; # https://github.com/philj56/tofi/issues/115
   };
 
-  fonts ={
+  fonts = {
     fontDir.enable = true;
     packages = [
       pkgs.noto-fonts
@@ -195,7 +194,9 @@ in
       pkgs.nerd-fonts.symbols-only
       pkgs.pkgs.ipafont
       ud-digi-kyokasho
-      gyosho # 日本語行書
+      mogiha-pen
+      _851tegaki_zatsu
+      chirufont
     ];
   };
 
@@ -210,7 +211,7 @@ in
         user = "yanis";
       };
       default_session = {
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --user-menu --cmd Hyprland";
+        command = "${pkgs.tuigreet}/bin/tuigreet --time --user-menu --cmd Hyprland";
         user = "greeter";
       };
     };
@@ -225,13 +226,10 @@ in
 
   nixpkgs.config.allowUnfree = true;
 
-
-
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   networking.networkmanager.enable = true; # Easiest to use and most distros use this by default.
   users.extraGroups.networkmanager.members = [ "yanis" ];
-
 
   # Set your time zone.
   time.timeZone = "Asia/Tokyo";
@@ -295,7 +293,7 @@ in
   # Or disable the firewall altogether.
   networking.firewall = {
     enable = true;
-    allowedUDPPorts = [ 4445 ];  # minecraft lan discovery
+    allowedUDPPorts = [ 4445 ]; # minecraft lan discovery
     allowedTCPPorts = [ 25565 ]; # temporary minecraft lan
   };
 

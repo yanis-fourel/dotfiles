@@ -1,4 +1,4 @@
-{ 
+{
   pkgs,
   upkgs,
   pkg_zen-browser,
@@ -40,7 +40,10 @@
   # users.groups.plugdev = {};
   users.users.yanis.extraGroups = [ "plugdev" ];
 
-  nix.settings.trusted-users = [ "root" "yanis" ];
+  nix.settings.trusted-users = [
+    "root"
+    "yanis"
+  ];
 
   # Disable keyboard backlight on boot
   services.udev.extraRules = ''
