@@ -32,7 +32,7 @@
     pkg_zen-browser
     upkgs.anki
     pkgs.osu-lazer-bin
-    pkgs.openai-whisper
+    pkgs.python313Packages.faster-whisper
     pkgs.prismlauncher # minecraft launcher
     upkgs.sillytavern
     pkgs.ollama

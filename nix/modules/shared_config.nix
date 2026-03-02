@@ -127,7 +127,6 @@ in
     pkgs.nix-search-cli
     pkgs.cachix
     pkgs.file
-    pkgs.openai-whisper # TODO: remove
     pkgs.cryptomator
     pkgs.obsidian
     pkgs.tofi
@@ -151,8 +150,6 @@ in
     pkgs.gromit-mpx # draw on screen
     pkgs.ghidra
     pkgs.direnv
-    pkgs.devenv
-    pkgs.aichat # llm cli
     pkgs.obs-studio
     pkgs.ncdu
     pkgs.tokei # code statistics
@@ -170,11 +167,9 @@ in
     pkgs.protonvpn-gui
     pkgs.ffmpeg
     pkgs.typst
-    pkgs.nvidia-vaapi-driver # VA-API for NVIDIA
-    pkgs.libvdpau-va-gl # idk
-    pkgs.libva-vdpau-driver # idk
     pkgs.google-chrome
     pkgs.ags
+    pkgs.gimp
   ];
 
   environment.sessionVariables = {
@@ -195,7 +190,7 @@ in
       pkgs.pkgs.ipafont
       ud-digi-kyokasho
       mogiha-pen
-      _851tegaki_zatsu
+      # _851tegaki_zatsu # This font causes issue with korean characters
       chirufont
     ];
   };
