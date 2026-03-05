@@ -1,0 +1,3 @@
+# use antidote to install
+zsh-users/zsh-autosuggestions
+zsh-users/zsh-syntax-highlighting
