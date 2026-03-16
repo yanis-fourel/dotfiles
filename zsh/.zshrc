@@ -112,13 +112,14 @@ findandreplace()
 
 y()
 {
-	tmp = $(mktemp -t "yazi-cwd.XXXXXX")
+	tmp=$(mktemp -t "yazi-cwd.XXXXXX")
+	echo "tmp file is $tmp" >> /tmp/ylogfile
 	yazi ...$@ --cwd-file $tmp
-	cwd = (cat $tmp)
-	if [[ -n $cwd && $cwd -ne $PWD ]]; then
+	cwd=$(cat $tmp)
+	if [[ -n $cwd && "$cwd" != "$PWD" ]]; then
 		cd $cwd
 	fi
-	rm -fp $tmp
+	rm -f $tmp
 }
 
 # Environment
