@@ -26,10 +26,5 @@ grim -g "$SELECTION" "$FILEPATH" || exit 1
 kill $PID 2>/dev/null
 trap - EXIT
 
-wl-copy <"$FILEPATH"
-
-satty --filename "$FILEPATH" \
-  --output-filename "$FILEPATH" \
-  --actions-on-enter save-to-clipboard \
-  --save-after-copy \
-  --copy-command 'wl-copy'
+swappy -f "$FILEPATH" -o "$FILEPATH"
+wl-copy < "$FILEPATH"
