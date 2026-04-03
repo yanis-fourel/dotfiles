@@ -7,7 +7,7 @@ else
 	choices=$(echo "$choices" | sed "s|$HOME/||")
 
 	choices=$(echo -e "root\n$choices")
-	selection=$(echo "$choices" | tofi)
+	selection=$(echo "$choices" | walker -d)
 	if [[ -z $selection ]]; then
 		exit 0
 	fi
