@@ -1,4 +1,7 @@
 #!/bin/sh
+
+# Connect to saved ssh server
+
 servers=$(cat ~/.ssh/config | grep "Host " | cut -d " " -f 2 | sort)
 choice=$(echo "$servers" | fzf)
 ssh "$choice"

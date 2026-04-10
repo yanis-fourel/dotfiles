@@ -42,11 +42,11 @@ WORDCHARS=''
 
 # Ensure terminal application mode for valid terminfo
 if (( ${+terminfo[smkx]} && ${+terminfo[rmkx]} )); then
-	autoload -Uz add-zle-hook-widget
-	function zle_application_mode_start { echoti smkx }
-	function zle_application_mode_stop { echoti rmkx }
-	add-zle-hook-widget -Uz zle-line-init zle_application_mode_start
-	add-zle-hook-widget -Uz zle-line-finish zle_application_mode_stop
+    autoload -Uz add-zle-hook-widget
+    function zle_application_mode_start { echoti smkx }
+    function zle_application_mode_stop { echoti rmkx }
+    add-zle-hook-widget -Uz zle-line-init zle_application_mode_start
+    add-zle-hook-widget -Uz zle-line-finish zle_application_mode_stop
 fi
 
 
@@ -72,25 +72,25 @@ bindkey -M emacs '^O' edit-command-line
 
 mkcd ()
 {
-	mkdir -p -- "$1" && cd -P -- "$1"
+    mkdir -p -- "$1" && cd -P -- "$1"
 }
 
 everysec ()
 {
-	emulate -LR sh # Inherit environment
+    emulate -LR sh # Inherit environment
 
-	CMD=$@
+    CMD=$@
 
-	CYAN='\033[0;36m'
-	NC='\033[0m' # No Color
+    CYAN='\033[0;36m'
+    NC='\033[0m' # No Color
 
-	while true; do
-		output=$($CMD 2>&1)
-		clear
-		echo -e $CYAN"$(date '+%R:%S') | $CMD"$NC
-		echo "$output"
-		sleep 1
-	done
+    while true; do
+        output=$($CMD 2>&1)
+        clear
+        echo -e $CYAN"$(date '+%R:%S') | $CMD"$NC
+        echo "$output"
+        sleep 1
+    done
 }
 
 gg()
@@ -99,11 +99,6 @@ gg()
     git switch $target
 }
 
-rootauth()
-{
-    path = (docker volume inspect appliance_Data | from json | get Mountpoint | get 0)
-    sudo cat "($path)/Authorities.txt"
-}
 
 findandreplace()
 {
@@ -112,21 +107,22 @@ findandreplace()
 
 y()
 {
-	tmp=$(mktemp -t "yazi-cwd.XXXXXX")
-	echo "tmp file is $tmp" >> /tmp/ylogfile
-	yazi ...$@ --cwd-file $tmp
-	cwd=$(cat $tmp)
-	if [[ -n $cwd && "$cwd" != "$PWD" ]]; then
-		cd $cwd
-	fi
-	rm -f $tmp
+    tmp=$(mktemp -t "yazi-cwd.XXXXXX")
+    echo "tmp file is $tmp" >> /tmp/ylogfile
+    yazi ...$@ --cwd-file $tmp
+    cwd=$(cat $tmp)
+    if [[ -n $cwd && "$cwd" != "$PWD" ]]; then
+        cd $cwd
+    fi
+    rm -f $tmp
 }
 
 # Environment
 
 export EDITOR=nvim
 export VISUAL=nvim
-path=($HOME/.local/scripts $HOME/.local/bin $path)
+export SUDO_EDITOR="nvim --noplugin"
+path=($HOME/bin/ $path)
 
 # alias
 alias ls="eza"
@@ -154,6 +150,12 @@ alias vi="nvim"
 alias ld="lazydocker"
 
 alias fuck="killall -9"
+
+# Only enable Kitty's ssh kitten when we're actually running inside Kitty
+# (This works great even inside tmux sessions started from Kitty)
+if [[ -n "$KITTY_WINDOW_ID" ]]; then
+    alias ssh="kitty +kitten ssh"
+fi
 
 # ~/.zshrc or ~/.bashrc
 
