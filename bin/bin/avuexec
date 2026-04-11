@@ -1,0 +1,12 @@
+#!/bin/sh
+tmp=$(mktemp)
+auth=$(rootauth)
+host="localhost"
+cat << EOF > "$tmp"
+$@
+EOF
+
+avu_id=$(docker ps | grep avu | awk '{ print $1 }')
+docker cp "$tmp" "$avu_id:/tmp.avu"
+
+rlwrap --always-readline docker exec -it $avu_id /AvesTerra/Executables/avu run "/tmp.avu" "$auth" "$host"
