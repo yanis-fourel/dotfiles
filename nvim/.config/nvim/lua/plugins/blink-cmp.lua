@@ -44,8 +44,8 @@ return {
 			["<C-b>"] = { "scroll_documentation_up", "fallback" },
 			["<C-f>"] = { "scroll_documentation_down", "fallback" },
 
-			["<C-n>"] = { "accept", "fallback" },           -- same as your old confirm
-			["<C-Space>"] = { "show", "fallback" },         -- manual trigger
+			["<C-n>"] = { "accept", "fallback" }, -- same as your old confirm
+			["<C-Space>"] = { "show", "fallback" }, -- manual trigger
 
 			["<C-l>"] = { "snippet_forward", "fallback" },
 			["<C-h>"] = { "snippet_backward", "fallback" },
@@ -57,7 +57,7 @@ return {
 
 		completion = {
 			documentation = { auto_show = true }, -- shows docs automatically in the menu
-			ghost_text = { enabled = true },      -- subtle preview of the selected item
+			ghost_text = { enabled = true }, -- subtle preview of the selected item
 			menu = {
 				auto_show = true,
 				draw = {
@@ -71,7 +71,38 @@ return {
 		snippets = { preset = "luasnip" }, -- native LuaSnip support, no extra cmp_luasnip needed
 
 		sources = {
-			default = { "lsp", "path", "snippets", "buffer" },
+			default = {
+				"lsp",
+				"path",
+				"snippets",
+				"buffer",
+				"avante_commands",
+				"avante_mentions",
+				"avante_files",
+				"avante_shortcuts",
+			},
+			providers = {
+				avante_commands = {
+					name = "avante_commands",
+					module = "blink.compat.source",
+					score_offset = 90,
+				},
+				avante_mentions = {
+					name = "avante_mentions",
+					module = "blink.compat.source",
+					score_offset = 1000,
+				},
+				avante_files = {
+					name = "avante_files",
+					module = "blink.compat.source",
+					score_offset = 100,
+				},
+				avante_shortcuts = {
+					name = "avante_shortcuts",
+					module = "blink.compat.source",
+					score_offset = 1000,
+				},
+			},
 		},
 	},
 }
