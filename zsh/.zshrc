@@ -124,6 +124,13 @@ export VISUAL=nvim
 export SUDO_EDITOR="nvim --noplugin"
 path=($HOME/bin/ $path)
 
+secrets_dir="${HOME}/.config/secrets"
+if [ -d "${secrets_dir}" ]; then
+    for file in "${secrets_dir}"/*; do
+        [ -f "${file}" ] && . "${file}"
+    done
+fi
+
 # alias
 alias ls="eza"
 export EXA_COLORS="da=0" # set the date field white
