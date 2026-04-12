@@ -1,7 +1,7 @@
 return {
 	"mason-org/mason-lspconfig.nvim",
 	dependencies = {
-		{ "mason-org/mason.nvim", opts = {} },
+		{ "mason-org/mason.nvim", opts = { ensure_installed = { "copilot-language-server" } } },
 		"neovim/nvim-lspconfig",
 	},
 	opts = {
@@ -84,5 +84,8 @@ return {
 		})
 
 		vim.lsp.enable({ "ruff", "basedpyright" })
+
+		vim.g.copilot_nes_debounce = 500
+		vim.lsp.enable("copilot-language-server")
 	end,
 }
