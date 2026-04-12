@@ -3,7 +3,6 @@ return {
 	event = "InsertEnter",
 	version = "1.*",
 	dependencies = {
-		"fang2hou/blink-copilot",
 		-- Snippet Engine & friendly-snippets (exactly like before)
 		{
 			"L3MON4D3/LuaSnip",
@@ -77,18 +76,12 @@ return {
 				"path",
 				"snippets",
 				"buffer",
-				"copilot",
 				"avante_commands",
 				"avante_mentions",
 				"avante_files",
 				"avante_shortcuts",
 			},
 			providers = {
-				copilot = {
-					name = "copilot",
-					module = "blink-copilot",
-					async = true,
-				},
 				avante_commands = {
 					name = "avante_commands",
 					module = "blink.compat.source",
