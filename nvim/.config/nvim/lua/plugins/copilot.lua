@@ -7,7 +7,7 @@ return {
 			settings = {
 				["*"] = {
 					-- stylua: ignore
-					filetypes = { "javascript", "typescript", "python", "lua", "rust", "go", "java", "c", "cpp", "ruby", "php", "swift", "kotlin", "scala", "html", "css", "scss", "json", "yaml", "toml", "markdown", "sql", "shell", "bash", "zsh", "fish", "dockerfile", "nix" },
+					filetypes = { "javascript", "typescript", "python", "lua", "rust", "go", "java", "c", "cpp", "ruby", "php", "swift", "kotlin", "scala", "html", "css", "scss", "json", "yaml", "toml", "sql", "shell", "bash", "zsh", "fish", "dockerfile", "nix" },
 				},
 			},
 		},
