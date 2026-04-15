@@ -17,10 +17,10 @@ return {
 				accept = "<Right>",
 			},
 		},
-		panel = {
-			keymap = {
-				accept = "<Right>",
-			},
-		},
+		-- panel = {
+		-- 	keymap = {
+		-- 		accept = "<Right>",
+		-- 	},
+		-- },
 	},
 }
