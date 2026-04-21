@@ -57,7 +57,7 @@ return {
 
 		completion = {
 			documentation = { auto_show = true }, -- shows docs automatically in the menu
-			ghost_text = { enabled = true }, -- subtle preview of the selected item
+			ghost_text = { enabled = false }, -- subtle preview of the selected item
 			menu = {
 				auto_show = true,
 				draw = {
