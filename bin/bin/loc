@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Simple script to cound line of codes in current git repository
+
+cloc $(git ls-files)
