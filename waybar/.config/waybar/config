@@ -18,7 +18,7 @@
         "tooltip": false
     },
     "memory": {
-        "format": "󰍛 {used}G",
+        "format": "󰍛 {used:.1f}G",
         "align": 0,
         "justify": "left",
         "tooltip": true,
