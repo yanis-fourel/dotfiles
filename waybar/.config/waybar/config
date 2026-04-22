@@ -4,7 +4,7 @@
     "height": 20, // Waybar height (to be removed for auto height)
     // "width": 1280, // Waybar width
     "spacing": 4, // Gaps between modules (4px)
-    "modules-left": ["hyprland/workspaces", "hyprland/submap", "custom/process-check"],
+    "modules-left": ["hyprland/workspaces", "hyprland/submap"],
     "modules-center": ["hyprland/window"],
     "modules-right": ["pulseaudio", "network", "memory", "disk", "temperature", "battery", "clock", "tray"],
     "clock": {
@@ -72,23 +72,13 @@
     "tray": {
         "icon-size": 21,
         "spacing": 10
-	},
-	"hyprland/window": {
-		"format": " {}",
-		"max-length": 50,
-		"rewrite": {
-			".* - Brave": "🌐 $1",
-			".* - zsh": ".Terminal"
-		}
-	},
-	"custom/process-check": {
-		"exec": "/home/yanis/.config/waybar/check.sh",
-		"return-type": "json",
-		"format": "{icon} {text}",
-		"format-icons": {
-			"active": "o",
-			"inactive": "x"
-		},
-		"restart-interval": 1  // Restart the script if it exits unexpectedly
-	}
+    },
+    "hyprland/window": {
+            "format": " {}",
+            "max-length": 50,
+            "rewrite": {
+                    ".* - Brave": "🌐 $1",
+                    ".* - zsh": ".Terminal"
+            }
+    },
 }
