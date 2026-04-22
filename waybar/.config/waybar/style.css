@@ -5,8 +5,7 @@
 }
 
 window#waybar {
-    background-color: #0a0e18;
-    border-right: none;
+    background: linear-gradient(180deg, #0a0e18 0%, #0c1020 50%, #0a0e18 100%);
     color: #f0e6eb;
     transition-property: background-color;
     transition-duration: .5s;
@@ -49,9 +48,10 @@ button:hover {
 }
 
 #workspaces button.focused {
-    background-color: #ff6b9d;
+    background: linear-gradient(90deg, #ff6b9d 0%, #ff8bb3 100%);
     box-shadow: none;
     color: #0a0e18;
+    border-left: 2px solid #ff6b9d;
 }
 
 #workspaces button.urgent {
@@ -83,15 +83,19 @@ button:hover {
 #mpd {
     padding: 5px 0 5px 5px;
     margin: 0;
-    background-color: #1a1418;
+    background: linear-gradient(90deg, #1a1418 0%, #1e1820 100%);
     color: #f0e6eb;
     border: none;
+    border-top: 1px solid rgba(255, 107, 157, 0.1);
+    border-right: 2px solid #ff6b9d;
     min-width: 0;
 }
 
 #window,
 #workspaces {
     margin: 0 4px;
+    background: linear-gradient(90deg, #1a1418 0%, #1e1820 100%);
+    border-bottom: 1px solid rgba(255, 107, 157, 0.1);
 }
 
 /* If workspaces is the leftmost module, omit left margin */
@@ -132,5 +136,39 @@ label:focus {
     font-size: 9px;
     min-width: 35px;
     color: #f0e6eb;
+    background: linear-gradient(90deg, #1e1820 0%, #22202a 100%);
+    border-top: 1px solid rgba(255, 107, 157, 0.15);
+}
+
+/* Hover effects for all modules */
+#clock:hover,
+#battery:hover,
+#cpu:hover,
+#memory:hover,
+#disk:hover,
+#temperature:hover,
+#network:hover,
+#pulseaudio:hover {
+    background: linear-gradient(90deg, #22202a 0%, #261e2e 100%);
+    border-top: 1px solid rgba(255, 107, 157, 0.25);
+    transition: all 0.3s ease;
+}
+
+/* Different opacity for secondary information */
+#battery.warning {
+    color: #ffb366;
+}
+
+#temperature.critical {
+    color: #ff6b9d;
+}
+
+/* Subtle accent for network and audio states */
+#network.disconnected {
+    color: #786070;
+}
+
+#pulseaudio.muted {
+    color: #786070;
 }
 
