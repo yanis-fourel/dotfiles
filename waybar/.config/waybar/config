@@ -1,14 +1,15 @@
 {
     "layer": "top", // Waybar at top layer
-    "position": "top", // Waybar position (top|bottom|left|right)
-    "height": 20, // Waybar height (to be removed for auto height)
-    // "width": 1280, // Waybar width
+    "position": "left", // Waybar position (top|bottom|left|right)
+    "width": 56, // Waybar width
+    // "height": 1080, // Waybar height
     "spacing": 4, // Gaps between modules (4px)
+    "orientation": "vertical",
     "modules-left": ["hyprland/workspaces", "hyprland/submap"],
-    "modules-center": ["hyprland/window"],
-    "modules-right": ["pulseaudio", "network", "memory", "disk", "temperature", "battery", "clock", "tray"],
+    "modules-center": [],
+    "modules-right": ["clock", "pulseaudio", "network", "memory", "disk", "temperature", "battery", "tray"],
     "clock": {
-        "format": "{:%Y-%m-%d %H:%M}",
+        "format": "{:%Y年\n  %m月\n  %d日\n%H:%M}",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
         "format-alt": "{:%Y-%m-%d}"
     },
@@ -17,14 +18,21 @@
         "tooltip": false
     },
     "memory": {
-        "format": "ram: {used}GiB / {total}GiB | swap: {swapUsed}GiB / {swapTotal}GiB"
+        "format": "󰍛 {used}G",
+        "align": 0,
+        "justify": "left",
+        "tooltip": true,
+        "tooltip-format": "RAM: {used}GiB / {total}GiB\nSwap: {swapUsed}GiB / {swapTotal}GiB"
     },
     "temperature": {
         // "thermal-zone": 2,
         // "hwmon-path": "/sys/class/hwmon/hwmon2/temp1_input",
         "critical-threshold": 80,
-        "format-critical": "CRITICAL: {temperatureC}°C",
-        "format": "{temperatureC}°C",
+        "format-critical": "󰈸 {temperatureC}°",
+        "format": "󰈸 {temperatureC}°",
+        "align": 0,
+        "justify": "left",
+        "tooltip": true
     },
     "battery": {
         "states": {
@@ -32,42 +40,53 @@
             "warning": 50,
             "critical": 25
         },
-        "format": "{capacity}% 󰁹",
-        "format-charging": "{capacity}% ",
-        "format-plugged": "{capacity}% ",
+        "format": "󰂎 {capacity}%",
+        "format-charging": "󰂄 {capacity}%",
+        "format-plugged": "󰂄 {capacity}%",
+        "align": 0,
+        "justify": "left"
     },
     "network": {
         // "interface": "wlp2*", // (Optional) To force the use of this interface
-        "format-wifi": "{essid} ({signalStrength}%) ",
-        "format-ethernet": "{ipaddr}/{cidr} ",
-        "tooltip-format": "{ifname} via {gwaddr} ",
-        "format-linked": "{ifname} (No IP) ",
-        "format-disconnected": "Disconnected ⚠",
+        "format-wifi": "󰖩 {signalStrength}%",
+        "format-ethernet": "󰈀 {ipaddr}",
+        "align": 0,
+        "justify": "left",
+        "tooltip-format": "{ifname}: {ipaddr}/{cidr}\nSSID: {essid}",
+        "format-linked": "󰈀 {ifname}",
+        "format-disconnected": "󰖪 ⚠",
         "format-alt": "{ifname}: {ipaddr}/{cidr}"
     },
     "pulseaudio": {
         // "scroll-step": 1, // %, can be a float
-        "format": "{volume}% {icon} {format_source}",
-        "format-bluetooth": "{volume}% {icon} {format_source}",
-        "format-bluetooth-muted": " {icon} {format_source}",
-        "format-muted": " {format_source}",
-        "format-source": "{volume}% ",
-        "format-source-muted": "",
+        "format": "󰕾 {volume}%",
+        "format-bluetooth": "󰂯 {volume}%",
+        "format-bluetooth-muted": "󰂴",
+        "format-muted": "󰖁",
+        "align": 0,
+        "justify": "left",
+        "format-source": "{volume}%",
+        "format-source-muted": "",
         "format-icons": {
-            "headphone": "",
-            "hands-free": "",
-            "headset": "",
-            "phone": "",
-            "portable": "",
-            "car": "",
-            "default": ["", "", ""]
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
         },
-        "on-click": "pavucontrol"
+        "on-click": "pavucontrol",
+        "tooltip": true
     },
     "disk": {
         "interval": 30,
-        "format": "disk: {used} / {total}",
-        "path": "/home/yanis/"
+        "format": "󰋊 {percentage_used}%",
+        "path": "/home/yanis/",
+        "align": 0,
+        "justify": "left",
+        "tooltip": true,
+        "tooltip-format": "{used} / {total}"
     },
     "tray": {
         "icon-size": 21,
