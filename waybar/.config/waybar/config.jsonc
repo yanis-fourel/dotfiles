@@ -1,7 +1,7 @@
 {
-    "layer": "top", // Waybar at top layer
-    "position": "left", // Waybar position (top|bottom|left|right)
-    "width": 56, // Waybar width
+  "layer": "top", // Waybar at top layer
+  "position": "left", // Waybar position (top|bottom|left|right)
+  "width": 56, // Waybar width
     // "height": 1080, // Waybar height
     "spacing": 4, // Gaps between modules (4px)
     "orientation": "vertical",
@@ -9,20 +9,20 @@
     "modules-center": [],
     "modules-right": ["pulseaudio", "network", "memory", "disk", "temperature", "battery", "tray"],
     "clock": {
-        "format": "{:%Y年\n  %m月\n  %d日\n%H:%M}",
-        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-        "format-alt": "{:%Y-%m-%d}"
+      "format": "{:%Y年\n  %m月\n  %d日\n%H:%M}",
+      "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+      "format-alt": "{:%Y-%m-%d}"
     },
     "cpu": {
-        "format": "{usage}% cpu",
-        "tooltip": false
+      "format": "{usage}% cpu",
+      "tooltip": false
     },
     "memory": {
-        "format": "󰍛 {used:.1f}G",
-        "align": 0,
-        "justify": "left",
-        "tooltip": true,
-        "tooltip-format": "RAM: {used}GiB / {total}GiB\nSwap: {swapUsed}GiB / {swapTotal}GiB"
+      "format": "󰍛 {used:.1f}G",
+      "align": 0,
+      "justify": "left",
+      "tooltip": true,
+      "tooltip-format": "RAM: {used}GiB / {total}GiB\nSwap: {swapUsed}GiB / {swapTotal}GiB"
     },
     "temperature": {
         // "thermal-zone": 2,
@@ -35,16 +35,16 @@
         "tooltip": true
     },
     "battery": {
-        "states": {
+      "states": {
             // "good": 95,
             "warning": 50,
             "critical": 25
-        },
-        "format": "󰂎 {capacity}%",
-        "format-charging": "󰂄 {capacity}%",
-        "format-plugged": "󰂄 {capacity}%",
-        "align": 0,
-        "justify": "left"
+      },
+      "format": "󰂎 {capacity}%",
+      "format-charging": "󰂄 {capacity}%",
+      "format-plugged": "󰂄 {capacity}%",
+      "align": 0,
+      "justify": "left"
     },
     "network": {
         // "interface": "wlp2*", // (Optional) To force the use of this interface
@@ -68,36 +68,36 @@
         "format-source": "{volume}%",
         "format-source-muted": "",
         "format-icons": {
-            "headphone": "",
-            "hands-free": "",
-            "headset": "",
-            "phone": "",
-            "portable": "",
-            "car": "",
-            "default": ["", "", ""]
+          "headphone": "",
+          "hands-free": "",
+          "headset": "",
+          "phone": "",
+          "portable": "",
+          "car": "",
+          "default": ["", "", ""]
         },
         "on-click": "pavucontrol",
         "tooltip": true
     },
     "disk": {
-        "interval": 30,
-        "format": "󰋊 {percentage_used}%",
-        "path": "/home/yanis/",
-        "align": 0,
-        "justify": "left",
-        "tooltip": true,
-        "tooltip-format": "{used} / {total}"
+      "interval": 30,
+      "format": "󰋊 {percentage_used}%",
+      "path": "/home/yanis/",
+      "align": 0,
+      "justify": "left",
+      "tooltip": true,
+      "tooltip-format": "{used} / {total}"
     },
     "tray": {
-        "icon-size": 21,
-        "spacing": 10
+      "icon-size": 21,
+      "spacing": 10
     },
     "hyprland/window": {
-            "format": " {}",
-            "max-length": 50,
-            "rewrite": {
-                    ".* - Brave": "🌐 $1",
-                    ".* - zsh": ".Terminal"
-            }
+      "format": " {}",
+      "max-length": 50,
+      "rewrite": {
+        ".* - Brave": "🌐 $1",
+        ".* - zsh": ".Terminal"
+      }
     },
 }
