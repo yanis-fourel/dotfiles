@@ -75,7 +75,7 @@ return {
 						diagnosticMode = "workspace",
 						useLibraryCodeForTypes = true,
 						typeCheckingMode = "standard", -- "strict" / "basic" / "off"
-						-- Explicitly tell BasedPyright about your uv venv (very important for uv projects)
+						-- Use venv from nvim's cwd if it exists
 						venvPath = ".",
 						venv = ".venv",
 					},
