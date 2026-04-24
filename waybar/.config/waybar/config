@@ -5,9 +5,9 @@
     // "height": 1080, // Waybar height
     "spacing": 4, // Gaps between modules (4px)
     "orientation": "vertical",
-    "modules-left": ["hyprland/workspaces", "hyprland/submap"],
+    "modules-left": ["clock", "hyprland/workspaces", "hyprland/submap"],
     "modules-center": [],
-    "modules-right": ["clock", "pulseaudio", "network", "memory", "disk", "temperature", "battery", "tray"],
+    "modules-right": ["pulseaudio", "network", "memory", "disk", "temperature", "battery", "tray"],
     "clock": {
         "format": "{:%Y年\n  %m月\n  %d日\n%H:%M}",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
