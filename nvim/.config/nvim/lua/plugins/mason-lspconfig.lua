@@ -1,11 +1,12 @@
 return {
 	"mason-org/mason-lspconfig.nvim",
 	dependencies = {
-		{ "mason-org/mason.nvim", opts = { ensure_installed = { "copilot-language-server" } } },
+		{ "mason-org/mason.nvim", opts = {} },
 		"neovim/nvim-lspconfig",
 	},
 	opts = {
-		automatic_enable = false,
+		automatic_enable = true,
+		ensure_installed = { "copilot-language-server", "ols" },
 	},
 	config = function()
 		local map = function(keys, func, desc)
@@ -87,5 +88,6 @@ return {
 
 		vim.g.copilot_nes_debounce = 500
 		vim.lsp.enable("copilot-language-server")
+		vim.lsp.enable("ols") -- how to make that automatic
 	end,
 }
