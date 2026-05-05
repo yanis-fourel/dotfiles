@@ -89,5 +89,6 @@ return {
 		vim.g.copilot_nes_debounce = 500
 		vim.lsp.enable("copilot-language-server")
 		vim.lsp.enable("ols") -- how to make that automatic
+		vim.lsp.enable("typescript-language-server") -- how to make that automatic
 	end,
 }
