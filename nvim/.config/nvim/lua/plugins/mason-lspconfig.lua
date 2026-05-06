@@ -6,9 +6,11 @@ return {
 	},
 	opts = {
 		automatic_enable = true,
-		ensure_installed = { "copilot-language-server", "ols" },
+		ensure_installed = { "copilot", "ols" },
 	},
-	config = function()
+	config = function(_, opts)
+		require("mason-lspconfig").setup(opts)
+
 		local map = function(keys, func, desc)
 			vim.keymap.set("n", keys, func, { buffer = 0, desc = "LSP: " .. desc })
 		end
@@ -87,8 +89,5 @@ return {
 		vim.lsp.enable({ "ruff", "basedpyright" })
 
 		vim.g.copilot_nes_debounce = 500
-		vim.lsp.enable("copilot-language-server")
-		vim.lsp.enable("ols") -- how to make that automatic
-		vim.lsp.enable("typescript-language-server") -- how to make that automatic
 	end,
 }
