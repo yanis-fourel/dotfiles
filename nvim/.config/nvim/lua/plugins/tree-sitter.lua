@@ -1,9 +1,40 @@
 return {
 	"neovim-treesitter/nvim-treesitter",
-	dependencies = { "neovim-treesitter/treesitter-parser-registry" },
+	dependencies = {
+		"neovim-treesitter/treesitter-parser-registry",
+		"luckasRanarison/tree-sitter-hypr",
+	},
 	lazy = false,
 	build = ":TSUpdate",
 	config = function()
-		require("nvim-treesitter").setup({})
+		require("nvim-treesitter").setup({
+			local_parsers = {
+				hypr = {
+					source = {
+						type = "self_contained",
+						url = "https://github.com/luckasRanarison/tree-sitter-hypr",
+						queries_path = "nvim-queries/hypr",
+					},
+					filetypes = { "hypr" },
+				},
+			},
+		})
+
+		require("nvim-treesitter").install({
+			"bash",
+			"c",
+			"cpp",
+			"diff",
+			"html",
+			"lua",
+			"luadoc",
+			"markdown",
+			"vim",
+			"vimdoc",
+			"rust",
+			"python",
+			"json",
+			"yaml",
+		})
 	end,
 }
