@@ -3,6 +3,7 @@ return {
 	dependencies = {
 		"neovim-treesitter/treesitter-parser-registry",
 		"luckasRanarison/tree-sitter-hypr",
+		"lewis6991/ts-install.nvim",
 	},
 	lazy = false,
 	build = ":TSUpdate",
@@ -19,25 +20,28 @@ return {
 				},
 			},
 		})
-
-		require("nvim-treesitter").install({
-			"bash",
-			"c",
-			"cpp",
-			"diff",
-			"html",
-			"lua",
-			"luadoc",
-			"markdown",
-			"vim",
-			"vimdoc",
-			"rust",
-			"python",
-			"json",
-			"yaml",
-			"javascript", -- The three must be installed together to supress
-			"typescript", -- warnings
-			"jsx",
+		require("ts-install").setup({
+			-- Automatically install missing parsers when you open a file
+			auto_install = true,
+			ensure_install = {
+				"bash",
+				"c",
+				"cpp",
+				"diff",
+				"html",
+				"lua",
+				"luadoc",
+				"markdown",
+				"vim",
+				"vimdoc",
+				"rust",
+				"python",
+				"json",
+				"yaml",
+				"javascript", -- The three must be installed together to supress
+				"typescript", -- warnings
+				"jsx",
+			},
 		})
 	end,
 }
