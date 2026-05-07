@@ -15,9 +15,10 @@ return {
 			dependencies = {
 				{
 					"rafamadriz/friendly-snippets",
-					config = function()
-						require("luasnip.loaders.from_vscode").lazy_load()
-					end,
+				config = function()
+					require("luasnip.loaders.from_vscode").lazy_load()
+					require("luasnip.loaders.from_lua").lazy_load({ paths = { vim.fn.stdpath("config") .. "/lua/snippets" } })
+				end,
 				},
 			},
 		},
@@ -44,8 +45,7 @@ return {
 			["<C-b>"] = { "scroll_documentation_up", "fallback" },
 			["<C-f>"] = { "scroll_documentation_down", "fallback" },
 
-			["<C-n>"] = { "accept", "fallback" }, -- same as your old confirm
-			["<C-Space>"] = { "show", "fallback" }, -- manual trigger
+			["<C-n>"] = { "accept", "snippet_forward", "fallback" }, -- accept completion, then jump snippet tabstop, then fallback
 
 			["<C-l>"] = { "snippet_forward", "fallback" },
 			["<C-h>"] = { "snippet_backward", "fallback" },
