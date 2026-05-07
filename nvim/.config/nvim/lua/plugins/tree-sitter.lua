@@ -35,6 +35,9 @@ return {
 			"python",
 			"json",
 			"yaml",
+			"javascript", -- The three must be installed together to supress
+			"typescript", -- warnings
+			"jsx",
 		})
 	end,
 }
