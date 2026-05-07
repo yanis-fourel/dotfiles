@@ -6,7 +6,7 @@ return {
 	},
 	opts = {
 		automatic_enable = true,
-		ensure_installed = { "copilot", "ols" },
+		ensure_installed = {},
 	},
 	config = function(_, opts)
 		require("mason-lspconfig").setup(opts)

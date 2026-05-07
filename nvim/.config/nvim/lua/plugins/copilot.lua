@@ -3,13 +3,8 @@ return {
 	cmd = "Copilot",
 	event = "InsertEnter",
 	opts = {
-		server = {
-			settings = {
-				["*"] = {
-					-- stylua: ignore
-					filetypes = { "javascript", "typescript", "python", "lua", "rust", "go", "java", "c", "cpp", "ruby", "php", "swift", "kotlin", "scala", "html", "css", "scss", "json", "yaml", "toml", "sql", "shell", "bash", "zsh", "fish", "dockerfile", "nix" },
-				},
-			},
+		filetypes = {
+			["*"] = true,
 		},
 		suggestion = {
 			auto_trigger = true,
