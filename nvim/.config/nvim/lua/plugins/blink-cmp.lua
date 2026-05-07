@@ -76,32 +76,6 @@ return {
 				"path",
 				"snippets",
 				"buffer",
-				"avante_commands",
-				"avante_mentions",
-				"avante_files",
-				"avante_shortcuts",
-			},
-			providers = {
-				avante_commands = {
-					name = "avante_commands",
-					module = "blink.compat.source",
-					score_offset = 90,
-				},
-				avante_mentions = {
-					name = "avante_mentions",
-					module = "blink.compat.source",
-					score_offset = 1000,
-				},
-				avante_files = {
-					name = "avante_files",
-					module = "blink.compat.source",
-					score_offset = 100,
-				},
-				avante_shortcuts = {
-					name = "avante_shortcuts",
-					module = "blink.compat.source",
-					score_offset = 1000,
-				},
 			},
 		},
 	},
