@@ -86,7 +86,15 @@ return {
 			},
 		})
 
-		vim.lsp.enable({ "ruff", "basedpyright" })
+		vim.lsp.config("ts_ls", {
+			settings = {
+				typescript = {
+					preferences = {
+						organizeImports = true,
+					},
+				},
+			},
+		})
 
 		vim.g.copilot_nes_debounce = 500
 	end,
