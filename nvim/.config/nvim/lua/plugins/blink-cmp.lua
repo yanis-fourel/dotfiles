@@ -34,6 +34,7 @@ return {
 			},
 		},
 		{ "Bilal2453/luvit-meta", lazy = true },
+		{ "saghen/blink.compat", version = "*", lazy = true, opts = {} },
 	},
 
 	opts = {
@@ -76,6 +77,26 @@ return {
 				"path",
 				"snippets",
 				"buffer",
+				"obsidian",
+				"obsidian_new",
+				"obsidian_tags",
+			},
+			providers = {
+				obsidian = {
+					name = "obsidian",
+					module = "blink.compat.source",
+					opts = { name = "obsidian" },
+				},
+				obsidian_new = {
+					name = "obsidian_new",
+					module = "blink.compat.source",
+					opts = { name = "obsidian_new" },
+				},
+				obsidian_tags = {
+					name = "obsidian_tags",
+					module = "blink.compat.source",
+					opts = { name = "obsidian_tags" },
+				},
 			},
 		},
 	},

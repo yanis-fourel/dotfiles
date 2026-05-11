@@ -6,8 +6,6 @@ return {
 	dependencies = {
 		-- Required.
 		"nvim-lua/plenary.nvim",
-
-		-- see below for full list of optional dependencies 👇
 	},
 	opts = {
 		workspaces = {
@@ -15,6 +13,15 @@ return {
 				name = "vault",
 				path = "~/vault",
 			},
+		},
+		ui = {
+			enable = false, -- already have nice markdown preview
+		},
+		daily_notes = {
+			folder = "daily/",
+			date_format = "%Y-%m-%d",
+			default_tags = { "daily" },
+			template = nil,
 		},
 	},
 }
