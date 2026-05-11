@@ -152,6 +152,7 @@ alias lll="exa -abghHliS --time-style=long-iso"
 alias ta="tmux a"
 alias dc="docker compose"
 alias dca="docker compose --profile '*'"
+alias nr="npm run"
 
 alias vi="nvim"
 alias ld="lazydocker"
