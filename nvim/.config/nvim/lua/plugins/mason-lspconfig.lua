@@ -31,6 +31,10 @@ return {
 				map("gI", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
 				map("gt", vim.lsp.buf.type_definition, "[G]oto [T]ype Definition")
 
+				map("gl", function()
+					vim.diagnostic.open_float(nil, { focusable = true })
+				end, "Open LSP Diagnostic Float")
+
 				map("g0", require("telescope.builtin").lsp_document_symbols, "Document Symbols")
 				map("gw", require("telescope.builtin").lsp_dynamic_workspace_symbols, "Workspace [S]ymbols")
 

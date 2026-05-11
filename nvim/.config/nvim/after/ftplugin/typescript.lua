@@ -6,12 +6,21 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 		if #clients == 0 then
 			return
 		end
+
+		local done = false
 		vim.lsp.buf.code_action({
 			apply = true,
 			context = {
 				only = { "source.removeUnusedImports.ts" },
 				diagnostics = {},
 			},
+			callback = function()
+				done = true
+			end,
 		})
+
+		vim.wait(1000, function()
+			return done
+		end, 10)
 	end,
 })
