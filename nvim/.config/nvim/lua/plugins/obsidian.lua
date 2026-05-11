@@ -7,6 +7,16 @@ return {
 		-- Required.
 		"nvim-lua/plenary.nvim",
 	},
+	keys = {
+		{ "<leader>f<leader>", "<cmd>ObsidianDailies<CR>", desc = "Obsidian [D]ailies" },
+		{
+			"<leader>fo",
+			function()
+				require("telescope.builtin").find_files({ cwd = "~/vault" })
+			end,
+			desc = "Find [O]bsidian notes",
+		},
+	},
 	opts = {
 		workspaces = {
 			{
