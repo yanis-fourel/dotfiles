@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+session_name="devjournal"
+vault_dir="$HOME/vault"
+
+waybar_w=56
+floating_rules="[float; move $waybar_w 0; size monitor_w-$waybar_w monitor_h; rounding 16; bordersize 3; ]"
+
+if tmux has-session -t="$session_name" 2>/dev/null; then
+    hyprctl dispatch exec "$floating_rules kitty tmux attach -t $session_name"
+    exit 0
+fi
+
+tmux new-session -ds "$session_name" -c "$vault_dir"
+tmux send-keys -t "$session_name" 'nvim -c "ObsidianDailies"' Enter
+hyprctl dispatch exec "$floating_rules kitty tmux attach -t $session_name"
