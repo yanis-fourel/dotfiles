@@ -1,0 +1,21 @@
+general {
+    # Optional: Hide cursor to ensure it doesn't appear on the black screen
+    hide_cursor = true
+    # Optional: Render immediately to avoid flicker
+    immediate_render = true
+}
+
+background {
+    # path = screenshot
+    # If you prefer a solid color instead of a screenshot, use:
+    # path = color:000000
+    color = 000000
+    blur_passes = 0
+    blur_size = 0
+    noise = 0
+    contrast = 1
+    brightness = 1
+    vibrancy = 0
+}
+
+# Ensure no input-field or label widgets are defined
