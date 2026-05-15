@@ -139,6 +139,7 @@ alias zz.st="curl -F 'file=@-' 0x0.st"
 
 alias gl="git log --oneline --graph --decorate"
 alias gla="git log --oneline --graph --decorate --all"
+alias gl1="git log --graph --oneline --decorate --first-parent"
 alias gs="git status"
 alias fastclone="git clone --depth=1 --recurse-submodules --shallow-submodules "
 alias unpushed='git log --branches --not --remotes --no-walk --decorate --oneline'
