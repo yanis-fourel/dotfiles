@@ -5,6 +5,7 @@ return {
 	opts = {
 		filetypes = {
 			["*"] = true,
+			markdown = false,
 		},
 		suggestion = {
 			auto_trigger = true,

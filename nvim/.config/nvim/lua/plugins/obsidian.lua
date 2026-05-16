@@ -3,19 +3,14 @@ return {
 	version = "*", -- recommended, use latest release instead of latest commit
 	lazy = true,
 	ft = "markdown",
+	cmd = { "ObsidianDailies", "ObsidianToday", "ObsidianQuickSwitch" },
 	dependencies = {
 		-- Required.
 		"nvim-lua/plenary.nvim",
 	},
 	keys = {
 		{ "<leader>f<leader>", "<cmd>ObsidianDailies<CR>", desc = "Obsidian [D]ailies" },
-		{
-			"<leader>fo",
-			function()
-				require("telescope.builtin").find_files({ cwd = "~/vault" })
-			end,
-			desc = "Find [O]bsidian notes",
-		},
+		{ "<leader>fo", "<cmd>ObsidianQuickSwitch<CR>", desc = "Find [O]bsidian notes" },
 	},
 	opts = {
 		workspaces = {
