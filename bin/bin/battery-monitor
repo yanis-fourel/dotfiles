@@ -1,0 +1,145 @@
+#!/bin/bash
+# Battery monitor script for low battery brightness reduction
+# Watches battery level and reduces brightness/color when below 10%
+
+BATTERY_THRESHOLD=10
+BATTERY_PATH="/sys/class/power_supply/BAT0/capacity"
+SAVEDBRIGHTNESS_FILE="/tmp/battery_monitor_saved_brightness"
+SAVEDSAT_FILE="/tmp/battery_monitor_saved_saturation"
+
+# Get current brightness
+get_brightness() {
+    brightnessctl g
+}
+
+# Get max brightness
+get_max_brightness() {
+    brightnessctl m
+}
+
+# Get saturation level (returns 0 if hyprctl not available)
+get_saturation() {
+    hyprctl -j getoption "decoration:dim_strength" 2>/dev/null | grep -o '"float": [0-9.]*' | awk -F': ' '{print $2}' || echo "1.0"
+}
+
+# Set saturation via Hyprland (0.0 = grayscale, 1.0 = normal color)
+set_saturation() {
+    local saturation=$1
+    hyprctl keyword "plugin:colorize:saturation" "$saturation" 2>/dev/null || true
+}
+
+# Alternative: disable color via Hyprland built-in decoration dim
+set_dim() {
+    local dim_strength=$1  # 0.0 = normal, 1.0 = full dim/grayscale
+    hyprctl keyword "decoration:dim_strength" "$dim_strength" 2>/dev/null || true
+}
+
+# Reduce brightness and color
+enter_low_battery_mode() {
+    echo "Entering low battery mode..."
+
+    CURRENT_BRIGHTNESS=$(get_brightness)
+    echo "$CURRENT_BRIGHTNESS" > "$SAVEDBRIGHTNESS_FILE"
+
+    NEW_BRIGHTNESS=$((CURRENT_BRIGHTNESS / 3))
+    brightnessctl -e4 -n2 set "$NEW_BRIGHTNESS"
+
+    # Try to enable grayscale/reduce saturation
+    # Option 1: Using hyprland's built-in dim (recommended)
+    set_dim "0.5"
+
+    # Option 2: Using colorize plugin if available
+    # set_saturation "0.0"
+
+    notify-send -u critical "Low Battery" "Battery below $BATTERY_THRESHOLD%"
+}
+
+# Restore brightness and color
+exit_low_battery_mode() {
+    echo "Exiting low battery mode..."
+
+    # Restore brightness
+    if [ -f "$SAVEDBRIGHTNESS_FILE" ]; then
+        SAVED_BRIGHTNESS=$(cat "$SAVEDBRIGHTNESS_FILE")
+        brightnessctl -e4 -n2 set "$SAVED_BRIGHTNESS"
+        rm "$SAVEDBRIGHTNESS_FILE"
+    fi
+
+    # Restore color
+    set_dim "0.0"
+
+    notify-send "Charger connected"
+}
+
+# Get battery percentage
+get_battery_percent() {
+    if [ -f "$BATTERY_PATH" ]; then
+        cat "$BATTERY_PATH"
+    else
+        # Fallback to upower if sysfs not available
+        upower -e | grep BAT | xargs -I{} upower -i {} | grep percentage | awk '{print $2}' | sed 's/%//'
+    fi
+}
+
+is_discharging() {
+    local status_path="/sys/class/power_supply/BAT0/status"
+    if [ -f "$status_path" ]; then
+        local status
+        status=$(cat "$status_path")
+        [ "$status" = "Discharging" ]
+    else
+        upower -e | grep BAT | xargs -I{} upower -i {} | grep -q "state:\s*discharging"
+    fi
+}
+
+is_charging() {
+    local status_path="/sys/class/power_supply/BAT0/status"
+    if [ -f "$status_path" ]; then
+        local status
+        status=$(cat "$status_path")
+        [ "$status" = "Charging" ] || [ "$status" = "Full" ]
+    else
+        upower -e | grep BAT | xargs -I{} upower -i {} | grep -q "state:.*charging"
+    fi
+}
+
+# Main monitoring loop
+echo "Battery monitor started (threshold: ${BATTERY_THRESHOLD}%)"
+
+while true; do
+    while true; do
+        BATTERY_PERCENT=$(get_battery_percent)
+
+        if [ -z "$BATTERY_PERCENT" ]; then
+            echo "Warning: Could not read battery percentage"
+            sleep 10
+            continue
+        fi
+
+        if [ "$BATTERY_PERCENT" -lt "$BATTERY_THRESHOLD" ] && is_discharging; then
+            break
+        fi
+
+        sleep 10
+    done
+
+    enter_low_battery_mode
+    trap exit_low_battery_mode EXIT
+
+    while true; do
+        BATTERY_PERCENT=$(get_battery_percent)
+
+        if [ -z "$BATTERY_PERCENT" ]; then
+            echo "Warning: Could not read battery percentage"
+            sleep 1
+            continue
+        fi
+
+        if is_charging; then
+            break
+        fi
+    done
+
+    exit_low_battery_mode
+    trap - EXIT
+done
