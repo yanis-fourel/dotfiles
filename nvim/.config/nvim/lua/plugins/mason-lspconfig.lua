@@ -100,6 +100,5 @@ return {
 			},
 		})
 
-		vim.g.copilot_nes_debounce = 500
 	end,
 }
