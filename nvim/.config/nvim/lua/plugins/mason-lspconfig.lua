@@ -100,5 +100,13 @@ return {
 			},
 		})
 
+		-- zls: use system binary if available (e.g. from nix shell), skip if not found
+		if vim.fn.executable("zls") == 1 then
+			vim.lsp.config("zls", {
+				cmd = { "zls" },
+			})
+			vim.lsp.enable("zls")
+		end
+
 	end,
 }
