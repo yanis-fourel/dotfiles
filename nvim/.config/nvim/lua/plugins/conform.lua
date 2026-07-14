@@ -17,6 +17,7 @@ return {
 			lua = { "stylua" },
 			javascript = { "prettier" },
 			typescript = { "prettier" },
+			go = { "gofmt" },
 		},
 
 		format_on_save = {

@@ -108,5 +108,9 @@ return {
 			vim.lsp.enable("zls")
 		end
 
+		vim.lsp.config("ada_language_server", {
+			cmd = { "ada_language_server" },
+			filetypes = { "ada" },
+		})
 	end,
 }
