@@ -18,6 +18,7 @@ return {
 			javascript = { "prettier" },
 			typescript = { "prettier" },
 			go = { "gofmt" },
+			ada = { lsp_format = "prefer" },
 		},
 
 		format_on_save = {
