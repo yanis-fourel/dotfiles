@@ -173,3 +173,5 @@ antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
 eval "$(starship init zsh)"
 
 eval "$(direnv hook zsh)"
+
+source /usr/share/nvm/init-nvm.sh
