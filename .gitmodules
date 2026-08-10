@@ -1,0 +1,3 @@
+[submodule "pi/.pi/agent/extensions/loop"]
+	path = pi/.pi/agent/extensions/loop
+	url = https://github.com/inancgumus/pi-loop

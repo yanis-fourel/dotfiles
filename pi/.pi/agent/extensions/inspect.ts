@@ -12,7 +12,7 @@
  * Everything is appended to a per-session log file. Tail it in another
  * terminal while you chat:
  *
- *   tail -f .pi/inspect/<session>.log
+ *   tail -f /tmp/pi-inspect-*/<session>.log
  *
  * Commands:
  *   /inspect        - show the log file path + a tail command, as a notify
@@ -20,9 +20,9 @@
  *                      built-in editor view (read-only-ish; press Esc/Ctrl+C
  *                      to close without sending anything)
  */
-import { appendFileSync, mkdirSync } from "node:fs";
+import { appendFileSync, mkdtempSync } from "node:fs";
 import { join } from "node:path";
-import { CONFIG_DIR_NAME, type ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 function ts(): string {
   return new Date().toISOString();
@@ -44,8 +44,7 @@ export default function (pi: ExtensionAPI) {
   }
 
   pi.on("session_start", (_event, ctx) => {
-    const dir = join(ctx.cwd, CONFIG_DIR_NAME, "inspect");
-    mkdirSync(dir, { recursive: true });
+    const dir = mkdtempSync("/tmp/pi-inspect-");
     const stamp = new Date().toISOString().replace(/[:.]/g, "-");
     logFile = join(dir, `${stamp}.log`);
     appendFileSync(logFile, `Inspect log for session starting ${ts()}\n`, "utf8");
