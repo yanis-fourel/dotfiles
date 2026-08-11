@@ -1,5 +1,5 @@
 /**
- * /work-review — isolated coder → reviewer loop with a live activity view.
+ * /work-review — isolated coder → reviewer loop with a live + full-history split viewer.
  *
  * Spawns two independent, in-memory AgentSessions via the SDK (not the model-driven
  * `task` tool), so isolation is enforced by code, not by prompt discipline:
@@ -13,23 +13,16 @@
  *    feedback text, fed back as the next prompt.
  *
  * The reviewer's verdict is captured through a dedicated `submit_verdict` tool call
- * (a boolean + optional feedback string), not by regex-matching its free-text reply.
- * Free text drifts under repeated rounds ("looks fine", "nothing left to do", markdown
- * formatting, etc.) and a text-based parser can silently misclassify a real approval as
- * a rejection, which then bounces the coder into a "nothing to do" / reviewer "still ok"
- * loop that never terminates. A tool call with a typed `approved: boolean` argument
- * cannot drift that way — the model must produce a boolean, not a string we guess at.
+ * (a boolean + optional feedback string), not by regex-matching its free-text reply —
+ * a typed boolean can't drift into ambiguous phrasing the way "APPROVE" in prose can.
  *
- * The two sessions loop (coder implements → reviewer reviews → coder addresses
- * feedback → …) until the reviewer approves, a round cap is hit, or feedback stalls
- * (two rounds in a row with identical feedback — no further progress is happening).
- * Both sessions keep their own multi-turn history across rounds for continuity without
- * cross-contaminating each other's context.
- *
- * While the loop runs, each session's live thinking/text/tool activity streams into
- * its own always-visible widget (`work-review-coder` / `work-review-reviewer`), so the
- * actual reasoning trace of both agents is visible on screen in real time — never
- * relayed to the *other* agent, only surfaced to the human watching.
+ * Every thinking/text/tool event from both child sessions is recorded, in full, into an
+ * in-memory transcript (`RunHistory`) for the lifetime of the extension process — not
+ * just a truncated tail. `/work-review-view` opens a split-screen viewer (coder left,
+ * reviewer right) over that transcript: independently scrollable per pane, live-updating
+ * while the run is in progress, and still browsable after it finishes. It can be opened
+ * at any point — including while `/work-review` is still running, since extension
+ * commands dispatch independently of each other.
  */
 import type { ThinkingLevel } from "@oh-my-pi/pi-agent-core";
 import type {
@@ -38,9 +31,13 @@ import type {
 	CustomTool,
 	ExtensionAPI,
 	ExtensionCommandContext,
+	Theme,
+	ThemeColor,
 } from "@oh-my-pi/pi-coding-agent";
 import { AgentRegistry, createAgentSession, SessionManager, Settings, z } from "@oh-my-pi/pi-coding-agent";
 import type { AssistantMessage, Model, ToolChoice } from "@oh-my-pi/pi-ai";
+import type { Component, TUI } from "@oh-my-pi/pi-tui";
+import { matchesKey, ScrollView, visibleWidth, wrapTextWithAnsi } from "@oh-my-pi/pi-tui";
 
 // Tool split is the actual isolation/safety boundary for the reviewer: it can run
 // tests/greps/reads but has no edit/write/ast_edit access.
@@ -50,12 +47,6 @@ const REVIEWER_TOOLS = ["read", "grep", "glob", "bash", "ast_grep", "web_search"
 const THINKING_LEVELS: readonly ThinkingLevel[] = ["off", "minimal", "low", "medium", "high", "xhigh", "max"];
 const ROUND_OPTIONS = ["3", "5", "8", "12"];
 const DEFAULT_ROUNDS = "5";
-
-// Widget line budget (setWidget content is capped at 10 lines): 1 header + this many tail lines.
-const WIDGET_TAIL_LINES = 8;
-const WIDGET_LINE_WIDTH = 100;
-// Bound how much raw streamed text we keep around per turn; only the tail is ever shown.
-const MAX_BUFFER_CHARS = 8000;
 
 interface Verdict {
 	approved: boolean;
@@ -77,6 +68,83 @@ interface WorkReviewChoice {
 	reviewerModel: Model;
 	reviewerThinking: ThinkingLevel | undefined;
 	maxRounds: number;
+}
+
+// ── Full-history transcript model ──────────────────────────────────────────
+// Kept in memory for the process lifetime (overwritten by the next /work-review),
+// independent of the compact status line, so /work-review-view can show everything
+// since the beginning of the run, not just a recent tail.
+
+type BlockKind = "thinking" | "text" | "tool" | "phase";
+
+interface HistoryBlock {
+	kind: BlockKind;
+	text: string;
+}
+
+interface SessionLog {
+	blocks: HistoryBlock[];
+	/** Kind of the last block, when it's still accepting appended deltas (thinking/text only). */
+	openKind: BlockKind | undefined;
+}
+
+interface RunHistory {
+	task: string;
+	coderLabel: string;
+	reviewerLabel: string;
+	coder: SessionLog;
+	reviewer: SessionLog;
+	status: string;
+}
+
+/** The run `/work-review-view` shows: the in-progress run, or the last completed one. */
+let activeRun: RunHistory | undefined;
+
+function createSessionLog(): SessionLog {
+	return { blocks: [], openKind: undefined };
+}
+
+function appendDelta(log: SessionLog, kind: "thinking" | "text", delta: string): void {
+	const last = log.blocks.at(-1);
+	if (log.openKind === kind && last) {
+		last.text += delta;
+	} else {
+		log.blocks.push({ kind, text: delta });
+		log.openKind = kind;
+	}
+}
+
+function pushAtomicBlock(log: SessionLog, kind: "tool" | "phase", text: string): void {
+	log.blocks.push({ kind, text });
+	log.openKind = undefined;
+}
+
+/** Best-effort single-line description of a tool call, for the transcript. */
+function summarizeToolArgs(toolName: string, args: unknown): string {
+	if (args && typeof args === "object") {
+		const a = args as Record<string, unknown>;
+		if (toolName === "submit_verdict" && typeof a.approved === "boolean") {
+			return `submit_verdict: approved=${a.approved}`;
+		}
+		const candidate = a.command ?? a.path ?? a.pattern ?? a.query ?? a.url;
+		if (typeof candidate === "string") return `${toolName}: ${candidate}`;
+	}
+	return toolName;
+}
+
+/** Subscribes a child session's events into its transcript log. Returns the unsubscribe fn. */
+function attachSessionLog(session: AgentSession, log: SessionLog): () => void {
+	return session.subscribe((event: AgentSessionEvent) => {
+		if (event.type === "message_update") {
+			const e = event.assistantMessageEvent;
+			if (e.type === "thinking_delta") appendDelta(log, "thinking", e.delta);
+			else if (e.type === "text_delta") appendDelta(log, "text", e.delta);
+		} else if (event.type === "tool_execution_start") {
+			pushAtomicBlock(log, "tool", `› ${summarizeToolArgs(event.toolName, event.args)}`);
+		} else if (event.type === "turn_end") {
+			log.openKind = undefined;
+		}
+	});
 }
 
 function textOnly(message: AssistantMessage | undefined): string {
@@ -248,107 +316,125 @@ async function getReviewVerdict(
 	};
 }
 
-/** Best-effort single-line description of a tool call, for the live activity view. */
-function summarizeToolArgs(toolName: string, args: unknown): string {
-	if (args && typeof args === "object") {
-		const a = args as Record<string, unknown>;
-		const candidate = a.command ?? a.path ?? a.pattern ?? a.query ?? a.url;
-		if (typeof candidate === "string") return `${toolName}: ${candidate}`;
-		if (toolName === "submit_verdict" && typeof a.approved === "boolean") return `submit_verdict: approved=${a.approved}`;
+// ── Split-screen transcript viewer ──────────────────────────────────────────
+
+const BLOCK_COLOR: Record<BlockKind, ThemeColor> = {
+	thinking: "thinkingText",
+	text: "text",
+	tool: "toolTitle",
+	phase: "accent",
+};
+
+function renderLogLines(log: SessionLog, theme: Theme, width: number): string[] {
+	if (log.blocks.length === 0) return [theme.fg("muted", "(nothing yet)")];
+	const lines: string[] = [];
+	for (const block of log.blocks) {
+		const wrapped = wrapTextWithAnsi(block.text, Math.max(1, width));
+		for (const w of wrapped) lines.push(theme.fg(BLOCK_COLOR[block.kind], w));
+		lines.push("");
 	}
-	return toolName;
+	return lines;
 }
 
-function wrapTail(text: string, width: number, maxLines: number): string[] {
-	const clean = text.replace(/\s+/g, " ").trim();
-	if (!clean) return [];
-	const lines: string[] = [];
-	for (let i = 0; i < clean.length; i += width) lines.push(clean.slice(i, i + width));
-	return lines.slice(-maxLines);
+function padToWidth(line: string, width: number): string {
+	const pad = width - visibleWidth(line);
+	return pad > 0 ? line + " ".repeat(pad) : line;
 }
 
 /**
- * Streams one child session's live activity (thinking, text, tool calls) into its own
- * always-visible widget so the human watching can see exactly what that agent is doing,
- * in real time, without that trace ever being relayed to the other agent.
+ * Split-screen viewer: coder transcript on the left, reviewer on the right, each an
+ * independently scrollable {@link ScrollView} pinned to the bottom until the user scrolls
+ * up. Rebuilds from the live {@link RunHistory} on a timer while mounted, so it reflects
+ * new activity without needing every individual delta to trigger a render.
  */
-function createLiveTracker(ctx: ExtensionCommandContext, widgetKey: string, role: string) {
-	let phase = "starting…";
-	let activity = "idle";
-	let thinkingBuf = "";
-	let textBuf = "";
-	let toolLine = "";
-	let dirty = true;
-	let lastRendered = "";
+class SplitHistoryViewer implements Component {
+	private readonly coderScroll = new ScrollView([], { height: 20, scrollbar: "auto" });
+	private readonly reviewerScroll = new ScrollView([], { height: 20, scrollbar: "auto" });
+	private focus: "coder" | "reviewer" = "coder";
+	private readonly timer: Timer;
+	private lastPaneWidth = 0;
 
-	const render = () => {
-		const header = `${role} — ${phase} — ${activity}`;
-		const source = activity.startsWith("running")
-			? toolLine
-			: activity.startsWith("writing")
-				? textBuf
-				: thinkingBuf || textBuf || toolLine;
-		const lines = [header, ...wrapTail(source, WIDGET_LINE_WIDTH, WIDGET_TAIL_LINES)];
-		const rendered = lines.join("\n");
-		if (rendered === lastRendered) return;
-		lastRendered = rendered;
-		ctx.ui.setWidget(widgetKey, lines);
-	};
+	constructor(
+		private readonly ctx: ExtensionCommandContext,
+		private readonly tui: TUI,
+		private readonly theme: Theme,
+		private readonly run: RunHistory,
+		private readonly done: (result: undefined) => void,
+	) {
+		this.timer = ctx.setInterval(() => {
+			this.refresh(this.lastPaneWidth || 40);
+			this.tui.requestRender();
+		}, 300);
+	}
 
-	const timer = ctx.setInterval(() => {
-		if (dirty) {
-			dirty = false;
-			render();
+	private refresh(paneWidth: number): void {
+		this.lastPaneWidth = paneWidth;
+		const coderAtBottom = this.coderScroll.getScrollOffset() >= this.coderScroll.getMaxScrollOffset();
+		const reviewerAtBottom = this.reviewerScroll.getScrollOffset() >= this.reviewerScroll.getMaxScrollOffset();
+		this.coderScroll.setLines(renderLogLines(this.run.coder, this.theme, paneWidth));
+		this.reviewerScroll.setLines(renderLogLines(this.run.reviewer, this.theme, paneWidth));
+		if (coderAtBottom) this.coderScroll.scrollToBottom();
+		if (reviewerAtBottom) this.reviewerScroll.scrollToBottom();
+	}
+
+	handleInput(data: string): void {
+		if (matchesKey(data, "escape") || data === "q") {
+			this.done(undefined);
+			return;
 		}
-	}, 250);
-
-	const handleEvent = (event: AgentSessionEvent): void => {
-		if (event.type === "message_update") {
-			const e = event.assistantMessageEvent;
-			if (e.type === "thinking_delta") {
-				activity = "thinking…";
-				thinkingBuf = (thinkingBuf + e.delta).slice(-MAX_BUFFER_CHARS);
-				dirty = true;
-			} else if (e.type === "text_delta") {
-				activity = "writing…";
-				textBuf = (textBuf + e.delta).slice(-MAX_BUFFER_CHARS);
-				dirty = true;
-			}
-		} else if (event.type === "tool_execution_start") {
-			activity = `running ${event.toolName}`;
-			toolLine = summarizeToolArgs(event.toolName, event.args);
-			dirty = true;
-		} else if (event.type === "tool_execution_end") {
-			activity = event.isError ? `${event.toolName} failed` : "thinking…";
-			dirty = true;
-		} else if (event.type === "turn_end") {
-			activity = "waiting…";
-			dirty = true;
+		if (matchesKey(data, "tab")) {
+			this.focus = this.focus === "coder" ? "reviewer" : "coder";
+			return;
 		}
-	};
+		const target = this.focus === "coder" ? this.coderScroll : this.reviewerScroll;
+		target.handleScrollKey(data);
+	}
 
-	return {
-		attach(session: { subscribe: (l: (e: AgentSessionEvent) => void) => () => void }): () => void {
-			return session.subscribe(handleEvent);
-		},
-		setPhase(next: string): void {
-			phase = next;
-			activity = "starting…";
-			dirty = true;
-		},
-		resetTurn(): void {
-			thinkingBuf = "";
-			textBuf = "";
-			toolLine = "";
-		},
-		dispose(): void {
-			ctx.clearTimer(timer);
-			ctx.ui.setWidget(widgetKey, undefined);
-		},
-	};
+	dispose(): void {
+		this.ctx.clearTimer(this.timer);
+	}
+
+	render(width: number): readonly string[] {
+		const rows = this.tui.terminal.rows ?? 24;
+		const height = Math.max(6, rows - 6);
+		this.coderScroll.setHeight(height);
+		this.reviewerScroll.setHeight(height);
+
+		const paneWidth = Math.max(20, Math.floor((width - 3) / 2));
+		if (paneWidth !== this.lastPaneWidth) this.refresh(paneWidth);
+
+		const coderHeader = `${this.focus === "coder" ? "▶ " : "  "}CODER — ${this.run.coderLabel}`;
+		const reviewerHeader = `${this.focus === "reviewer" ? "▶ " : "  "}REVIEWER — ${this.run.reviewerLabel}`;
+		const headerLine = `${padToWidth(this.theme.fg("accent", coderHeader), paneWidth)} │ ${this.theme.fg("accent", reviewerHeader)}`;
+
+		const left = this.coderScroll.render(paneWidth);
+		const right = this.reviewerScroll.render(paneWidth);
+		const bodyRows = Math.max(left.length, right.length);
+		const out: string[] = [headerLine];
+		for (let i = 0; i < bodyRows; i++) {
+			out.push(`${padToWidth(left[i] ?? "", paneWidth)} │ ${right[i] ?? ""}`);
+		}
+		out.push(
+			this.theme.fg(
+				"muted",
+				`status: ${this.run.status}   ·   ↑/↓ scroll   Tab switch pane (${this.focus})   Home/End jump   Esc close`,
+			),
+		);
+		return out;
+	}
 }
 
 async function runLoop(pi: ExtensionAPI, ctx: ExtensionCommandContext, choice: WorkReviewChoice): Promise<void> {
+	const run: RunHistory = {
+		task: choice.task,
+		coderLabel: modelLabel(choice.coderModel, choice.coderThinking),
+		reviewerLabel: modelLabel(choice.reviewerModel, choice.reviewerThinking),
+		coder: createSessionLog(),
+		reviewer: createSessionLog(),
+		status: "starting…",
+	};
+	activeRun = run;
+
 	const settings = Settings.isolated({
 		"tools.approvalMode": "yolo",
 		"compaction.enabled": true,
@@ -391,10 +477,8 @@ async function runLoop(pi: ExtensionAPI, ctx: ExtensionCommandContext, choice: W
 		}),
 	]);
 
-	const coderView = createLiveTracker(ctx, "work-review-coder", "CODER");
-	const reviewerView = createLiveTracker(ctx, "work-review-reviewer", "REVIEWER");
-	const unsubCoder = coderView.attach(coder.session);
-	const unsubReviewer = reviewerView.attach(reviewer.session);
+	const unsubCoder = attachSessionLog(coder.session, run.coder);
+	const unsubReviewer = attachSessionLog(reviewer.session, run.reviewer);
 
 	const rounds: RoundEntry[] = [];
 	let approved = false;
@@ -405,16 +489,16 @@ async function runLoop(pi: ExtensionAPI, ctx: ExtensionCommandContext, choice: W
 		let coderPrompt = choice.task;
 
 		for (let round = 1; round <= choice.maxRounds; round++) {
-			ctx.ui.setStatus("work-review", `round ${round}/${choice.maxRounds}: coding`);
-			coderView.setPhase(`round ${round}/${choice.maxRounds} — implementing`);
-			coderView.resetTurn();
+			run.status = `round ${round}/${choice.maxRounds}: coding`;
+			ctx.ui.setStatus("work-review", run.status);
+			pushAtomicBlock(run.coder, "phase", `── Round ${round}/${choice.maxRounds}: implementing ──`);
 
 			await coder.session.prompt(coderPrompt);
 			const coderSummary = textOnly(coder.session.getLastAssistantMessage()) || "(coder returned no text summary)";
 
-			ctx.ui.setStatus("work-review", `round ${round}/${choice.maxRounds}: reviewing`);
-			reviewerView.setPhase(`round ${round}/${choice.maxRounds} — reviewing`);
-			reviewerView.resetTurn();
+			run.status = `round ${round}/${choice.maxRounds}: reviewing`;
+			ctx.ui.setStatus("work-review", run.status);
+			pushAtomicBlock(run.reviewer, "phase", `── Round ${round}/${choice.maxRounds}: reviewing ──`);
 
 			const reviewPrompt =
 				round === 1
@@ -425,8 +509,6 @@ async function runLoop(pi: ExtensionAPI, ctx: ExtensionCommandContext, choice: W
 
 			if (verdict.approved) {
 				approved = true;
-				coderView.setPhase(`round ${round}/${choice.maxRounds} — approved`);
-				reviewerView.setPhase(`round ${round}/${choice.maxRounds} — approved`);
 				ctx.ui.notify(`work-review: reviewer approved after round ${round}.`, "info");
 				break;
 			}
@@ -448,8 +530,7 @@ async function runLoop(pi: ExtensionAPI, ctx: ExtensionCommandContext, choice: W
 	} finally {
 		unsubCoder();
 		unsubReviewer();
-		coderView.dispose();
-		reviewerView.dispose();
+		run.status = approved ? "approved" : stalled ? "stalled" : "round cap reached";
 		ctx.ui.setStatus("work-review", undefined);
 		await Promise.allSettled([coder.session.dispose(), reviewer.session.dispose()]);
 	}
@@ -460,7 +541,8 @@ async function runLoop(pi: ExtensionAPI, ctx: ExtensionCommandContext, choice: W
 **Coder:** ${modelLabel(choice.coderModel, choice.coderThinking)}
 **Reviewer:** ${modelLabel(choice.reviewerModel, choice.reviewerThinking)}
 **Rounds run:** ${rounds.length}/${choice.maxRounds}
-${approved ? "" : "\nChanges from the last round remain in the working tree. Run `git diff` to inspect them; re-run /work-review to continue iterating."}`;
+${approved ? "" : "\nChanges from the last round remain in the working tree. Run `git diff` to inspect them; re-run /work-review to continue iterating."}
+Full live/scrollable transcript: run \`/work-review-view\`.`;
 
 	const roundLog = rounds
 		.map(
@@ -483,7 +565,7 @@ export default function workReviewExtension(pi: ExtensionAPI) {
 	pi.setLabel("Work + Review Loop");
 
 	pi.registerCommand("work-review", {
-		description: "Coder → reviewer loop: isolated contexts, live thinking trace, pick model + thinking level for each",
+		description: "Coder → reviewer loop: isolated contexts, pick model + thinking level for each",
 		handler: async (args, ctx) => {
 			if (!ctx.hasUI) {
 				ctx.ui.notify("work-review requires interactive dialogs (TUI or RPC mode).", "error");
@@ -497,7 +579,7 @@ export default function workReviewExtension(pi: ExtensionAPI) {
 				`work-review: starting — coder=${modelLabel(choice.coderModel, choice.coderThinking)}, reviewer=${modelLabel(
 					choice.reviewerModel,
 					choice.reviewerThinking,
-				)}, max ${choice.maxRounds} round(s).`,
+				)}, max ${choice.maxRounds} round(s). Run /work-review-view any time to watch.`,
 				"info",
 			);
 
@@ -506,6 +588,25 @@ export default function workReviewExtension(pi: ExtensionAPI) {
 			} catch (err) {
 				ctx.ui.notify(`work-review failed: ${err instanceof Error ? err.message : String(err)}`, "error");
 			}
+		},
+	});
+
+	pi.registerCommand("work-review-view", {
+		description: "Open the split coder/reviewer transcript viewer for the current or last work-review run",
+		handler: async (_args, ctx) => {
+			if (!activeRun) {
+				ctx.ui.notify("work-review-view: no work-review run yet — start one with /work-review.", "warning");
+				return;
+			}
+			if (ctx.mode !== "tui") {
+				ctx.ui.notify("work-review-view: the split viewer is only available in the interactive TUI.", "error");
+				return;
+			}
+			const run = activeRun;
+			await ctx.ui.custom<undefined>(
+				(tui, theme, _keybindings, done) => new SplitHistoryViewer(ctx, tui, theme, run, done),
+				{ overlay: true },
+			);
 		},
 	});
 }
