@@ -1,8 +1,9 @@
 /**
- * /work-review — isolated coder → reviewer loop with a live + full-history split viewer.
+ * /work-review — isolated coder → reviewer loop where the MAIN interactive session
+ * literally becomes each agent in turn, instead of opening a split view.
  *
- * Spawns two independent, in-memory AgentSessions via the SDK (not the model-driven
- * `task` tool), so isolation is enforced by code, not by prompt discipline:
+ * Isolation is still enforced by code, not prompt discipline — coder and reviewer are
+ * two independent, disk-backed sessions (own message history, own tools, own model):
  *
  *  - The coder session gets real read/write/exec tools scoped to the project cwd and
  *    implements the requested change directly in the working tree.
@@ -12,37 +13,48 @@
  *  - The coder never sees the reviewer's thinking either — only the reviewer's final
  *    feedback text, fed back as the next prompt.
  *
- * The reviewer's verdict is captured through a dedicated `submit_verdict` tool call
- * (a boolean + optional feedback string), not by regex-matching its free-text reply —
- * a typed boolean can't drift into ambiguous phrasing the way "APPROVE" in prose can.
+ * The reviewer's verdict is captured through a dedicated `work_review_submit_verdict`
+ * tool call (a boolean + optional feedback string), not by regex-matching its free-text
+ * reply — a typed boolean can't drift into ambiguous phrasing the way "APPROVE" in
+ * prose can.
  *
- * Every thinking/text/tool event from both child sessions is recorded, in full, into an
- * in-memory transcript (`RunHistory`) for the lifetime of the extension process — not
- * just a truncated tail. `/work-review-view` opens a split-screen viewer (coder left,
- * reviewer right) over that transcript: independently scrollable per pane, live-updating
- * while the run is in progress, and still browsable after it finishes. It can be opened
- * at any point — including while `/work-review` is still running, since extension
- * commands dispatch independently of each other.
+ * UI: rather than rendering a synthetic transcript in a custom split-screen overlay,
+ * `/work-review` drives the SAME `AgentSession` that powers the interactive terminal —
+ * `ctx.switchSession()` repoints it at the coder's session file while the coder works,
+ * then at the reviewer's while it reviews. While a given agent is "on stage" every
+ * native affordance just works: live streaming, thinking/tool-call rendering, tool
+ * approval prompts, Esc-to-interrupt, and typing a follow-up into the input box (native
+ * steer/resume) — none of that is reimplemented here.
+ *
+ * Consequences worth knowing:
+ *  - This is modal: your own conversation is off-screen for the run's duration (that's
+ *    the point — the terminal "becomes" the worker, then the reviewer). It's restored
+ *    automatically when the run ends, or via `/work-review-stop`.
+ *  - `switchSession` only happens between rounds (never while a turn is mid-stream), so
+ *    this models coder/reviewer as strictly serial — they're never watched simultaneously.
+ *    Genuine simultaneous native views would mean spawning separate `omp --resume <file>`
+ *    processes (e.g. in tmux panes) instead of one process taking turns.
+ *  - Tool approval mode is inherited from your own session's settings (there is no
+ *    extension-facing API to force yolo-mode on a sub-scope). If you want the coder and
+ *    reviewer to run unattended, start this session with `--approval-mode yolo` (or set
+ *    `tools.approvalMode` accordingly) — otherwise you'll see normal approval prompts
+ *    while each is on stage, which is also a legitimate way to supervise them live.
+ *  - The coder/reviewer sessions are real, persisted session files — `/work-review-peek`
+ *    gives a quick read of the latest output without switching onto them, and
+ *    `/resume <file>` (path printed in the final summary) opens either one's full native
+ *    history at any time, no bespoke viewer needed.
  */
-import type { ThinkingLevel } from "@oh-my-pi/pi-agent-core";
-import type {
-	AgentSession,
-	AgentSessionEvent,
-	CustomTool,
-	ExtensionAPI,
-	ExtensionCommandContext,
-	Theme,
-	ThemeColor,
-} from "@oh-my-pi/pi-coding-agent";
-import { AgentRegistry, createAgentSession, SessionManager, Settings, z } from "@oh-my-pi/pi-coding-agent";
-import type { AssistantMessage, Model, ToolChoice } from "@oh-my-pi/pi-ai";
-import type { Component, TUI } from "@oh-my-pi/pi-tui";
-import { matchesKey, ScrollView, visibleWidth, wrapTextWithAnsi } from "@oh-my-pi/pi-tui";
+import type { AgentMessage, ThinkingLevel } from "@oh-my-pi/pi-agent-core";
+import type { ExtensionAPI, ExtensionCommandContext } from "@oh-my-pi/pi-coding-agent";
+import { z } from "@oh-my-pi/pi-coding-agent";
+import type { AssistantMessage, Model } from "@oh-my-pi/pi-ai";
+import { matchesKey, ScrollView, wrapTextWithAnsi } from "@oh-my-pi/pi-tui";
 
 // Tool split is the actual isolation/safety boundary for the reviewer: it can run
 // tests/greps/reads but has no edit/write/ast_edit access.
 const CODER_TOOLS = ["read", "edit", "write", "bash", "grep", "glob", "ast_grep", "todo"];
-const REVIEWER_TOOLS = ["read", "grep", "glob", "bash", "ast_grep", "web_search", "submit_verdict"];
+const REVIEWER_TOOLS = ["read", "grep", "glob", "bash", "ast_grep", "web_search"];
+const VERDICT_TOOL_NAME = "work_review_submit_verdict";
 
 const THINKING_LEVELS: readonly ThinkingLevel[] = ["off", "minimal", "low", "medium", "high", "xhigh", "max"];
 const ROUND_OPTIONS = ["3", "5", "8", "12"];
@@ -70,81 +82,63 @@ interface WorkReviewChoice {
 	maxRounds: number;
 }
 
-// ── Full-history transcript model ──────────────────────────────────────────
-// Kept in memory for the process lifetime (overwritten by the next /work-review),
-// independent of the compact status line, so /work-review-view can show everything
-// since the beginning of the run, not just a recent tail.
+type WorkReviewMode = "coder" | "reviewer";
 
-type BlockKind = "thinking" | "text" | "tool" | "phase";
+/** Freeze switch for one `/work-review` run: pauses the round loop between turns without
+ *  touching anything else in the process (unlike the SDK's process-wide `AgentPauseGate`,
+ *  which would also freeze the user's own session). */
+class RunGate {
+	#gate: { promise: Promise<void>; resolve: () => void } | undefined;
 
-interface HistoryBlock {
-	kind: BlockKind;
-	text: string;
+	get paused(): boolean {
+		return this.#gate !== undefined;
+	}
+
+	pause(): void {
+		if (this.#gate) return;
+		let resolve!: () => void;
+		const promise = new Promise<void>(r => {
+			resolve = r;
+		});
+		this.#gate = { promise, resolve };
+	}
+
+	resume(): void {
+		this.#gate?.resolve();
+		this.#gate = undefined;
+	}
+
+	wait(): Promise<void> {
+		return this.#gate?.promise ?? Promise.resolve();
+	}
 }
 
-interface SessionLog {
-	blocks: HistoryBlock[];
-	/** Kind of the last block, when it's still accepting appended deltas (thinking/text only). */
-	openKind: BlockKind | undefined;
-}
-
-interface RunHistory {
+/** State for the single `/work-review` run this extension instance can drive at once. */
+interface RunState {
 	task: string;
-	coderLabel: string;
-	reviewerLabel: string;
-	coder: SessionLog;
-	reviewer: SessionLog;
+	coderModel: Model;
+	coderThinking: ThinkingLevel | undefined;
+	reviewerModel: Model;
+	reviewerThinking: ThinkingLevel | undefined;
+	maxRounds: number;
+	/** The user's own session file, restored when the run ends. */
+	originalFile: string;
+	coderFile: string;
+	reviewerFile: string;
+	/** Which agent's system prompt/tools should be in effect for the NEXT turn. */
+	mode: WorkReviewMode | undefined;
+	lastAssistantText: { coder?: string; reviewer?: string };
+	verdictBox: Verdict | undefined;
+	pendingTurn: { resolve: () => void; reject: (err: Error) => void } | undefined;
+	cancelled: boolean;
+	gate: RunGate;
 	status: string;
+	/** Set once `runLoop` returns, so a stale run never blocks the next `/work-review`. */
+	done: boolean;
 }
 
-/** The run `/work-review-view` shows: the in-progress run, or the last completed one. */
-let activeRun: RunHistory | undefined;
-
-function createSessionLog(): SessionLog {
-	return { blocks: [], openKind: undefined };
-}
-
-function appendDelta(log: SessionLog, kind: "thinking" | "text", delta: string): void {
-	const last = log.blocks.at(-1);
-	if (log.openKind === kind && last) {
-		last.text += delta;
-	} else {
-		log.blocks.push({ kind, text: delta });
-		log.openKind = kind;
-	}
-}
-
-function pushAtomicBlock(log: SessionLog, kind: "tool" | "phase", text: string): void {
-	log.blocks.push({ kind, text });
-	log.openKind = undefined;
-}
-
-/** Best-effort single-line description of a tool call, for the transcript. */
-function summarizeToolArgs(toolName: string, args: unknown): string {
-	if (args && typeof args === "object") {
-		const a = args as Record<string, unknown>;
-		if (toolName === "submit_verdict" && typeof a.approved === "boolean") {
-			return `submit_verdict: approved=${a.approved}`;
-		}
-		const candidate = a.command ?? a.path ?? a.pattern ?? a.query ?? a.url;
-		if (typeof candidate === "string") return `${toolName}: ${candidate}`;
-	}
-	return toolName;
-}
-
-/** Subscribes a child session's events into its transcript log. Returns the unsubscribe fn. */
-function attachSessionLog(session: AgentSession, log: SessionLog): () => void {
-	return session.subscribe((event: AgentSessionEvent) => {
-		if (event.type === "message_update") {
-			const e = event.assistantMessageEvent;
-			if (e.type === "thinking_delta") appendDelta(log, "thinking", e.delta);
-			else if (e.type === "text_delta") appendDelta(log, "text", e.delta);
-		} else if (event.type === "tool_execution_start") {
-			pushAtomicBlock(log, "tool", `› ${summarizeToolArgs(event.toolName, event.args)}`);
-		} else if (event.type === "turn_end") {
-			log.openKind = undefined;
-		}
-	});
+function isAssistantMessage(message: AgentMessage): message is AssistantMessage {
+	return message.role === "assistant";
 }
 
 function textOnly(message: AssistantMessage | undefined): string {
@@ -238,44 +232,47 @@ with your read-only tools (read, grep, glob, bash, ast_grep, web_search). You NE
 summary alone — use \`git diff\`, \`git status\`, and file reads to verify the actual change, and run tests/build
 commands via bash when useful.
 
-When you are done inspecting, call the \`submit_verdict\` tool EXACTLY ONCE as your final action:
+When you are done inspecting, call the \`${VERDICT_TOOL_NAME}\` tool EXACTLY ONCE as your final action:
 - \`approved: true\` only if the change is fully correct and complete with nothing left to fix.
 - \`approved: false\` with \`feedback\`: a bullet list of concrete, actionable issues (file/line when applicable).
   Only list issues that still need fixing — do not repeat points already resolved in a prior round.
-Do not call any other tool after \`submit_verdict\`, and do not describe your verdict in plain text instead of
+Do not call any other tool after \`${VERDICT_TOOL_NAME}\`, and do not describe your verdict in plain text instead of
 calling the tool — the tool call is the only thing that counts as your verdict.`;
 }
 
+/** Runtime-validated shape of the verdict tool's arguments — reused for both the tool's
+ *  declared parameter schema and to actually validate what the model sent, since tool
+ *  arguments are external input the compiler never verified. */
+const VerdictParamsSchema = z.object({
+	approved: z.boolean().describe("true only if the change is fully correct and complete, nothing left to fix"),
+	feedback: z
+		.string()
+		.optional()
+		.describe(
+			"Required when approved is false: a bullet list of concrete, actionable issues (file/line when applicable).",
+		),
+});
+
 /**
- * Dedicated tool for the reviewer's final verdict. A typed `approved: boolean` argument
- * cannot drift into ambiguous phrasing the way a free-text "APPROVE" reply can, which is
- * what previously let a real approval get misread as a rejection and loop forever.
+ * Registered once at extension load. `defaultInactive` keeps it invisible to every
+ * session (including the coder's) until `enterMode` explicitly activates it while the
+ * reviewer is on stage — the coder can never call it, by construction, not by prompt.
  */
-function buildVerdictTool(onVerdict: (verdict: Verdict) => void): CustomTool {
-	return {
-		name: "submit_verdict",
+function registerVerdictTool(pi: ExtensionAPI, onVerdict: (verdict: Verdict) => void): void {
+	pi.registerTool({
+		name: VERDICT_TOOL_NAME,
 		label: "Submit Review Verdict",
 		description:
 			"Submit your final review verdict. Call this exactly once, as the very last thing you do, after " +
 			"independently inspecting the repository. Do not call any other tool afterward.",
-		parameters: z.object({
-			approved: z.boolean().describe("true only if the change is fully correct and complete, nothing left to fix"),
-			feedback: z
-				.string()
-				.optional()
-				.describe(
-					"Required when approved is false: a bullet list of concrete, actionable issues (file/line when applicable).",
-				),
-		}),
+		parameters: VerdictParamsSchema,
 		approval: "read",
+		defaultInactive: true,
 		async execute(_toolCallId, rawParams) {
-			// The schema kernel's generic `Static<TSchema>` doesn't narrow through this factory's
-			// inferred return type, so validate the two fields we actually rely on directly.
-			const params = rawParams as { approved?: unknown; feedback?: unknown };
-			const verdict: Verdict = {
-				approved: params.approved === true,
-				feedback: typeof params.feedback === "string" ? params.feedback : "",
-			};
+			const parsed = VerdictParamsSchema.safeParse(rawParams);
+			const verdict: Verdict = parsed.success
+				? { approved: parsed.data.approved, feedback: parsed.data.feedback ?? "" }
+				: { approved: false, feedback: "" };
 			onVerdict(verdict);
 			return {
 				content: [
@@ -286,235 +283,151 @@ function buildVerdictTool(onVerdict: (verdict: Verdict) => void): CustomTool {
 				],
 			};
 		},
-	};
+	});
+}
+
+/** Sends `text` as the next user turn and resolves once that turn's `agent_end` settles
+ *  (or rejects if `/work-review-stop`/`/work-review-pause` cuts it short — see the
+ *  `agent_end`/pause/stop wiring in the extension body). `pi.sendUserMessage` itself is
+ *  fire-and-forget and races several internal `await`s before `isStreaming` flips, so
+ *  polling `ctx.waitForIdle()` right after calling it is NOT safe — this event-driven
+ *  handshake is. */
+function runTurn(pi: ExtensionAPI, run: RunState, text: string): Promise<void> {
+	return new Promise<void>((resolve, reject) => {
+		run.pendingTurn = { resolve, reject };
+		pi.sendUserMessage(text);
+	});
+}
+
+/** Points the main session at the right file/tools/model for `mode`, only switching the
+ *  session file when necessary (round 1 coder turn is already there). Returns false when
+ *  a hook cancelled the switch or no credentials are available for the target model —
+ *  callers treat that as "stop the run". */
+async function enterMode(
+	pi: ExtensionAPI,
+	ctx: ExtensionCommandContext,
+	run: RunState,
+	mode: WorkReviewMode,
+): Promise<boolean> {
+	const file = mode === "coder" ? run.coderFile : run.reviewerFile;
+	if (ctx.sessionManager.getSessionFile() !== file) {
+		const { cancelled } = await ctx.switchSession(file);
+		if (cancelled) return false;
+	}
+	run.mode = mode;
+	const tools = mode === "coder" ? CODER_TOOLS : [...REVIEWER_TOOLS, VERDICT_TOOL_NAME];
+	await pi.setActiveTools(tools);
+	const model = mode === "coder" ? run.coderModel : run.reviewerModel;
+	const modelOk = await pi.setModel(model);
+	if (!modelOk) {
+		ctx.ui.notify(`work-review: no credentials available for ${modelLabel(model, undefined)}.`, "error");
+		return false;
+	}
+	const thinking = mode === "coder" ? run.coderThinking : run.reviewerThinking;
+	if (thinking) pi.setThinkingLevel(thinking);
+	return true;
 }
 
 /**
- * Runs one reviewer turn and waits for its `submit_verdict` call. Nudges, then forces the
- * tool call via `toolChoice`, before falling back to a safe "unresolved" verdict — this
- * bounds retries instead of ever silently guessing a verdict from prose.
+ * Runs one reviewer turn and waits for its `work_review_submit_verdict` call. Nudges up
+ * to twice more before falling back to a safe "unresolved" verdict — this bounds retries
+ * instead of ever silently guessing a verdict from prose. Unlike the in-process design
+ * this replaces, there is no extension-facing way to force a tool choice on a turn, so
+ * the nudges are plain text rather than a forced `toolChoice`.
  */
 async function getReviewVerdict(
-	reviewer: AgentSession,
-	verdictBox: { value: Verdict | undefined },
+	pi: ExtensionAPI,
+	run: RunState,
 	reviewPrompt: string,
-): Promise<Verdict> {
-	verdictBox.value = undefined;
-	await reviewer.prompt(reviewPrompt);
-	if (verdictBox.value) return verdictBox.value;
-
-	await reviewer.prompt("You did not call submit_verdict. Call it now with your verdict based on what you already found.");
-	if (verdictBox.value) return verdictBox.value;
-
-	const forcedToolChoice: ToolChoice = { type: "tool", name: "submit_verdict" };
-	await reviewer.prompt("Call submit_verdict now with your verdict.", { toolChoice: forcedToolChoice });
-	if (verdictBox.value) return verdictBox.value;
-
+): Promise<Verdict | "cancelled"> {
+	run.verdictBox = undefined;
+	const nudges = [
+		reviewPrompt,
+		"You did not call the verdict tool. Call it now with your verdict based on what you already found.",
+		`This is your final chance: call ${VERDICT_TOOL_NAME} now with your verdict, and nothing else.`,
+	];
+	for (const prompt of nudges) {
+		try {
+			await runTurn(pi, run, prompt);
+		} catch {
+			return "cancelled";
+		}
+		if (run.cancelled) return "cancelled";
+		if (run.verdictBox) return run.verdictBox;
+	}
 	return {
 		approved: false,
 		feedback: "(reviewer did not submit a verdict after being prompted three times; needs manual inspection)",
 	};
 }
 
-// ── Split-screen transcript viewer ──────────────────────────────────────────
-
-const BLOCK_COLOR: Record<BlockKind, ThemeColor> = {
-	thinking: "thinkingText",
-	text: "text",
-	tool: "toolTitle",
-	phase: "accent",
-};
-
-function renderLogLines(log: SessionLog, theme: Theme, width: number): string[] {
-	if (log.blocks.length === 0) return [theme.fg("muted", "(nothing yet)")];
-	const lines: string[] = [];
-	for (const block of log.blocks) {
-		const wrapped = wrapTextWithAnsi(block.text, Math.max(1, width));
-		for (const w of wrapped) lines.push(theme.fg(BLOCK_COLOR[block.kind], w));
-		lines.push("");
-	}
-	return lines;
-}
-
-function padToWidth(line: string, width: number): string {
-	const pad = width - visibleWidth(line);
-	return pad > 0 ? line + " ".repeat(pad) : line;
-}
-
-/**
- * Split-screen viewer: coder transcript on the left, reviewer on the right, each an
- * independently scrollable {@link ScrollView} pinned to the bottom until the user scrolls
- * up. Rebuilds from the live {@link RunHistory} on a timer while mounted, so it reflects
- * new activity without needing every individual delta to trigger a render.
- */
-class SplitHistoryViewer implements Component {
-	private readonly coderScroll = new ScrollView([], { height: 20, scrollbar: "auto" });
-	private readonly reviewerScroll = new ScrollView([], { height: 20, scrollbar: "auto" });
-	private focus: "coder" | "reviewer" = "coder";
-	private readonly timer: Timer;
-	private lastPaneWidth = 0;
-
-	constructor(
-		private readonly ctx: ExtensionCommandContext,
-		private readonly tui: TUI,
-		private readonly theme: Theme,
-		private readonly run: RunHistory,
-		private readonly done: (result: undefined) => void,
-	) {
-		this.timer = ctx.setInterval(() => {
-			this.refresh(this.lastPaneWidth || 40);
-			this.tui.requestRender();
-		}, 300);
-	}
-
-	private refresh(paneWidth: number): void {
-		this.lastPaneWidth = paneWidth;
-		const coderAtBottom = this.coderScroll.getScrollOffset() >= this.coderScroll.getMaxScrollOffset();
-		const reviewerAtBottom = this.reviewerScroll.getScrollOffset() >= this.reviewerScroll.getMaxScrollOffset();
-		this.coderScroll.setLines(renderLogLines(this.run.coder, this.theme, paneWidth));
-		this.reviewerScroll.setLines(renderLogLines(this.run.reviewer, this.theme, paneWidth));
-		if (coderAtBottom) this.coderScroll.scrollToBottom();
-		if (reviewerAtBottom) this.reviewerScroll.scrollToBottom();
-	}
-
-	handleInput(data: string): void {
-		if (matchesKey(data, "escape") || data === "q") {
-			this.done(undefined);
-			return;
-		}
-		if (matchesKey(data, "tab")) {
-			this.focus = this.focus === "coder" ? "reviewer" : "coder";
-			return;
-		}
-		const target = this.focus === "coder" ? this.coderScroll : this.reviewerScroll;
-		target.handleScrollKey(data);
-	}
-
-	dispose(): void {
-		this.ctx.clearTimer(this.timer);
-	}
-
-	render(width: number): readonly string[] {
-		const rows = this.tui.terminal.rows ?? 24;
-		const height = Math.max(6, rows - 6);
-		this.coderScroll.setHeight(height);
-		this.reviewerScroll.setHeight(height);
-
-		const paneWidth = Math.max(20, Math.floor((width - 3) / 2));
-		if (paneWidth !== this.lastPaneWidth) this.refresh(paneWidth);
-
-		const coderHeader = `${this.focus === "coder" ? "▶ " : "  "}CODER — ${this.run.coderLabel}`;
-		const reviewerHeader = `${this.focus === "reviewer" ? "▶ " : "  "}REVIEWER — ${this.run.reviewerLabel}`;
-		const headerLine = `${padToWidth(this.theme.fg("accent", coderHeader), paneWidth)} │ ${this.theme.fg("accent", reviewerHeader)}`;
-
-		const left = this.coderScroll.render(paneWidth);
-		const right = this.reviewerScroll.render(paneWidth);
-		const bodyRows = Math.max(left.length, right.length);
-		const out: string[] = [headerLine];
-		for (let i = 0; i < bodyRows; i++) {
-			out.push(`${padToWidth(left[i] ?? "", paneWidth)} │ ${right[i] ?? ""}`);
-		}
-		out.push(
-			this.theme.fg(
-				"muted",
-				`status: ${this.run.status}   ·   ↑/↓ scroll   Tab switch pane (${this.focus})   Home/End jump   Esc close`,
-			),
-		);
-		return out;
-	}
-}
-
-async function runLoop(pi: ExtensionAPI, ctx: ExtensionCommandContext, choice: WorkReviewChoice): Promise<void> {
-	const run: RunHistory = {
-		task: choice.task,
-		coderLabel: modelLabel(choice.coderModel, choice.coderThinking),
-		reviewerLabel: modelLabel(choice.reviewerModel, choice.reviewerThinking),
-		coder: createSessionLog(),
-		reviewer: createSessionLog(),
-		status: "starting…",
-	};
-	activeRun = run;
-
-	const settings = Settings.isolated({
-		"tools.approvalMode": "yolo",
-		"compaction.enabled": true,
-		"retry.enabled": true,
-	});
-
-	const verdictBox: { value: Verdict | undefined } = { value: undefined };
-	const verdictTool = buildVerdictTool(v => {
-		verdictBox.value = v;
-	});
-
-	const [coder, reviewer] = await Promise.all([
-		createAgentSession({
-			cwd: ctx.cwd,
-			agentRegistry: new AgentRegistry(),
-			modelRegistry: ctx.modelRegistry,
-			model: choice.coderModel,
-			thinkingLevel: choice.coderThinking,
-			sessionManager: SessionManager.inMemory(),
-			settings,
-			toolNames: CODER_TOOLS,
-			restrictToolNames: true,
-			disableExtensionDiscovery: true,
-			appendSystemPrompt: buildCoderPrompt(ctx.cwd),
-		}),
-		createAgentSession({
-			cwd: ctx.cwd,
-			agentRegistry: new AgentRegistry(),
-			modelRegistry: ctx.modelRegistry,
-			model: choice.reviewerModel,
-			thinkingLevel: choice.reviewerThinking,
-			sessionManager: SessionManager.inMemory(),
-			settings,
-			toolNames: REVIEWER_TOOLS,
-			restrictToolNames: true,
-			allowRestrictedCustomTools: true,
-			customTools: [verdictTool],
-			disableExtensionDiscovery: true,
-			appendSystemPrompt: buildReviewerPrompt(ctx.cwd),
-		}),
-	]);
-
-	const unsubCoder = attachSessionLog(coder.session, run.coder);
-	const unsubReviewer = attachSessionLog(reviewer.session, run.reviewer);
-
+async function runLoop(pi: ExtensionAPI, ctx: ExtensionCommandContext, run: RunState): Promise<void> {
 	const rounds: RoundEntry[] = [];
 	let approved = false;
 	let stalled = false;
+	let cancelledOut = false;
 	let previousFeedback: string | undefined;
 
 	try {
-		let coderPrompt = choice.task;
+		let coderPrompt = run.task;
 
-		for (let round = 1; round <= choice.maxRounds; round++) {
-			run.status = `round ${round}/${choice.maxRounds}: coding`;
+		roundLoop: for (let round = 1; round <= run.maxRounds; round++) {
+			await run.gate.wait();
+			if (run.cancelled) {
+				cancelledOut = true;
+				break;
+			}
+
+			run.status = `round ${round}/${run.maxRounds}: coding`;
 			ctx.ui.setStatus("work-review", run.status);
-			pushAtomicBlock(run.coder, "phase", `── Round ${round}/${choice.maxRounds}: implementing ──`);
+			ctx.ui.setTitle(`🔨 coder · work-review ${round}/${run.maxRounds}`);
+			if (!(await enterMode(pi, ctx, run, "coder"))) {
+				cancelledOut = true;
+				break;
+			}
 
-			await coder.session.prompt(coderPrompt);
-			const coderSummary = textOnly(coder.session.getLastAssistantMessage()) || "(coder returned no text summary)";
+			try {
+				await runTurn(pi, run, coderPrompt);
+			} catch {
+				cancelledOut = true;
+				break;
+			}
 
-			run.status = `round ${round}/${choice.maxRounds}: reviewing`;
+			await run.gate.wait();
+			if (run.cancelled) {
+				cancelledOut = true;
+				break;
+			}
+
+			const coderSummary = run.lastAssistantText.coder || "(coder returned no text summary)";
+
+			run.status = `round ${round}/${run.maxRounds}: reviewing`;
 			ctx.ui.setStatus("work-review", run.status);
-			pushAtomicBlock(run.reviewer, "phase", `── Round ${round}/${choice.maxRounds}: reviewing ──`);
+			ctx.ui.setTitle(`🔍 reviewer · work-review ${round}/${run.maxRounds}`);
+			if (!(await enterMode(pi, ctx, run, "reviewer"))) {
+				cancelledOut = true;
+				break;
+			}
 
 			const reviewPrompt =
 				round === 1
-					? `Original task:\n${choice.task}\n\nCoder's summary of its changes:\n${coderSummary}\n\nReview the actual repository state now.`
+					? `Original task:\n${run.task}\n\nCoder's summary of its changes:\n${coderSummary}\n\nReview the actual repository state now.`
 					: `Coder's summary of changes made to address your last feedback:\n${coderSummary}\n\nReview the actual repository state now.`;
-			const verdict = await getReviewVerdict(reviewer.session, verdictBox, reviewPrompt);
+			const verdict = await getReviewVerdict(pi, run, reviewPrompt);
+			if (verdict === "cancelled") {
+				cancelledOut = true;
+				break;
+			}
 			rounds.push({ round, coderSummary, approved: verdict.approved, feedback: verdict.feedback });
 
 			if (verdict.approved) {
 				approved = true;
 				ctx.ui.notify(`work-review: reviewer approved after round ${round}.`, "info");
-				break;
+				break roundLoop;
 			}
 
-			if (round === choice.maxRounds) {
-				ctx.ui.notify(`work-review: round cap (${choice.maxRounds}) reached without approval.`, "warning");
+			if (round === run.maxRounds) {
+				ctx.ui.notify(`work-review: round cap (${run.maxRounds}) reached without approval.`, "warning");
 				break;
 			}
 
@@ -528,21 +441,35 @@ async function runLoop(pi: ExtensionAPI, ctx: ExtensionCommandContext, choice: W
 			coderPrompt = `Reviewer feedback — address every point:\n${verdict.feedback}`;
 		}
 	} finally {
-		unsubCoder();
-		unsubReviewer();
-		run.status = approved ? "approved" : stalled ? "stalled" : "round cap reached";
+		run.mode = undefined;
 		ctx.ui.setStatus("work-review", undefined);
-		await Promise.allSettled([coder.session.dispose(), reviewer.session.dispose()]);
+		ctx.ui.setTitle(ctx.cwd.split("/").pop() ?? "omp");
+		if (ctx.sessionManager.getSessionFile() !== run.originalFile) {
+			const { cancelled } = await ctx.switchSession(run.originalFile);
+			if (cancelled) {
+				ctx.ui.notify(
+					`work-review: could not restore your session automatically — resume it with "/resume ${run.originalFile}".`,
+					"warning",
+				);
+			}
+		}
+		run.done = true;
 	}
 
-	const outcome = approved ? "— approved ✅" : stalled ? "— stalled ⚠️" : "— round cap reached ⚠️";
+	const outcome = cancelledOut
+		? "— interrupted 🛑"
+		: approved
+			? "— approved ✅"
+			: stalled
+				? "— stalled ⚠️"
+				: "— round cap reached ⚠️";
 	const header = `## /work-review ${outcome}
-**Task:** ${choice.task}
-**Coder:** ${modelLabel(choice.coderModel, choice.coderThinking)}
-**Reviewer:** ${modelLabel(choice.reviewerModel, choice.reviewerThinking)}
-**Rounds run:** ${rounds.length}/${choice.maxRounds}
-${approved ? "" : "\nChanges from the last round remain in the working tree. Run `git diff` to inspect them; re-run /work-review to continue iterating."}
-Full live/scrollable transcript: run \`/work-review-view\`.`;
+**Task:** ${run.task}
+**Coder:** ${modelLabel(run.coderModel, run.coderThinking)} — session: \`${run.coderFile}\`
+**Reviewer:** ${modelLabel(run.reviewerModel, run.reviewerThinking)} — session: \`${run.reviewerFile}\`
+**Rounds run:** ${rounds.length}/${run.maxRounds}
+${approved || cancelledOut ? "" : "\nChanges from the last round remain in the working tree. Run `git diff` to inspect them; re-run /work-review to continue iterating."}
+Inspect either agent's full native history any time with \`/resume <session>\`, or a quick snapshot with \`/work-review-peek coder\` / \`/work-review-peek reviewer\`.`;
 
 	const roundLog = rounds
 		.map(
@@ -561,62 +488,231 @@ Full live/scrollable transcript: run \`/work-review-view\`.`;
 	);
 }
 
-/**
- * Opens the split viewer for the active run. `ctx.ui.custom` is a documented no-op in
- * non-TUI modes (RPC/print) — it resolves immediately without throwing — so this needs
- * no mode check; there is no `ctx.mode` field on `ExtensionContext` to check against.
- */
-async function openHistoryViewer(ctx: ExtensionCommandContext): Promise<void> {
-	if (!activeRun) {
-		ctx.ui.notify("work-review-view: no work-review run yet — start one with /work-review.", "warning");
-		return;
-	}
-	const run = activeRun;
-	await ctx.ui.custom<undefined>(
-		(tui, theme, _keybindings, done) => new SplitHistoryViewer(ctx, tui, theme, run, done),
-		{ overlay: true },
-	);
-}
-
 export default function workReviewExtension(pi: ExtensionAPI) {
 	pi.setLabel("Work + Review Loop");
 
+	/** The run this extension instance is driving, if any. A new `/work-review` refuses
+	 *  to start while a previous one hasn't reached its `finally` block yet. */
+	let run: RunState | undefined;
+
+	registerVerdictTool(pi, verdict => {
+		if (run) run.verdictBox = verdict;
+	});
+
+	// Re-injects the coder/reviewer role prompt on top of the session's normal base
+	// system prompt for every turn taken while that role is on stage. Additive (appends
+	// to `event.systemPrompt`, doesn't replace it) so tool-use instructions and workspace
+	// info the host already computed stay intact.
+	pi.on("before_agent_start", (event, ctx) => {
+		if (!run?.mode) return;
+		const addendum = run.mode === "coder" ? buildCoderPrompt(ctx.cwd) : buildReviewerPrompt(ctx.cwd);
+		return { systemPrompt: [...event.systemPrompt, addendum] };
+	});
+
+	// Single always-on listener replaces the old per-child `session.subscribe` plumbing:
+	// there's only one real session now, so this sees every turn coder/reviewer ever run.
+	pi.on("agent_end", event => {
+		if (!run?.mode) return;
+		const lastAssistant = [...event.messages].reverse().find(isAssistantMessage);
+		if (lastAssistant) run.lastAssistantText[run.mode] = textOnly(lastAssistant);
+		if (event.willContinue) return;
+		const pending = run.pendingTurn;
+		if (pending) {
+			run.pendingTurn = undefined;
+			pending.resolve();
+		}
+	});
+
 	pi.registerCommand("work-review", {
-		description: "Coder → reviewer loop: isolated contexts, pick model + thinking level for each",
+		description: "Coder → reviewer loop: the main session becomes the coder, then the reviewer, in turn",
 		handler: async (args, ctx) => {
 			if (!ctx.hasUI) {
 				ctx.ui.notify("work-review requires interactive dialogs (TUI or RPC mode).", "error");
+				return;
+			}
+			if (run && !run.done) {
+				ctx.ui.notify("work-review: a run is already in progress. Use /work-review-stop first.", "warning");
+				return;
+			}
+
+			const originalFile = ctx.sessionManager.getSessionFile();
+			if (!originalFile) {
+				ctx.ui.notify(
+					"work-review needs a persisted session to switch back to — this session was started with --no-session.",
+					"error",
+				);
 				return;
 			}
 
 			const choice = await collectChoice(args, ctx);
 			if (!choice) return;
 
+			const coderCreated = await ctx.newSession();
+			if (coderCreated.cancelled) {
+				ctx.ui.notify("work-review: cancelled.", "warning");
+				return;
+			}
+			const coderFile = ctx.sessionManager.getSessionFile();
+			if (!coderFile) {
+				ctx.ui.notify("work-review: failed to create the coder session.", "error");
+				await ctx.switchSession(originalFile);
+				return;
+			}
+
+			const reviewerCreated = await ctx.newSession();
+			if (reviewerCreated.cancelled) {
+				ctx.ui.notify("work-review: cancelled.", "warning");
+				await ctx.switchSession(originalFile);
+				return;
+			}
+			const reviewerFile = ctx.sessionManager.getSessionFile();
+			if (!reviewerFile) {
+				ctx.ui.notify("work-review: failed to create the reviewer session.", "error");
+				await ctx.switchSession(originalFile);
+				return;
+			}
+
+			run = {
+				task: choice.task,
+				coderModel: choice.coderModel,
+				coderThinking: choice.coderThinking,
+				reviewerModel: choice.reviewerModel,
+				reviewerThinking: choice.reviewerThinking,
+				maxRounds: choice.maxRounds,
+				originalFile,
+				coderFile,
+				reviewerFile,
+				mode: undefined,
+				lastAssistantText: {},
+				verdictBox: undefined,
+				pendingTurn: undefined,
+				cancelled: false,
+				gate: new RunGate(),
+				status: "starting…",
+				done: false,
+			};
+
 			ctx.ui.notify(
 				`work-review: starting — coder=${modelLabel(choice.coderModel, choice.coderThinking)}, reviewer=${modelLabel(
 					choice.reviewerModel,
 					choice.reviewerThinking,
-				)}, max ${choice.maxRounds} round(s).`,
+				)}, max ${choice.maxRounds} round(s). This session will become each agent in turn: Esc interrupts whichever ` +
+					"is on stage, /work-review-pause + /work-review-resume freeze the workflow between turns, /work-review-stop ends the run.",
 				"info",
 			);
 
-			// `activeRun` is set synchronously at the top of runLoop, before its first
-			// await, so it is already populated by the time this line finishes — safe to
-			// open the viewer right after. The loop keeps running in the background while
-			// the viewer is open, and after Esc closes it, and after this handler returns.
-			const runPromise = runLoop(pi, ctx, choice).catch(err => {
-				ctx.ui.notify(`work-review failed: ${err instanceof Error ? err.message : String(err)}`, "error");
-			});
-
-			await openHistoryViewer(ctx);
-			await runPromise;
+			await runLoop(pi, ctx, run);
 		},
 	});
 
-	pi.registerCommand("work-review-view", {
-		description: "Reopen the split coder/reviewer transcript viewer for the current or last work-review run",
+	pi.registerCommand("work-review-pause", {
+		description: "Pause the active /work-review run: interrupts whoever is on stage and freezes the workflow",
 		handler: async (_args, ctx) => {
-			await openHistoryViewer(ctx);
+			if (!run || run.done) {
+				ctx.ui.notify("work-review-pause: no active run.", "warning");
+				return;
+			}
+			if (run.gate.paused) {
+				ctx.ui.notify("work-review-pause: already paused.", "warning");
+				return;
+			}
+			run.gate.pause();
+			ctx.abort();
+			// Don't wait on agent_end to notice the abort — resolve the in-flight turn
+			// immediately so the round loop reaches the gate and parks there right away.
+			const pending = run.pendingTurn;
+			if (pending) {
+				run.pendingTurn = undefined;
+				pending.resolve();
+			}
+			ctx.ui.setStatus("work-review", `${run.status} · paused`);
+			ctx.ui.notify(
+				`work-review: paused. You're talking directly to the ${run.mode ?? "active"} session now — type below, or /work-review-resume to continue the workflow.`,
+				"info",
+			);
+		},
+	});
+
+	pi.registerCommand("work-review-resume", {
+		description: "Resume a /work-review run paused with /work-review-pause",
+		handler: async (_args, ctx) => {
+			if (!run || run.done) {
+				ctx.ui.notify("work-review-resume: no active run.", "warning");
+				return;
+			}
+			if (!run.gate.paused) {
+				ctx.ui.notify("work-review-resume: run is not paused.", "warning");
+				return;
+			}
+			run.gate.resume();
+			ctx.ui.setStatus("work-review", run.status);
+			ctx.ui.notify("work-review: resumed.", "info");
+		},
+	});
+
+	pi.registerCommand("work-review-stop", {
+		description: "Interrupt the entire /work-review run and restore your own session",
+		handler: async (_args, ctx) => {
+			if (!run || run.done) {
+				ctx.ui.notify("work-review-stop: no active run.", "warning");
+				return;
+			}
+			run.cancelled = true;
+			const pending = run.pendingTurn;
+			if (pending) {
+				run.pendingTurn = undefined;
+				pending.reject(new Error("work-review: interrupted"));
+			}
+			ctx.abort();
+			run.gate.resume();
+			ctx.ui.notify("work-review: stopping…", "warning");
+		},
+	});
+
+	pi.registerCommand("work-review-peek", {
+		description: "Peek at the coder's or reviewer's latest output without switching onto it (args: coder|reviewer)",
+		handler: async (args, ctx) => {
+			if (!ctx.hasUI) {
+				ctx.ui.notify("work-review-peek requires a TUI.", "error");
+				return;
+			}
+			if (!run) {
+				ctx.ui.notify("work-review-peek: no /work-review run this session.", "warning");
+				return;
+			}
+			const target: WorkReviewMode = args.trim().toLowerCase() === "reviewer" ? "reviewer" : "coder";
+			const text = run.lastAssistantText[target] ?? "(nothing yet)";
+			const file = target === "coder" ? run.coderFile : run.reviewerFile;
+			await ctx.ui.custom<undefined>(
+				(tui, theme, _keybindings, done) => {
+					const scroll = new ScrollView([], { height: Math.max(6, (tui.terminal.rows ?? 24) - 6), scrollbar: "auto" });
+					let lastWidth = 0;
+					return {
+						render(width: number): readonly string[] {
+							if (width !== lastWidth) {
+								lastWidth = width;
+								scroll.setLines(wrapTextWithAnsi(text, Math.max(1, width)));
+							}
+							return [
+								theme.fg("accent", `${target.toUpperCase()} — latest output`),
+								theme.fg("muted", file),
+								"",
+								...scroll.render(width),
+								theme.fg("muted", "↑/↓ scroll · Esc close · /resume this session for full native history"),
+							];
+						},
+						handleInput(data: string): void {
+							if (matchesKey(data, "escape") || data === "q") {
+								done(undefined);
+								return;
+							}
+							scroll.handleScrollKey(data);
+							tui.requestRender();
+						},
+					};
+				},
+				{ overlay: true },
+			);
 		},
 	});
 }
