@@ -561,6 +561,23 @@ Full live/scrollable transcript: run \`/work-review-view\`.`;
 	);
 }
 
+/**
+ * Opens the split viewer for the active run. `ctx.ui.custom` is a documented no-op in
+ * non-TUI modes (RPC/print) — it resolves immediately without throwing — so this needs
+ * no mode check; there is no `ctx.mode` field on `ExtensionContext` to check against.
+ */
+async function openHistoryViewer(ctx: ExtensionCommandContext): Promise<void> {
+	if (!activeRun) {
+		ctx.ui.notify("work-review-view: no work-review run yet — start one with /work-review.", "warning");
+		return;
+	}
+	const run = activeRun;
+	await ctx.ui.custom<undefined>(
+		(tui, theme, _keybindings, done) => new SplitHistoryViewer(ctx, tui, theme, run, done),
+		{ overlay: true },
+	);
+}
+
 export default function workReviewExtension(pi: ExtensionAPI) {
 	pi.setLabel("Work + Review Loop");
 
@@ -579,34 +596,27 @@ export default function workReviewExtension(pi: ExtensionAPI) {
 				`work-review: starting — coder=${modelLabel(choice.coderModel, choice.coderThinking)}, reviewer=${modelLabel(
 					choice.reviewerModel,
 					choice.reviewerThinking,
-				)}, max ${choice.maxRounds} round(s). Run /work-review-view any time to watch.`,
+				)}, max ${choice.maxRounds} round(s).`,
 				"info",
 			);
 
-			try {
-				await runLoop(pi, ctx, choice);
-			} catch (err) {
+			// `activeRun` is set synchronously at the top of runLoop, before its first
+			// await, so it is already populated by the time this line finishes — safe to
+			// open the viewer right after. The loop keeps running in the background while
+			// the viewer is open, and after Esc closes it, and after this handler returns.
+			const runPromise = runLoop(pi, ctx, choice).catch(err => {
 				ctx.ui.notify(`work-review failed: ${err instanceof Error ? err.message : String(err)}`, "error");
-			}
+			});
+
+			await openHistoryViewer(ctx);
+			await runPromise;
 		},
 	});
 
 	pi.registerCommand("work-review-view", {
-		description: "Open the split coder/reviewer transcript viewer for the current or last work-review run",
+		description: "Reopen the split coder/reviewer transcript viewer for the current or last work-review run",
 		handler: async (_args, ctx) => {
-			if (!activeRun) {
-				ctx.ui.notify("work-review-view: no work-review run yet — start one with /work-review.", "warning");
-				return;
-			}
-			if (ctx.mode !== "tui") {
-				ctx.ui.notify("work-review-view: the split viewer is only available in the interactive TUI.", "error");
-				return;
-			}
-			const run = activeRun;
-			await ctx.ui.custom<undefined>(
-				(tui, theme, _keybindings, done) => new SplitHistoryViewer(ctx, tui, theme, run, done),
-				{ overlay: true },
-			);
+			await openHistoryViewer(ctx);
 		},
 	});
 }
