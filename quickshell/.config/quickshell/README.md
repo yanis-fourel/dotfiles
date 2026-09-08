@@ -8,8 +8,11 @@ A small horizontal Quickshell replacement for the previous Waybar setup. It prov
 - iwd Wi-Fi status with click-to-toggle SSID and a generic default-route fallback
 - a graphical system-resource panel with usage bars, CPU/load/temperature, RAM/swap, and top-process cards
 - a graphical storage panel with filesystem usage cards and a block-device list
+- OpenAI Codex subscription usage, reset countdowns, plan status, and optional credits
 - temperature and battery status
 - StatusNotifier system tray with application context menus
+
+The Codex widget reuses the `openai-codex` OAuth session in `~/.pi/agent/auth.json`. Its collector sends the access token only to OpenAI's HTTPS usage endpoint and never prints credentials, account IDs, or email addresses.
 
 ## Try it
 

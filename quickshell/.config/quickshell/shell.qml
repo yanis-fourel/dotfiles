@@ -13,6 +13,27 @@ ShellRoot {
     readonly property color background: "#0a0e18"
     readonly property color accent: "#ff6b9d"
     property bool showWifiName: false
+    readonly property var codexData: parseJson(codexUsage.output)
+    readonly property real codexPercent: highestCodexPercent(codexData)
+
+    function parseJson(value) {
+        try { return JSON.parse(value || "{}") }
+        catch (_) { return {} }
+    }
+
+    function highestCodexPercent(data) {
+        const limits = data && data.limits ? data.limits : []
+        let highest = -1
+        for (let i = 0; i < limits.length; i++)
+            highest = Math.max(highest, Number(limits[i].usedPercent || 0))
+        return highest
+    }
+
+    function codexLabel(data) {
+        if (!codexUsage.output.length) return "󱚣 …"
+        if (!data.ok) return "󱚣 !"
+        return "󱚣 " + (codexPercent >= 0 ? Math.round(codexPercent) + "%" : "—")
+    }
 
     function percentage(value) {
         const match = String(value).match(/([0-9]+)%/)
@@ -84,6 +105,12 @@ ShellRoot {
         id: battery
         interval: 10000
         command: ["bash", "-lc", "b=$(find /sys/class/power_supply -maxdepth 1 -name 'BAT*' -print -quit); [ -n \"$b\" ] || exit 0; p=$(cat \"$b/capacity\"); s=$(cat \"$b/status\"); case \"$s\" in Charging|Full) i=󰂄;; *) i=󰂎;; esac; printf '%s %s%%' \"$i\" \"$p\""]
+    }
+
+    StatusCommand {
+        id: codexUsage
+        interval: 300000
+        command: ["python3", Quickshell.shellDir + "/scripts/codex_usage.py"]
     }
 
     Variants {
@@ -169,6 +196,7 @@ ShellRoot {
                             onClicked: {
                                 memoryPopup.visible = false
                                 diskPopup.visible = false
+                                aiPopup.visible = false
                                 calendarPopup.visible = !calendarPopup.visible
                             }
                         }
@@ -179,6 +207,22 @@ ShellRoot {
                         anchors.rightMargin: 5
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 5
+
+                        StatusPill {
+                            id: aiPill
+                            text: root.codexLabel(root.codexData)
+                            tooltip: root.codexData.ok ? "OpenAI Codex · " + (root.codexData.plan || "Subscription") : (root.codexData.error || "Loading Codex usage")
+                            foreground: root.foreground
+                            clickable: true
+                            warning: !root.codexData.ok || root.codexPercent >= 75
+                            critical: root.codexData.ok === true && root.codexPercent >= 90
+                            onClicked: {
+                                calendarPopup.visible = false
+                                memoryPopup.visible = false
+                                diskPopup.visible = false
+                                aiPopup.visible = !aiPopup.visible
+                            }
+                        }
 
                         StatusPill {
                             text: audio.output
@@ -209,6 +253,7 @@ ShellRoot {
                             onClicked: {
                                 calendarPopup.visible = false
                                 diskPopup.visible = false
+                                aiPopup.visible = false
                                 memoryPopup.visible = !memoryPopup.visible
                             }
                         }
@@ -221,6 +266,7 @@ ShellRoot {
                             onClicked: {
                                 calendarPopup.visible = false
                                 memoryPopup.visible = false
+                                aiPopup.visible = false
                                 diskPopup.visible = !diskPopup.visible
                             }
                             warning: root.percentage(disk.output) >= 85
@@ -248,6 +294,14 @@ ShellRoot {
                     CalendarPopup {
                         id: calendarPopup
                         anchorItem: clockButton
+                    }
+
+                    AiUsagePopup {
+                        id: aiPopup
+                        anchorItem: aiPill
+                        dataText: codexUsage.output
+                        onRefreshRequested: codexUsage.refresh()
+                        onVisibleChanged: if (visible) codexUsage.refresh()
                     }
 
                     ResourcePopup {
