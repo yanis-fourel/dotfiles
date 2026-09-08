@@ -7,6 +7,7 @@ QtObject {
 
     property var command: []
     property int interval: 5000
+    property bool enabled: true
     property string output: ""
 
     function refresh() {
@@ -26,7 +27,7 @@ QtObject {
     property Timer timer: Timer {
         interval: root.interval
         repeat: true
-        running: true
+        running: root.enabled
         triggeredOnStart: true
         onTriggered: root.refresh()
     }

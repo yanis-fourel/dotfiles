@@ -118,13 +118,13 @@ ShellRoot {
     StatusCommand {
         id: submap
         interval: 750
-        command: ["bash", "-lc", "s=$(hyprctl submap 2>/dev/null); case \"$s\" in ''|default|reset) ;; *) printf '󰌌 %s' \"$s\";; esac"]
+        command: ["bash", "-c", "s=$(hyprctl submap 2>/dev/null); case \"$s\" in ''|default|reset) ;; *) printf '󰌌 %s' \"$s\";; esac"]
     }
 
     StatusCommand {
         id: audio
         interval: 2000
-        command: ["bash", "-lc", "v=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null) || exit; p=$(awk -v v=\"$(printf '%s' \"$v\" | awk '{print $2}')\" 'BEGIN { printf \"%.0f\", v*100 }'); if printf '%s' \"$v\" | grep -q MUTED; then printf '󰖁 %s%%' \"$p\"; else printf '󰕾 %s%%' \"$p\"; fi"]
+        command: ["bash", "-c", "v=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null) || exit; p=$(awk -v v=\"$(printf '%s' \"$v\" | awk '{print $2}')\" 'BEGIN { printf \"%.0f\", v*100 }'); if printf '%s' \"$v\" | grep -q MUTED; then printf '󰖁 %s%%' \"$p\"; else printf '󰕾 %s%%' \"$p\"; fi"]
     }
 
     StatusCommand {
@@ -132,49 +132,37 @@ ShellRoot {
         interval: 5000
         // This machine uses iwd directly, but retain a generic default-route
         // fallback for wired links and other network managers.
-        command: ["bash", "-lc", "wifi=$(iw dev 2>/dev/null | awk '$1==\"Interface\" {d=$2} $1==\"ssid\" {print d; exit}'); if [ -n \"$wifi\" ]; then sig=$(awk -v d=\"$wifi\" '$1 ~ (\"^\" d \":\") {printf \"%.0f\", $3*100/70}' /proc/net/wireless); [ \"${sig:-0}\" -gt 100 ] && sig=100; printf '󰖩 %s%%' \"${sig:-0}\"; else dev=$(ip route 2>/dev/null | awk '/^default/ {print $5; exit}'); if [ -n \"$dev\" ]; then printf '󰈀 %s' \"$dev\"; else printf '󰖪 offline'; fi; fi"]
+        command: ["bash", "-c", "wifi=$(iw dev 2>/dev/null | awk '$1==\"Interface\" {d=$2} $1==\"ssid\" {print d; exit}'); if [ -n \"$wifi\" ]; then sig=$(awk -v d=\"$wifi\" '$1 ~ (\"^\" d \":\") {printf \"%.0f\", $3*100/70}' /proc/net/wireless); [ \"${sig:-0}\" -gt 100 ] && sig=100; printf '󰖩 %s%%' \"${sig:-0}\"; else dev=$(ip route 2>/dev/null | awk '/^default/ {print $5; exit}'); if [ -n \"$dev\" ]; then printf '󰈀 %s' \"$dev\"; else printf '󰖪 offline'; fi; fi"]
     }
 
     StatusCommand {
         id: networkName
         interval: 5000
-        command: ["bash", "-lc", "iw dev 2>/dev/null | awk '$1==\"ssid\" {$1=\"\"; sub(/^ /,\"\"); print; exit}'"]
+        command: ["bash", "-c", "iw dev 2>/dev/null | awk '$1==\"ssid\" {$1=\"\"; sub(/^ /,\"\"); print; exit}'"]
     }
 
     StatusCommand {
         id: memory
         interval: 5000
-        command: ["bash", "-lc", "free -b | awk '/^Mem:/ {printf \"󰍛 %.1fG\", $3/1073741824}'"]
-    }
-
-    StatusCommand {
-        id: memoryDetails
-        interval: 4000
-        command: ["python3", Quickshell.shellDir + "/scripts/system_stats.py"]
+        command: ["bash", "-c", "free -b | awk '/^Mem:/ {printf \"󰍛 %.1fG\", $3/1073741824}'"]
     }
 
     StatusCommand {
         id: disk
         interval: 30000
-        command: ["bash", "-lc", "df -P \"$HOME\" | awk 'NR==2 {printf \"󰋊 %s\", $5}'"]
-    }
-
-    StatusCommand {
-        id: diskDetails
-        interval: 15000
-        command: ["python3", Quickshell.shellDir + "/scripts/storage_stats.py"]
+        command: ["bash", "-c", "df -P \"$HOME\" | awk 'NR==2 {printf \"󰋊 %s\", $5}'"]
     }
 
     StatusCommand {
         id: temperature
         interval: 5000
-        command: ["bash", "-lc", "sensors 2>/dev/null | awk '/Package id 0:/ {v=$4} /^Tctl:|^Tdie:/ {v=$2} v != \"\" {gsub(/[+°C]/,\"\",v); printf \"󰈸 %.0f°\", v; exit}'"]
+        command: ["python3", Quickshell.shellDir + "/scripts/cpu_temperature.py"]
     }
 
     StatusCommand {
         id: battery
         interval: 10000
-        command: ["bash", "-lc", "b=$(find /sys/class/power_supply -maxdepth 1 -name 'BAT*' -print -quit); [ -n \"$b\" ] || exit 0; p=$(cat \"$b/capacity\"); s=$(cat \"$b/status\"); case \"$s\" in Charging|Full) i=󰂄;; *) i=󰂎;; esac; printf '%s %s%%' \"$i\" \"$p\""]
+        command: ["bash", "-c", "b=$(find /sys/class/power_supply -maxdepth 1 -name 'BAT*' -print -quit); [ -n \"$b\" ] || exit 0; p=$(cat \"$b/capacity\"); s=$(cat \"$b/status\"); case \"$s\" in Charging|Full) i=󰂄;; *) i=󰂎;; esac; printf '%s %s%%' \"$i\" \"$p\""]
     }
 
     StatusCommand {
@@ -222,6 +210,19 @@ ShellRoot {
                             }
                         }
                     }
+                }
+
+                StatusCommand {
+                    id: memoryDetails
+                    enabled: memoryPopup.visible
+                    interval: 4000
+                    command: ["python3", Quickshell.shellDir + "/scripts/system_stats.py"]
+                }
+                StatusCommand {
+                    id: diskDetails
+                    enabled: diskPopup.visible
+                    interval: 15000
+                    command: ["python3", Quickshell.shellDir + "/scripts/storage_stats.py"]
                 }
 
                 screen: modelData

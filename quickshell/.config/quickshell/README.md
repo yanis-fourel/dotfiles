@@ -28,7 +28,9 @@ Once it is working, replace the existing Waybar autostart command in your Hyprla
 exec-once = qs -p ~/.config/quickshell
 ```
 
-The existing Waybar and Hyprland files were intentionally left unchanged. The bar uses `hyprctl`, `wpctl`, `iw`, `free`, `df`, `sensors`, Python 3, `busctl`, `bluetoothctl`, `kitty`, `bluetui`, and `pavucontrol`.
+Hyprland autostart now launches Quickshell instead of Waybar. The bar uses `hyprctl`, `wpctl`, `iw`, `free`, `df`, Python 3, `busctl`, `bluetoothctl`, `kitty`, `bluetui`, `impala`, and `pavucontrol`.
+
+Resource and storage detail collectors poll only while their respective popups are visible (4s/15s). Status commands use non-login shells to avoid repeatedly executing `/etc/profile.d` hooks. CPU temperature comes directly from CPU hwmon sysfs files, without querying unrelated sensors.
 
 ## Desktop controls
 

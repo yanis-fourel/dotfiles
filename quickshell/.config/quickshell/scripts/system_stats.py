@@ -3,7 +3,7 @@
 
 import json
 import os
-import re
+from cpu_temperature import cpu_temperature
 import subprocess
 import time
 
@@ -46,15 +46,6 @@ def cpu_model():
         if line.startswith("model name"):
             return line.split(":", 1)[1].strip()
     return "Unknown CPU"
-
-
-def cpu_temperature():
-    try:
-        output = subprocess.check_output(["sensors"], text=True, stderr=subprocess.DEVNULL)
-        match = re.search(r"(?:Package id 0|Tctl|Tdie):\s*\+?([0-9.]+)°C", output)
-        return float(match.group(1)) if match else None
-    except (OSError, subprocess.SubprocessError):
-        return None
 
 
 total1, idle1 = cpu_times()
