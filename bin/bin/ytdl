@@ -16,6 +16,6 @@ URL=$1
 FILENAME=$2
 
 # Download and convert to MP3
-yt-dlp -x --audio-format mp3 --output "$FILENAME.%(ext)s" "$URL"
+yt-dlp --cookies-from-browser brave -x --audio-format mp3 --output "$FILENAME.%(ext)s" "$URL"
 
 echo "Download complete: $FILENAME.mp3"
