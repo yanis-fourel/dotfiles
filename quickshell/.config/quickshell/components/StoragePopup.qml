@@ -9,7 +9,7 @@ PopupWindow {
     readonly property var stats: parseData(dataText)
 
     implicitWidth: 820
-    implicitHeight: 520
+    implicitHeight: 570
     color: "transparent"
     grabFocus: true
 

@@ -4,6 +4,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Io
 import qs.components
 
 ShellRoot {
@@ -12,27 +13,96 @@ ShellRoot {
     readonly property color foreground: "#f0e6eb"
     readonly property color background: "#0a0e18"
     readonly property color accent: "#ff6b9d"
-    property bool showWifiName: false
+    readonly property var powerData: parseJson(powerStatus.output)
+    readonly property var bluetoothData: parseJson(bluetoothStatus.output)
+    readonly property var updateData: parseJson(updateStatus.output)
+    property string profileMessage: ""
+
+    Process {
+        id: profileChange
+        onExited: (exitCode, exitStatus) => powerStatus.refresh()
+        stdout: StdioCollector {
+            onStreamFinished: root.profileMessage = root.parseJson(text).detail || ""
+        }
+    }
+
+    StatusCommand {
+        id: powerStatus
+        interval: 5000
+        command: ["python3", Quickshell.shellDir + "/scripts/desktop_status.py", "power"]
+    }
+    StatusCommand {
+        id: bluetoothStatus
+        interval: 10000
+        command: ["python3", Quickshell.shellDir + "/scripts/desktop_status.py", "bluetooth"]
+    }
+    StatusCommand {
+        id: updateStatus
+        interval: 3600000
+        command: ["python3", Quickshell.shellDir + "/scripts/desktop_status.py", "updates"]
+    }
     readonly property var codexData: parseJson(codexUsage.output)
-    readonly property real codexPercent: highestCodexPercent(codexData)
+    readonly property var codexLimit: selectedCodexLimit(codexData)
+    readonly property real codexPercent: codexLimit ? Number(codexLimit.usedPercent || 0) : -1
+    property double budgetNow: Date.now() / 1000
+    Timer {
+        interval: 60000
+        running: true
+        repeat: true
+        onTriggered: root.budgetNow = Date.now() / 1000
+    }
 
     function parseJson(value) {
         try { return JSON.parse(value || "{}") }
         catch (_) { return {} }
     }
 
-    function highestCodexPercent(data) {
+    function selectedCodexLimit(data) {
         const limits = data && data.limits ? data.limits : []
-        let highest = -1
-        for (let i = 0; i < limits.length; i++)
-            highest = Math.max(highest, Number(limits[i].usedPercent || 0))
-        return highest
+        let selected = null
+        for (const limit of limits) {
+            if (!selected || Number(limit.usedPercent || 0) > Number(selected.usedPercent || 0))
+                selected = limit
+        }
+        return selected
+    }
+
+    function budgetProgress(limit, now) {
+        const span = Number(limit.windowSeconds)
+        const reset = Number(limit.resetAt)
+        if (!(span > 0) || !(reset > 0)) return null
+        const elapsed = Math.max(0, Math.min(span, now - (reset - span)))
+        const unit = span >= 86400 ? 86400 : span >= 3600 ? 3600 : 60
+        const suffix = unit === 86400 ? "d" : unit === 3600 ? "h" : "m"
+        const compact = value => String(Math.round(value * 10) / 10)
+        return { period: compact(elapsed / unit) + "/" + compact(span / unit) + suffix,
+                 reference: Math.round(elapsed / span * 100) }
     }
 
     function codexLabel(data) {
         if (!codexUsage.output.length) return "󱚣 …"
         if (!data.ok) return "󱚣 !"
-        return "󱚣 " + (codexPercent >= 0 ? Math.round(codexPercent) + "%" : "—")
+        const limit = codexLimit
+        if (!limit) return "󱚣 —"
+        const group = limit.group === "Codex" ? "" : (limit.group.indexOf("Spark") >= 0 ? "Spark " : limit.group + " ")
+        const usage = "󱚣 " + group + Math.round(codexPercent) + "%"
+        const progress = budgetProgress(limit, budgetNow)
+        return usage + (progress ? " · 󰥔 " + progress.period + " · 󰓾 " + progress.reference + "%" : " · 󰥔 —")
+    }
+
+    function codexTooltip() {
+        if (!codexData.ok) return codexData.error || "Loading Codex usage"
+        const limit = codexLimit
+        if (!limit) return "No usage windows reported"
+        let text = limit.group + " · " + limit.label + "\nUsage · elapsed/total · linear budget reference"
+        const progress = budgetProgress(limit, budgetNow)
+        if (progress) {
+            const format = seconds => Qt.formatDateTime(new Date(seconds * 1000), "MMM d HH:mm")
+            text += "\n" + format(limit.resetAt - limit.windowSeconds) + " → " + format(limit.resetAt)
+            text += "\n" + Math.abs(Math.round(codexPercent) - progress.reference) + " percentage points "
+                  + (codexPercent > progress.reference ? "over" : "under") + " linear budget"
+        }
+        return text
     }
 
     function percentage(value) {
@@ -121,6 +191,39 @@ ShellRoot {
                 id: barWindow
                 required property var modelData
 
+                function togglePopup(popup) {
+                    const opening = !popup.visible
+                    for (const item of [calendarPopup, aiPopup, memoryPopup, diskPopup, powerPopup, commandPopup, updatesPopup])
+                        item.visible = false
+                    popup.visible = opening
+                }
+
+                property string launchTool: ""
+                property string launchUrl: ""
+                property var launchAnchor: null
+                function launchApp(tool, anchor, command, url) {
+                    if (appLauncher.running) return
+                    launchTool = tool
+                    launchAnchor = anchor
+                    launchUrl = url || ""
+                    appLauncher.command = ["python3", Quickshell.shellDir + "/scripts/floating_tool.py", tool, command || "", launchUrl]
+                    appLauncher.running = true
+                }
+                Process {
+                    id: appLauncher
+                    stdout: StdioCollector {
+                        onStreamFinished: {
+                            const result = root.parseJson(text)
+                            if (result.ok) commandPopup.visible = false
+                            else {
+                                commandPopup.commandText = result.command || commandPopup.commandText
+                                commandPopup.message = result.error || "Unable to launch application."
+                                if (!commandPopup.visible) barWindow.togglePopup(commandPopup)
+                            }
+                        }
+                    }
+                }
+
                 screen: modelData
                 implicitHeight: 27
                 color: "transparent"
@@ -145,8 +248,38 @@ ShellRoot {
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 7
 
+                        StatusPill {
+                            id: batteryPill
+                            text: (root.powerData.emoji || "") + " " + battery.output
+                            tooltip: "Power profile: " + (root.powerData.profile || "unavailable")
+                            clickable: true
+                            onClicked: barWindow.togglePopup(powerPopup)
+                            foreground: root.foreground
+                            warning: root.percentage(battery.output) >= 0 && root.percentage(battery.output) <= 50
+                            critical: root.percentage(battery.output) >= 0 && root.percentage(battery.output) <= 25
+                        }
+                        StatusPill {
+                            text: temperature.output
+                            foreground: root.foreground
+                            critical: root.temperatureValue(temperature.output) >= 80
+                        }
+                        StatusPill {
+                            id: diskPill
+                            text: disk.output
+                            foreground: root.foreground
+                            clickable: true
+                            onClicked: barWindow.togglePopup(diskPopup)
+                            warning: root.percentage(disk.output) >= 85
+                            critical: root.percentage(disk.output) >= 95
+                        }
+                        StatusPill {
+                            id: memoryPill
+                            text: memory.output
+                            foreground: root.foreground
+                            clickable: true
+                            onClicked: barWindow.togglePopup(memoryPopup)
+                        }
                         Workspaces { }
-
                         StatusPill {
                             text: submap.output
                             foreground: root.foreground
@@ -194,10 +327,7 @@ ShellRoot {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                memoryPopup.visible = false
-                                diskPopup.visible = false
-                                aiPopup.visible = false
-                                calendarPopup.visible = !calendarPopup.visible
+                                barWindow.togglePopup(calendarPopup)
                             }
                         }
                     }
@@ -211,24 +341,22 @@ ShellRoot {
                         StatusPill {
                             id: aiPill
                             text: root.codexLabel(root.codexData)
-                            tooltip: root.codexData.ok ? "OpenAI Codex · " + (root.codexData.plan || "Subscription") : (root.codexData.error || "Loading Codex usage")
+                            tooltip: root.codexTooltip()
                             foreground: root.foreground
                             clickable: true
                             warning: !root.codexData.ok || root.codexPercent >= 75
                             critical: root.codexData.ok === true && root.codexPercent >= 90
                             onClicked: {
-                                calendarPopup.visible = false
-                                memoryPopup.visible = false
-                                diskPopup.visible = false
-                                aiPopup.visible = !aiPopup.visible
+                                barWindow.togglePopup(aiPopup)
                             }
                         }
 
                         StatusPill {
+                            id: audioPill
                             text: audio.output
                             foreground: root.foreground
                             clickable: true
-                            onClicked: Quickshell.execDetached(["pavucontrol"])
+                            onClicked: barWindow.launchApp("audio", audioPill, "", "")
                             onWheel: wheel => {
                                 const direction = wheel.angleDelta.y > 0 ? "5%+" : "5%-"
                                 Quickshell.execDetached(["wpctl", "set-volume", "-l", "1.5", "@DEFAULT_AUDIO_SINK@", direction])
@@ -237,57 +365,66 @@ ShellRoot {
                         }
 
                         StatusPill {
-                            text: root.showWifiName && networkName.output.length > 0
-                                  ? "󰖩 " + networkName.output : network.output
+                            id: wifiPill
+                            text: network.output
+                            tooltip: networkName.output || "Wi-Fi · open impala"
                             foreground: root.foreground
                             critical: network.output.indexOf("offline") >= 0
-                            clickable: networkName.output.length > 0
-                            onClicked: root.showWifiName = !root.showWifiName
-                        }
-
-                        StatusPill {
-                            id: memoryPill
-                            text: memory.output
-                            foreground: root.foreground
                             clickable: true
-                            onClicked: {
-                                calendarPopup.visible = false
-                                diskPopup.visible = false
-                                aiPopup.visible = false
-                                memoryPopup.visible = !memoryPopup.visible
-                            }
+                            onClicked: barWindow.launchApp("wifi", wifiPill, "", "")
                         }
 
                         StatusPill {
-                            id: diskPill
-                            text: disk.output
-                            foreground: root.foreground
+                            id: bluetoothPill
+                            text: root.bluetoothData.label || "󰂯 …"
+                            tooltip: root.bluetoothData.detail || "Bluetooth"
                             clickable: true
-                            onClicked: {
-                                calendarPopup.visible = false
-                                memoryPopup.visible = false
-                                aiPopup.visible = false
-                                diskPopup.visible = !diskPopup.visible
-                            }
-                            warning: root.percentage(disk.output) >= 85
-                            critical: root.percentage(disk.output) >= 95
+                            onClicked: barWindow.launchApp("bluetooth", bluetoothPill, "", "")
                         }
-
                         StatusPill {
-                            text: temperature.output
-                            foreground: root.foreground
-                            critical: root.temperatureValue(temperature.output) >= 80
+                            id: updatesPill
+                            text: root.updateData.label || "󰚰 …"
+                            tooltip: "Days since last recorded full upgrade · click for Arch news"
+                            clickable: true
+                            onClicked: barWindow.togglePopup(updatesPopup)
                         }
-
-                        StatusPill {
-                            text: battery.output
-                            foreground: root.foreground
-                            warning: root.percentage(battery.output) >= 0 && root.percentage(battery.output) <= 50
-                            critical: root.percentage(battery.output) >= 0 && root.percentage(battery.output) <= 25
-                        }
-
                         Tray {
                             barWindow: barWindow
+                        }
+                    }
+
+                    ControlsPopup {
+                        id: powerPopup
+                        anchorItem: batteryPill
+                        heading: "Power · " + (root.powerData.profile || "unavailable")
+                        detail: (root.powerData.detail || "Loading…") + (root.profileMessage ? "\n\n" + root.profileMessage : "")
+                        actions: (root.powerData.profiles || []).map(p => ({label: (p === root.powerData.profile ? "✓ " : "") + p, action: p}))
+                        onVisibleChanged: if (visible) { root.profileMessage = ""; powerStatus.refresh() }
+                        onActionTriggered: action => {
+                            if (profileChange.running) return
+                            root.profileMessage = "Applying…"
+                            profileChange.command = ["python3", Quickshell.shellDir + "/scripts/desktop_status.py", "set-profile", action]
+                            profileChange.running = true
+                        }
+                    }
+                    CommandPopup {
+                        id: commandPopup
+                        anchorItem: barWindow.launchAnchor || bluetoothPill
+                        tool: barWindow.launchTool
+                        busy: appLauncher.running
+                        onSubmitted: command => barWindow.launchApp(barWindow.launchTool, barWindow.launchAnchor, command, barWindow.launchUrl)
+                    }
+                    ControlsPopup {
+                        id: updatesPopup
+                        anchorItem: updatesPill
+                        heading: "Arch updates"
+                        detail: root.updateData.detail || "Checking upgrade history and official Arch news…"
+                        toolbarActions: [{label: updateStatus.process.running ? "Checking…" : "↻ Refresh", action: "refresh", primary: true}, {label: "Arch news ↗", url: "https://archlinux.org/news/"}]
+                        actions: root.updateData.links || []
+                        onVisibleChanged: if (visible) updateStatus.refresh()
+                        onActionTriggered: action => {
+                            if (action === "refresh") updateStatus.refresh()
+                            else barWindow.launchApp("browser", updatesPill, "", action)
                         }
                     }
 

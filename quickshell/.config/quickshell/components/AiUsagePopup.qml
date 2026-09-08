@@ -12,7 +12,7 @@ PopupWindow {
     signal refreshRequested()
 
     implicitWidth: 470
-    implicitHeight: 500
+    implicitHeight: 550
     color: "transparent"
     grabFocus: true
 

@@ -5,7 +5,7 @@ import Quickshell.Hyprland
 
 RowLayout {
     id: root
-    spacing: 3
+    spacing: 2
 
     function workspace(id) {
         const values = Hyprland.workspaces.values
@@ -17,7 +17,7 @@ RowLayout {
     }
 
     Repeater {
-        // Keep the usual first five available and reveal 6–10 when occupied.
+        // Only occupied workspaces and the current workspace need bar space.
         model: 10
 
         Rectangle {
@@ -29,8 +29,8 @@ RowLayout {
             readonly property bool occupied: workspaceObject !== null
                                                 && workspaceObject.toplevels.values.length > 0
 
-            visible: workspaceId <= 5 || occupied || focused
-            implicitWidth: visible ? 21 : 0
+            visible: occupied || focused
+            implicitWidth: visible ? 14 : 0
             implicitHeight: 21
             radius: 6
             color: focused ? "#ff6b9d" : (mouseArea.containsMouse ? "#2a2230" : "transparent")
