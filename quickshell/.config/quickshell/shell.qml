@@ -1,3 +1,6 @@
+//@ pragma UseQApplication
+//@ pragma IconTheme Adwaita
+
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
@@ -9,6 +12,7 @@ ShellRoot {
     readonly property color foreground: "#f0e6eb"
     readonly property color background: "#0a0e18"
     readonly property color accent: "#ff6b9d"
+    property bool showWifiName: false
 
     function percentage(value) {
         const match = String(value).match(/([0-9]+)%/)
@@ -41,6 +45,12 @@ ShellRoot {
     }
 
     StatusCommand {
+        id: networkName
+        interval: 5000
+        command: ["bash", "-lc", "iw dev 2>/dev/null | awk '$1==\"ssid\" {$1=\"\"; sub(/^ /,\"\"); print; exit}'"]
+    }
+
+    StatusCommand {
         id: memory
         interval: 5000
         command: ["bash", "-lc", "free -b | awk '/^Mem:/ {printf \"󰍛 %.1fG\", $3/1073741824}'"]
@@ -48,8 +58,8 @@ ShellRoot {
 
     StatusCommand {
         id: memoryDetails
-        interval: 5000
-        command: ["bash", "-lc", "free -h | awk 'NR==1 {printf \"%-9s %8s %8s %8s %8s\\n\",\"\",$2,$3,$4,$7} NR==2 {printf \"%-9s %8s %8s %8s %8s  (%d%% used)\\n\",\"Memory\",$2,$3,$4,$7,$3/$2*100} NR==3 {p=$2 ? $3/$2*100 : 0; printf \"%-9s %8s %8s %8s           (%d%% used)\\n\",\"Swap\",$2,$3,$4,p}'; printf '\\nLargest processes by resident memory:\\n'; ps -eo comm,rss --sort=-rss | awk 'NR==1 {printf \"%-24s %s\\n\",$1,\"MEM\"} NR>1 && NR<9 {printf \"%-24s %.1f MiB\\n\",$1,$2/1024}'"]
+        interval: 4000
+        command: ["python3", Quickshell.shellDir + "/scripts/system_stats.py"]
     }
 
     StatusCommand {
@@ -61,7 +71,7 @@ ShellRoot {
     StatusCommand {
         id: diskDetails
         interval: 15000
-        command: ["bash", "-lc", "printf 'Mounted filesystems:\\n'; df -hT -x tmpfs -x devtmpfs | awk 'NR==1 {printf \"%-15s %-7s %7s %7s %7s %5s  %s\\n\",$1,$2,$3,$4,$5,$6,$7} NR>1 {printf \"%-15s %-7s %7s %7s %7s %5s  %s\\n\",$1,$2,$3,$4,$5,$6,$7}'; printf '\\nBlock devices:\\n'; lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINTS --noheadings"]
+        command: ["python3", Quickshell.shellDir + "/scripts/storage_stats.py"]
     }
 
     StatusCommand {
@@ -183,9 +193,12 @@ ShellRoot {
                         }
 
                         StatusPill {
-                            text: network.output
+                            text: root.showWifiName && networkName.output.length > 0
+                                  ? "󰖩 " + networkName.output : network.output
                             foreground: root.foreground
                             critical: network.output.indexOf("offline") >= 0
+                            clickable: networkName.output.length > 0
+                            onClicked: root.showWifiName = !root.showWifiName
                         }
 
                         StatusPill {
@@ -237,19 +250,17 @@ ShellRoot {
                         anchorItem: clockButton
                     }
 
-                    DetailPopup {
+                    ResourcePopup {
                         id: memoryPopup
                         anchorItem: memoryPill
-                        title: "メモリ使用状況"
-                        detailText: memoryDetails.output
+                        dataText: memoryDetails.output
                         onVisibleChanged: if (visible) memoryDetails.refresh()
                     }
 
-                    DetailPopup {
+                    StoragePopup {
                         id: diskPopup
                         anchorItem: diskPill
-                        title: "ストレージ使用状況"
-                        detailText: diskDetails.output
+                        dataText: diskDetails.output
                         onVisibleChanged: if (visible) diskDetails.refresh()
                     }
                 }

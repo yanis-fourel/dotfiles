@@ -10,8 +10,9 @@ PopupWindow {
     property int viewMonth: today.getMonth()
 
     readonly property var monthNames: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"]
-    readonly property var weekdays: ["日", "月", "火", "水", "木", "金", "土"]
-    readonly property int firstWeekday: new Date(viewYear, viewMonth, 1).getDay()
+    readonly property var weekdays: ["月", "火", "水", "木", "金", "土", "日"]
+    // JavaScript uses Sunday=0; convert it to a Monday-first index.
+    readonly property int firstWeekday: (new Date(viewYear, viewMonth, 1).getDay() + 6) % 7
     readonly property int daysInMonth: new Date(viewYear, viewMonth + 1, 0).getDate()
 
     implicitWidth: 294
