@@ -123,6 +123,8 @@ export EDITOR=nvim
 export VISUAL=nvim
 export SUDO_EDITOR="nvim --noplugin"
 path=($HOME/bin/ $path)
+path=($HOME/.bun/bin $path)
+
 
 secrets_dir="${HOME}/.config/secrets"
 if [ -d "${secrets_dir}" ]; then
@@ -170,7 +172,10 @@ fi
 
 source '/usr/share/zsh-antidote/antidote.zsh'
 antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
-eval "$(starship init zsh)"
+
+if [[ $TERM != "dumb" ]]; then
+  eval "$(starship init zsh)"
+fi
 
 eval "$(direnv hook zsh)"
 
