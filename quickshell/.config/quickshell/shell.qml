@@ -87,14 +87,14 @@ ShellRoot {
         const group = limit.group === "Codex" ? "" : (limit.group.indexOf("Spark") >= 0 ? "Spark " : limit.group + " ")
         const usage = "󱚣 " + group + Math.round(codexPercent) + "%"
         const progress = budgetProgress(limit, budgetNow)
-        return usage + (progress ? " · 󰥔 " + progress.period + " · 󰓾 " + progress.reference + "%" : " · 󰥔 —")
+        return usage + (progress ? " · 󰓾 " + progress.reference + "% · 󰥔 " + progress.period : " · 󰥔 —")
     }
 
     function codexTooltip() {
         if (!codexData.ok) return codexData.error || "Loading Codex usage"
         const limit = codexLimit
         if (!limit) return "No usage windows reported"
-        let text = limit.group + " · " + limit.label + "\nUsage · elapsed/total · linear budget reference"
+        let text = limit.group + " · " + limit.label + "\nUsage · linear budget reference · elapsed/total"
         const progress = budgetProgress(limit, budgetNow)
         if (progress) {
             const format = seconds => Qt.formatDateTime(new Date(seconds * 1000), "MMM d HH:mm")
@@ -298,6 +298,7 @@ ShellRoot {
 
                         Text {
                             id: clock
+                            textFormat: Text.RichText
                             anchors.centerIn: parent
                             color: root.foreground
                             font.family: "Comic Code Ligatures"
@@ -307,8 +308,12 @@ ShellRoot {
                             function update() {
                                 const date = new Date()
                                 const weekdays = ["日", "月", "火", "水", "木", "金", "土"]
-                                text = Qt.formatDateTime(date, "yyyy年M月d日")
-                                     + "(" + weekdays[date.getDay()] + ") "
+                                const number = value => '<span style="color: #ff6b9d;">' + value + '</span>'
+                                const kanji = value => '<span style="font-size: 6px; color: #a99aa5;">' + value + '</span>'
+                                text = number(Qt.formatDateTime(date, "yyyy")) + kanji("年")
+                                     + number(Qt.formatDateTime(date, "MM")) + kanji("月")
+                                     + number(Qt.formatDateTime(date, "dd")) + kanji("日")
+                                     + "&nbsp;" + weekdays[date.getDay()] + " "
                                      + Qt.formatTime(date, "HH:mm")
                             }
 
