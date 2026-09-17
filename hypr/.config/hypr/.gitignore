@@ -1,1 +1,4 @@
 setup_specific.conf
+
+# A session still watching the old path may regenerate this legacy stub.
+hyprland.conf
