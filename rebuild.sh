@@ -2,10 +2,9 @@
 set -e
 
 nixhost=$(cat nixhost)
-git add nix flake.nix
 sudo nix flake lock
-git add flake.lock
+git add .
 echo "NixOS Rebuilding and switching for host $nixhost"
-sudo nixos-rebuild --flake ".#$nixhost" switch # || (cat nixos-switch.log | grep --color error && false)
+time nh os switch . --hostname "$nixhost"
 gen=$(nixos-rebuild list-generations | grep current)
 git commit -m "${nixhost}: $gen"

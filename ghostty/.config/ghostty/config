@@ -1,8 +1,72 @@
+# Match kitty/.config/kitty/kitty.conf.
+font-family = "Comic Code Ligatures"
+font-size = 8
+
 window-decoration = false
 confirm-close-surface = false
-font-family = "Comic Code Ligatures"
-font-size = 14
-theme = GruvboxDark
+window-padding-x = 0
+window-padding-y = 0
+window-padding-balance = true
 
-keybind = unconsumed:ctrl+enter=ignore
-keybind = unconsumed:ctrl+shift+n=ignore
+# Slightly custom Gruvbox palette
+foreground = #ebdbb2
+background = #272727
+selection-foreground = #655b53
+selection-background = #ebdbb2
+cursor-color = #cccccc
+cursor-text = #111111
+palette = 0=#272727
+palette = 1=#cc231c
+palette = 2=#989719
+palette = 3=#d79920
+palette = 4=#448488
+palette = 5=#b16185
+palette = 6=#689d69
+palette = 7=#a89983
+palette = 8=#928373
+palette = 9=#fb4833
+palette = 10=#b8ba25
+palette = 11=#fabc2e
+palette = 12=#83a597
+palette = 13=#d3859a
+palette = 14=#8ec07b
+palette = 15=#ebdbb2
+
+# Allow OSC 52 writes (including tmux), but never reads. Ghostty replaces
+# clipboard contents, so Kitty's no-append workaround isn't needed.
+clipboard-read = deny
+clipboard-write = allow
+clipboard-trim-trailing-spaces = false
+# On Linux, select into PRIMARY only; Ctrl+Shift+C copies to the clipboard.
+copy-on-select = true
+
+# Silent bell, but retain attention/title notifications.
+bell-features = no-system,no-audio,attention,title,no-border
+
+# Pass these keys to applications, like Kitty's no_op mappings.
+# Also retain the old Ghostty config's Ctrl+Enter passthrough.
+keybind = ctrl+enter=unbind
+keybind = ctrl+shift+n=unbind
+keybind = ctrl+shift+e=unbind
+
+# Let tmux select window 6. Ghostty otherwise opens a screen dump in the
+# default text-file application with this shortcut.
+keybind = ctrl+alt+shift+j=unbind
+
+# Familiar Kitty shortcuts; other Ghostty defaults remain available.
+keybind = ctrl+shift+s=paste_from_selection
+keybind = ctrl+shift+up=scroll_page_lines:-1
+keybind = ctrl+shift+down=scroll_page_lines:1
+keybind = ctrl+shift+page_up=scroll_page_up
+keybind = ctrl+shift+page_down=scroll_page_down
+keybind = ctrl+shift+home=scroll_to_top
+keybind = ctrl+shift+end=scroll_to_bottom
+keybind = ctrl+shift+equal=increase_font_size:2
+keybind = ctrl+shift+minus=decrease_font_size:2
+keybind = ctrl+shift+backspace=reset_font_size
+keybind = ctrl+shift+w=close_surface
+keybind = ctrl+shift+q=close_tab:this
+keybind = ctrl+shift+f2=open_config
+keybind = ctrl+shift+f5=reload_config
+keybind = ctrl+shift+f10=toggle_maximize
+keybind = ctrl+shift+f11=toggle_fullscreen

@@ -5,7 +5,6 @@
 }:
 {
   environment.systemPackages = [
-    pkgs.sonarlint-ls
 
     pkgs.typescript
     pkgs.typescript-language-server
@@ -47,9 +46,6 @@
     upkgs.zls
     upkgs.zig
 
-    pkgs.kotlin
-    pkgs.kotlin-language-server
-    pkgs.openjdk
-    pkgs.gradle
+    pkgs.gdb
   ];
 }

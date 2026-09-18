@@ -9,4 +9,5 @@
 
   users.users.yanis.extraGroups = [ "docker" ];
 
+  virtualisation.docker.daemon.settings.features.cdi = true;  # Enables Container Device Interface for GPU access.
 }

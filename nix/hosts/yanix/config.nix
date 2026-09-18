@@ -1,5 +1,6 @@
-{ 
+{
   pkgs,
+  upkgs,
   pkg_zen-browser,
   ...
 }:
@@ -7,6 +8,8 @@
   imports = [
     ./hardware.nix
     ../../modules/shared_config.nix
+    ./tuxedo_keyboard.nix
+    ./matobadrive.nix
   ];
 
   networking.hostName = "yanix";
@@ -18,17 +21,41 @@
   boot.loader.grub.efiSupport = true;
   boot.loader.grub.useOSProber = true;
 
+  boot.kernel.sysctl = {
+    "vm.swappiness" = 80;
+  };
+
   services.openssh.enable = true;
 
   environment.systemPackages = [
     pkgs.sparrow # adds user to extragroups = plugdev
     pkg_zen-browser
-    pkgs.anki
+    upkgs.anki
+    pkgs.osu-lazer-bin
+    pkgs.python313Packages.faster-whisper
+    pkgs.prismlauncher # minecraft launcher
+    upkgs.sillytavern
+    pkgs.ollama
   ];
   # users.groups.plugdev = {};
   users.users.yanis.extraGroups = [ "plugdev" ];
 
-  nix.settings.trusted-users = [ "root" "yanis" ];
+  nix.settings.trusted-users = [
+    "root"
+    "yanis"
+  ];
+
+  # Disable keyboard backlight on boot
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="leds", KERNEL=="*kbd_backlight*", ATTR{brightness}="0"
+  '';
+
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+    localNetworkGameTransfers.openFirewall = true; # Open ports in the firewall for Steam Local Network Game Transfers
+  };
 
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.

@@ -1,9 +1,8 @@
 return {
 	"stevearc/oil.nvim",
-	opts = {},
 	-- Optional dependencies
 	dependencies = { "nvim-tree/nvim-web-devicons" },
-	config = {
+	opts = {
 		skip_confirm_for_simple_edits = true,
 	},
 	init = function()

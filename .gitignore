@@ -1,3 +1,13 @@
 packer_compiled.lua
 lazy-lock.json
 nixhost
+
+# Fcitx5: generated layout cache and mutable runtime profile.
+/fcitx5/.config/fcitx5/conf/cached_layouts
+/fcitx5/.config/fcitx5/profile
+
+# Quickshell: Python bytecode and locally saved launcher commands.
+/quickshell/**/__pycache__/
+/quickshell/**/*.py[cod]
+/quickshell/.config/quickshell/commands.json
+/quickshell/.config/quickshell/commands.json.tmp

@@ -1,0 +1,7 @@
+#!/bin/sh
+CURRENT=$(hyprctl getoption cursor:zoom_factor -j | jq -r '.float')
+if (( $(echo "$CURRENT > 1.05" | bc -l) )); then
+    hyprctl keyword cursor:zoom_factor 1.0
+else
+    hyprctl keyword cursor:zoom_factor 2.0
+fi

@@ -1,10 +1,16 @@
 {
-  config,
+  upkgs,
   pkgs,
   inputs,
   pkg_ghostty,
   ...
 }:
+let
+  ud-digi-kyokasho = pkgs.callPackage ./pkgs/ud-digi-kyokasho.nix { };
+  mogiha-pen = pkgs.callPackage ./pkgs/mogiha-pen.nix { };
+  _851tegaki_zatsu = pkgs.callPackage ./pkgs/851tegaki_zatsu.nix { };
+  chirufont = pkgs.callPackage ./pkgs/chirufont.nix { };
+in
 {
   imports = [
     ./keyboard.nix
@@ -12,7 +18,19 @@
     ./devtools.nix
     ./docker.nix
     ./wireshark.nix
+    ./nvidia.nix
   ];
+
+  nix.settings = {
+    substituters = [
+      "https://cache.nixos.org"
+      "https://nix-community.cachix.org"
+    ];
+    trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    ];
+  };
 
   users.users.yanis = {
     isNormalUser = true;
@@ -22,16 +40,22 @@
     shell = pkgs.nushell;
   };
 
+  programs.nh = {
+    enable = true;
+    clean.enable = true;
+    clean.extraArgs = "--keep-since 4d --keep 3";
+    flake = "/home/user/dotfiles"; # sets NH_OS_FLAKE variable for you
+  };
+
   services.tailscale.enable = true;
 
-  
   systemd.timers."dotfile-fetch" = {
     wantedBy = [ "timers.target" ];
-      timerConfig = {
-        OnBootSec = "1m";
-        OnUnitActiveSec = "1m";
-        Unit = "dotfile-fetch.service";
-      };
+    timerConfig = {
+      OnBootSec = "1m";
+      OnUnitActiveSec = "1m";
+      Unit = "dotfile-fetch.service";
+    };
   };
 
   systemd.services."dotfile-fetch" = {
@@ -84,7 +108,9 @@
     pkgs.oh-my-zsh
     pkgs.zsh-autocomplete
     pkgs.zsh-autosuggestions
-    pkgs.brave
+    upkgs.brave
+    pkgs.kdePackages.kwallet # brave needs
+    pkgs.kdePackages.kwalletmanager # brave needs
     pkgs.fzf
     pkgs.unzip
     pkgs.waybar
@@ -101,14 +127,12 @@
     pkgs.nix-search-cli
     pkgs.cachix
     pkgs.file
-    pkgs.openai-whisper # TODO: remove
     pkgs.cryptomator
     pkgs.obsidian
     pkgs.tofi
     pkgs.wofi
     pkgs.libreoffice
     pkgs.kdePackages.okular
-    pkgs.gimp
     pkgs.i3
     pkgs.lmms
     pkgs.gammastep
@@ -126,8 +150,6 @@
     pkgs.gromit-mpx # draw on screen
     pkgs.ghidra
     pkgs.direnv
-    pkgs.devenv
-    pkgs.aichat # llm cli
     pkgs.obs-studio
     pkgs.ncdu
     pkgs.tokei # code statistics
@@ -136,9 +158,19 @@
     pkgs.ncspot # ncurses spotify client
     pkgs.audacity
     pkgs.code-cursor
+    pkgs.xdg-desktop-portal-hyprland
+    pkgs.kitty
+    pkgs.mpv
+    pkgs.vlc
+    pkgs.qbittorrent
+    pkgs.tor-browser
+    pkgs.protonvpn-gui
+    pkgs.ffmpeg
+    pkgs.typst
+    pkgs.google-chrome
+    pkgs.ags
+    pkgs.gimp
   ];
-
-
 
   environment.sessionVariables = {
     PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
@@ -148,14 +180,23 @@
     cleartoficache.text = "rm -f /home/yanis/.cache/tofi-drun"; # https://github.com/philj56/tofi/issues/115
   };
 
-  fonts.packages = [
-    pkgs.noto-fonts
-    pkgs.noto-fonts-cjk-sans
-    pkgs.noto-fonts-emoji
-    pkgs.nerd-fonts.symbols-only
-  ];
+  fonts = {
+    fontDir.enable = true;
+    packages = [
+      pkgs.noto-fonts
+      pkgs.noto-fonts-cjk-sans
+      pkgs.noto-fonts-color-emoji
+      pkgs.nerd-fonts.symbols-only
+      pkgs.pkgs.ipafont
+      ud-digi-kyokasho
+      mogiha-pen
+      # _851tegaki_zatsu # This font causes issue with korean characters
+      chirufont
+    ];
+  };
 
   programs.gnupg.agent.enable = true;
+  programs.nix-ld.enable = true;
 
   services.greetd = {
     enable = true;
@@ -165,68 +206,25 @@
         user = "yanis";
       };
       default_session = {
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --user-menu --cmd Hyprland";
+        command = "${pkgs.tuigreet}/bin/tuigreet --time --user-menu --cmd Hyprland";
         user = "greeter";
       };
     };
   };
 
+  security.pam.services.hyprland.kwallet.enable = true;
+
+  services.upower.enable = true; # brave wants
+
   hardware.opentabletdriver.enable = true;
   hardware.opentabletdriver.daemon.enable = true;
 
-  # Needed for NVIDIA, might want to only allow unfree NVIDIA
   nixpkgs.config.allowUnfree = true;
-
-  hardware.graphics = {
-    enable = true;
-  };
-
-  # Load nvidia driver for Xorg and Wayland
-  services.xserver.videoDrivers = [ "nvidia" ];
-
-  hardware.nvidia = {
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
-
-    # Modesetting is required
-    modesetting.enable = true;
-
-    # Nvidia power management. Experimental, and can cause sleep/supend to fail.
-    # Enable this is you have graphical corruption issues or application crashes after waking
-    # up from sleep. This fixes it by saving the entire VRAM memory to /tmp/ instead
-    # of just the base essentials.
-    powerManagement.enable = false;
-
-    # Fine-grained power management. Turns off GPU when not in use.
-    # Experimental and only works on modern Nvidia GPUs (Turing or newer).
-    powerManagement.finegrained = false;
-
-    # Use the NVidia open source kernel module (not to be confused with the
-    # independant third-party "nouveau" open source driver).
-    # Support is limited to the Turing and later architectures. Full list of
-    # supported GPUs is at:
-    # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus
-    # Only available from driver 515.43.04+
-    # Currently alpha-quality/buggy, so false is currently the recommanded setting.
-    open = false;
-
-    # Enable the Nvidia settings menu,
-    # accessible via `nvidia-settings`.
-    nvidiaSettings = true;
-
-    prime = {
-      offload = {
-        enable = true;
-        enableOffloadCmd = true;
-      };
-      # Found using `lshw -c display`
-      intelBusId = "PCI:0:2:0";
-      nvidiaBusId = "PCI:1:0:0";
-    };
-  };
 
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   networking.networkmanager.enable = true; # Easiest to use and most distros use this by default.
+  users.extraGroups.networkmanager.members = [ "yanis" ];
 
   # Set your time zone.
   time.timeZone = "Asia/Tokyo";
@@ -288,7 +286,11 @@
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  networking.firewall = {
+    enable = true;
+    allowedUDPPorts = [ 4445 ]; # minecraft lan discovery
+    allowedTCPPorts = [ 25565 ]; # temporary minecraft lan
+  };
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you

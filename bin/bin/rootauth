@@ -1,0 +1,3 @@
+#!/bin/sh
+p=$(docker volume inspect -f '{{.Mountpoint}}' appliance_Data)
+sudo cat "$p/Authorities.txt"

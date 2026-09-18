@@ -2,7 +2,7 @@
   description = "Yanis system";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
 
     # rust toolchain
@@ -27,16 +27,17 @@
       ...
     }@inputs:
     let
-      upkgs = inputs.nixpkgs-unstable.legacyPackages.x86_64-linux;
+      system = "x86_64-linux";
+      upkgs = inputs.nixpkgs-unstable.legacyPackages.${system};
     in
     {
-      packages.x86_64-linux.default = fenix.packages.x86_64-linux.minimal.toolchain;
+      packages.${system}.default = fenix.packages.${system}.minimal.toolchain;
 
       nixosConfigurations.yanix = nixpkgs.lib.nixosSystem {
         specialArgs = rec {
-          system = "x86_64-linux";
           inherit inputs;
           inherit upkgs;
+          inherit system;
           pkg_ghostty = ghostty.packages.${system}.default;
           pkg_zen-browser = zen-browser.packages.${system}.specific;
         };

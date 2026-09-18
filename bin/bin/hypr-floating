@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+hyprctl dispatch exec '[float; center; size monitor_w*0.9 monitor_h*0.9; ] kitty' $@

@@ -26,7 +26,7 @@ export def "from .env" []: string -> record {
   lines 
     | split column '#' 
     | get column1 
-    | filter {($in | str length) > 0} 
+    | where {$in | str length > 0} 
     | parse "{key}={value}"
     | update value {str trim -c '"'}
     | transpose -r -d
@@ -157,6 +157,7 @@ alias lll = exa -abghHliS
 alias vi = nvim
 
 alias fuck = killall -9
+alias fu = tmux kill-session -t v
 
 alias lk = sudo docker compose --profile lk
 
@@ -171,7 +172,7 @@ alias "docker compose" = echo 'use `dc` for docker compose'
 source ~/.cache/carapace/init.nu
 
 $env.config.hooks.env_change.PWD = (
-    $env.config.hooks.env_change | get -i PWD | default [] | append (
+    $env.config.hooks.env_change | get --optional PWD | default [] | append (
         { ||
             if (which direnv | is-empty) {
                 return

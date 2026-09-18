@@ -1,37 +1,48 @@
--- Autoformat
+local find_ruff_cmd = function()
+	local local_ruff = vim.fn.getcwd() .. "/.venv/bin/ruff"
+	if vim.fn.executable(local_ruff) == 1 then
+		return local_ruff
+	else
+		return "ruff"
+	end
+end
+
 return {
 	"stevearc/conform.nvim",
-	lazy = false,
-	keys = {
-		{
-			"<leader>w",
-			function()
-				require("conform").format({ async = true, lsp_fallback = true })
-			end,
-			mode = "",
-			desc = "Format buffer",
-		},
-	},
+	event = { "BufWritePre" },
+	cmd = { "ConformInfo" },
 	opts = {
-		notify_on_error = true,
-		format_on_save = function(bufnr)
-			local disable_filetypes = { c = true, cpp = true }
-			return {
-				timeout_ms = 500,
-				lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
-			}
-		end,
 		formatters_by_ft = {
+			python = { "ruff_fix", "ruff_format", "ruff_organize_imports" },
 			lua = { "stylua" },
-			c = { "clang-format" },
-			cpp = { "clang-format" },
-
-			-- TODO: ? python = { "isort", "black" },
-			python = { "black" },
-
-			javascript = { "eslint_d" },
-			typescript = { "eslint_d" },
+			javascript = { "prettier" },
+			typescript = { "prettier" },
+			go = { "gofmt" },
+			ada = { lsp_format = "prefer" },
 		},
-		log_level = vim.log.levels.DEBUG,
+
+		format_on_save = {
+			timeout_ms = 1000,
+			lsp_fallback = false,
+			async = false,
+		},
+
+		formatters = {
+			ruff_fix = {
+				command = find_ruff_cmd,
+				args = { "check", "--fix", "--exit-zero", "--stdin-filename", "$FILENAME", "-" },
+				stdin = true,
+			},
+			ruff_format = {
+				command = find_ruff_cmd,
+				args = { "format", "--stdin-filename", "$FILENAME", "-" },
+				stdin = true,
+			},
+			ruff_organize_imports = {
+				command = find_ruff_cmd,
+				args = { "check", "--select", "I", "--fix", "--exit-zero", "--stdin-filename", "$FILENAME", "-" },
+				stdin = true,
+			},
+		},
 	},
 }
