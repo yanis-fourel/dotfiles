@@ -88,7 +88,7 @@ hl.config({
 hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
 hl.device({ name = "epic-mouse-v1", sensitivity = -0.5 })
 
-hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd("kitty --hold sh -c 'tmux a -t root || tmux new -s root'"))
+hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd("ghostty --wait-after-command=true -e sh -c 'tmux a -t root || tmux new -s root'"))
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
