@@ -51,7 +51,8 @@ RowLayout {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: Quickshell.execDetached([
-                    "hyprctl", "dispatch", "workspace", String(parent.workspaceId)
+                    "hyprctl", "dispatch",
+                    "hl.dsp.focus({workspace = " + String(parent.workspaceId) + "})"
                 ])
             }
         }

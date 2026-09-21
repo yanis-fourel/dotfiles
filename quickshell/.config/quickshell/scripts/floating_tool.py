@@ -17,8 +17,22 @@ TOOLS = {
 CONFIG = Path(os.environ.get('XDG_CONFIG_HOME', str(Path.home() / '.config'))) / 'quickshell/commands.json'
 
 
-def dispatch(*args):
-    subprocess.run(['hyprctl', 'dispatch', *args], check=True, capture_output=True, timeout=10)
+def lua_string(value):
+    """Quote text for Lua, independently of shell argument quoting."""
+    return '"' + ''.join(
+        '\\' + char if char in ('"', '\\') else
+        f'\\{ord(char):03d}' if ord(char) < 32 else char
+        for char in value
+    ) + '"'
+
+
+def dispatch(expression):
+    # With a Lua config, hyprctl dispatch wraps this in hl.dispatch(...).
+    result = subprocess.run(['hyprctl', 'dispatch', expression],
+                            capture_output=True, text=True, timeout=10)
+    output = (result.stdout + result.stderr).strip()
+    if result.returncode or output.startswith('error:'):
+        raise RuntimeError(output or 'Hyprland dispatch failed')
 
 
 def launch(tool, replacement=None, url=''):
@@ -49,11 +63,13 @@ def launch(tool, replacement=None, url=''):
         existing = next((c for c in clients if command == default and
                          (c['class'] == app_class or (tool == 'audio' and 'pavucontrol' in c['class'].lower()))), None)
         if existing:
-            selector = 'address:' + existing['address']
-            dispatch('setfloating', selector)
-            dispatch('focuswindow', selector)
+            selector = lua_string('address:' + existing['address'])
+            dispatch(f'hl.dsp.window.float({{action = "on", window = {selector}}})')
+            dispatch(f'hl.dsp.focus({{window = {selector}}})')
         else:
-            dispatch('exec', f'[float; size {size}; center] {shlex.join(argv)}')
+            width, height = map(int, size.split())
+            dispatch(f'hl.dsp.exec_cmd({lua_string(shlex.join(argv))}, '
+                     f'{{float = true, size = {{{width}, {height}}}, center = true}})')
     if replacement is not None:
         saved[tool] = command
         CONFIG.parent.mkdir(parents=True, exist_ok=True)
