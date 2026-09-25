@@ -11,3 +11,12 @@ nixhost
 /quickshell/**/*.py[cod]
 /quickshell/.config/quickshell/commands.json
 /quickshell/.config/quickshell/commands.json.tmp
+
+# Icons: generated application icons, not cursor themes.
+/hyprcursor_themes/.local/share/icons/distrobox/
+/hyprcursor_themes/.local/share/icons/hicolor/
+
+# Nushell: local command history and SQLite sidecar files.
+/nushell/.config/nushell/history.txt
+/nushell/.config/nushell/history.sqlite3
+/nushell/.config/nushell/history.sqlite3-*
