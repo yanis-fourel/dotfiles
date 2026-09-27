@@ -344,6 +344,10 @@ ShellRoot {
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 5
 
+                        LinearCounter {
+                            foreground: root.foreground
+                        }
+
                         StatusPill {
                             id: aiPill
                             text: root.codexLabel(root.codexData)
