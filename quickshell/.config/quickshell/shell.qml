@@ -17,6 +17,12 @@ ShellRoot {
     readonly property var bluetoothData: parseJson(bluetoothStatus.output)
     readonly property var updateData: parseJson(updateStatus.output)
     property string profileMessage: ""
+    readonly property var hypruseData: parseJson(hypruseStatus.output)
+    StatusCommand {
+        id: hypruseStatus
+        interval: 1000
+        command: ["python3", Quickshell.shellDir + "/scripts/hypruse_activity.py"]
+    }
 
     Process {
         id: profileChange
@@ -244,6 +250,7 @@ ShellRoot {
                     border.width: 1
 
                     Row {
+                        id: leftStatusRow
                         anchors.left: parent.left
                         anchors.leftMargin: 5
                         anchors.verticalCenter: parent.verticalCenter
@@ -281,6 +288,7 @@ ShellRoot {
                             onClicked: barWindow.togglePopup(memoryPopup)
                         }
                         Workspaces { }
+                        HypruseActivity { state: root.hypruseData }
                         StatusPill {
                             text: submap.output
                             foreground: root.foreground
@@ -289,6 +297,9 @@ ShellRoot {
 
                     Rectangle {
                         anchors.centerIn: parent
+                        // Expanded desktop activity must never overlap the clock.
+                        anchors.horizontalCenterOffset: Math.max(0, leftStatusRow.width + 15 - (barWindow.width - width) / 2)
+                        visible: x + width + 10 < rightStatusRow.x
                         id: clockButton
                         implicitWidth: clock.implicitWidth + 12
                         implicitHeight: 22
@@ -339,6 +350,7 @@ ShellRoot {
                     }
 
                     Row {
+                        id: rightStatusRow
                         anchors.right: parent.right
                         anchors.rightMargin: 5
                         anchors.verticalCenter: parent.verticalCenter

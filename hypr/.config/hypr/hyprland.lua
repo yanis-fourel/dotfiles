@@ -96,6 +96,8 @@ hl.bind(mainMod .. " + L", hl.dsp.exec_cmd(launcher))
 hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("screenshot.sh"))
 hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("hyprlock"))
 hl.bind(mainMod .. " + J", hl.dsp.exec_cmd("devjournal"))
+-- Desktop-agent panic key: abort tracked Pi runs and stop hypruse input.
+hl.bind(mainMod .. " + SHIFT + BackSpace", hl.dsp.exec_cmd("python3 ~/.config/quickshell/scripts/hypruse_activity.py stop"), { locked = true })
 
 for _, direction in ipairs({ "left", "right", "up", "down" }) do
     hl.bind(mainMod .. " + " .. direction, hl.dsp.focus({ direction = direction }))
