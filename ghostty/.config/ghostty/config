@@ -2,6 +2,10 @@
 font-family = "Comic Code Ligatures"
 font-size = 8
 
+# Ghostty 1.3.1 needs distinct conditional themes to report dark mode correctly.
+# Explicit colours below override these themes (ghostty-org/ghostty#13604).
+theme = light:Rose Pine Dawn,dark:Rose Pine
+window-theme = dark
 window-decoration = false
 confirm-close-surface = false
 window-padding-x = 0
